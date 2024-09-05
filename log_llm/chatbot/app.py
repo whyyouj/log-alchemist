@@ -5,7 +5,7 @@ import os
 import time
 from small_llm import get_chat_engine
 
-st.title("Log Analysis")
+st.title("Log Analysis 📊")
 
 col1, col2 = st.columns([5, 0.5])
 
@@ -57,9 +57,17 @@ llm = st.radio(label="Choose your llm:",
          options = [':rainbow[llama3]', '***llama3-groq-tool-use***', 'mistral', 'phi'])
 
 
-question = st.text_input("Question")
+st.title("Chat 🦾")
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-if st.button("Submit"):
+for message in st.session_state.messages:
+    with st.chat_message(message['role']):
+        st.markdown(message["content"])
+        
+if prompt := st.chat_input("Ask a Question"):
+    st.chat_message("user").markdown(prompt)
+    st.session_state.messages.append({"role":"user", "content":prompt})
     with st.spinner('Processing'):
         if llm == ':rainbow[llama3]':
             model_name = 'llama3'
@@ -71,8 +79,12 @@ if st.button("Submit"):
             model_name = 'phi'
         
         model = get_chat_engine(model_name)
-        response = model.stream_chat(question)
+        response = model.stream_chat(prompt)
         response_str = ''
         for r in response.response_gen:
             response_str += r
-        st.text_area('Resposne:', value = response_str, height = 150)
+        #st.text_area('Resposne:', value = response_str, height = 150)
+    response = f"{model_name}: {response_str}" 
+    with st.chat_message("assistant"):
+        st.markdown(response)
+    st.session_state.messages.append({"role": "assistant", "content":response})
