@@ -22,8 +22,8 @@ def get_chat_engine(model):
     llm_model            = Ollama(base_url='http://localhost:11434',model=model,request_timeout=300.0)
     Settings.llm         = llm_model
     
-    collections          = [ 'devguide_collection','logs_collection']
-    # collections = [f'{folder}_collection' for folder in os.listdir('../data')  if folder != '.DS_Store']
+    # collections          = [ 'pdf_collection','logs_collection']
+    collections = [f'{folder}_collection' for folder in os.listdir('../data')  if folder != '.DS_Store']
     #indices              = ['vector_index', 'vector_index'] #['devguide_idx','logs_idx']
     indices = ['vector_index' for _ in os.listdir('../data')]
     print(collections, indices)
