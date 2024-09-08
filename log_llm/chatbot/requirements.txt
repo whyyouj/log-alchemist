@@ -12,3 +12,4 @@ llama-index-storage-docstore-mongodb
 llama-index-vector-stores-mongodb
 llama-index-storage-index-store-mongodb
 llama-index-llms-ollama
+python-getenv
