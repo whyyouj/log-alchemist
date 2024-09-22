@@ -8,3 +8,5 @@ log_llm_v0/
 a3/
 streamlit/
 llm/
+llm.egg-info/
+build/
