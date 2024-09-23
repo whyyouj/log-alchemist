@@ -1,1 +1,4 @@
 __pycache__
+llm/
+log_llm/
+streamlit/

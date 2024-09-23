@@ -1,6 +1,6 @@
 from dash import Dash, Input, Output,State, dcc, no_update, html
 import dash_bootstrap_components as dbc
-from system_log import event_freq, component_freq, user_freq, top_spikes, inactivity, potential_shut_down, correlation_analysis
+from system_log import event_freq, component_freq, user_freq, top_spikes, inactivity, potential_shut_down, correlation_analysis, error_analysis, top_spikes_analysis
 class App:
     def __init__(self):
         self.app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -67,8 +67,10 @@ class App:
                         dcc.Graph(figure = user_freq()),
                         html.H2('Anomaly Detection'),
                         dcc.Graph(figure = top_spikes()),
+                        dcc.Graph(figure = top_spikes_analysis()),
                         dcc.Graph(figure = inactivity()),
                         dcc.Graph(figure = potential_shut_down()),
+                        dcc.Graph(figure = error_analysis()),
                         html.H2('Correlation Analysis'),
                         dcc.Graph(figure = correlation_analysis())
                     ])

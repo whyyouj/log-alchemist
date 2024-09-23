@@ -142,6 +142,38 @@ def top_spikes():
     )
     return fig
 
+def top_spikes_analysis():
+    fouth_of_july_df = structured_system_log_df[(structured_system_log_df['Month']=='Jul') & (structured_system_log_df['Date']== 4)]
+    spike_df = fouth_of_july_df[(fouth_of_july_df["Time"] >= "23:22:00") & (fouth_of_july_df["Time"] < "23:23:00")]
+    spike_df_plotly = spike_df.groupby(["EventId"])["EventId"].value_counts().reset_index()
+    event_list = []
+    for i in list(spike_df_plotly["EventId"]):
+        temp_str = str(i)
+        template_event =  template_system_log_df[template_system_log_df["EventId"] == i]["EventTemplate"]
+        event_list.append(temp_str + ": \n" + template_event)
+    fig = make_subplots(
+        rows = 1,
+        cols = 1,
+        specs =[[{"type": "table"}]]
+        )    
+    fig.add_trace(go.Table(
+    columnwidth=[3, 1],
+    header = dict(values=['EventId and Type','Count'], align=['left']),
+    cells = dict(values=[
+        event_list, 
+        list(spike_df_plotly['count'])
+        ], align= ["left"], font = dict( size=10)
+    )
+    ),
+                  row=1,
+                  col=1)
+    fig.update_layout(
+        title_text = "Events that occured during the highest spike",
+        height = 300
+    )
+
+    return fig
+
 
 def inactivity():
     date_time_structured_system_log_df = structured_system_log_df
@@ -206,6 +238,34 @@ def potential_shut_down():
 
     return fig
 
+def error_analysis():
+    error_keywords = ['error']
+    error_logs = structured_system_log_df[structured_system_log_df['Content'].str.contains('|'.join(error_keywords), case=False, na=False)]
+    error_logs_plotly = error_logs.groupby("EventId")["EventId"].value_counts().nlargest(5)
+    error_logs_plotly = error_logs_plotly.reset_index()
+
+    
+    fig = make_subplots(
+        rows = 1,
+        cols = 1,
+        specs =[[{"type": "table"}]]
+        )    
+    fig.add_trace(go.Table(
+    columnwidth=[1, 1],
+    header = dict(values=['EventId','Count'], align=['left']),
+    cells = dict(values=[
+        list(error_logs_plotly['EventId']), 
+        list(error_logs_plotly['count'])
+        ], align= ["left"], font = dict( size=10)
+    )
+    ),
+                  row=1,
+                  col=1)
+    fig.update_layout(
+        title_text = "Top 5 Events with potential error",
+        height = 300
+    )
+    return fig
 
 
 def correlation_analysis():
@@ -259,7 +319,6 @@ def correlation_analysis():
 
     fig.update_xaxes(visible=False, constrain="domain", scaleanchor="y", row=1, col=2)
     fig.update_yaxes(visible=False, row=1, col=2)#domain=[0.5, 1],
-    fig.show()
     return fig
 
 
