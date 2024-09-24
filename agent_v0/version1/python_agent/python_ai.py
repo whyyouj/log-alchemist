@@ -17,13 +17,13 @@ class Python_Ai:
         return Agent_Ai(model=self.model, temperature=self.temperature, df=self.df)
         
     def pandas_agent(self,query, verbose = False, return_intermediate_steps=True, handle_parsing_error =True, max_iterations=1, allow_dangerous_code=True ):
-        llm = self.get_llm()
+        llm = self.get_llm().llm
         pd_agent = create_pandas_dataframe_agent(llm= llm, df = self.df, verbose=verbose, return_intermediate_steps=return_intermediate_steps, max_iterations=max_iterations, allow_dangerous_code= allow_dangerous_code, handle_parsing_error=handle_parsing_error)
         out = pd_agent.invoke(query)
         return out
     
     def pandas_ai_agent(self, query):
-        llm = self.get_llm()
+        llm = self.get_llm().llm
 
         # Running PandasAI
         pandas_ai = SmartDataframe(self.df, config = {
@@ -84,4 +84,7 @@ class Python_Ai:
         output, input_code = self.code_parser(python_code)
         return output, input_code
         
-        
+
+if __name__== "__main__":
+    llm = Python_Ai()
+    print(llm.get_llm())
