@@ -1,11 +1,2 @@
 __pycache__
-advance_rag/
-agent_tut/
-llmama_db/
-vantage/
-log_llm_v0/
-a3/
-streamlit/
-llm/
-llm.egg-info/
 build/
