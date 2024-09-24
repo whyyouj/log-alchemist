@@ -8,7 +8,7 @@ from pandasai import SmartDataframe
 import re
 
 class Python_Ai:
-    def __init__(self, model = "llama3", df =None, temperature=0):
+    def __init__(self, model = "llama3.1", df =None, temperature=0):
         self.model = model
         self.temperature = temperature
         self.df = df
@@ -27,7 +27,8 @@ class Python_Ai:
 
         # Running PandasAI
         pandas_ai = SmartDataframe(self.df, config = {
-            "llm" : llm
+            "llm" : llm,
+            "enable_cache" : False
         })
 
         out = pandas_ai.chat(query)
