@@ -10,3 +10,5 @@ streamlit/
 llm/
 llm.egg-info/
 build/
+cache/
+exports/
