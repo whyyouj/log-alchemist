@@ -3,6 +3,8 @@ from langchain_experimental.tools import PythonAstREPLTool
 from langchain_experimental.utilities import PythonREPL
 from langchain_community.llms import Ollama
 from regular_agent.agent_ai import Agent_Ai
+from pandasai import SmartDataframe
+
 import re
 
 class Python_Ai:
@@ -18,6 +20,17 @@ class Python_Ai:
         llm = self.get_llm()
         pd_agent = create_pandas_dataframe_agent(llm= llm, df = self.df, verbose=verbose, return_intermediate_steps=return_intermediate_steps, max_iterations=max_iterations, allow_dangerous_code= allow_dangerous_code, handle_parsing_error=handle_parsing_error)
         out = pd_agent.invoke(query)
+        return out
+    
+    def pandas_ai_agent(self, query):
+        llm = self.get_llm()
+
+        # Running PandasAI
+        pandas_ai = SmartDataframe(self.df, config = {
+            "llm" : llm
+        })
+
+        out = pandas_ai.chat(query)
         return out
     
     
