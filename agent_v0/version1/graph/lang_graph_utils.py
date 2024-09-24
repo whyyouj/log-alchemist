@@ -3,7 +3,7 @@ from regular_agent.agent_ai import Agent_Ai
 from python_agent.python_ai import Python_Ai
 from graph_agent.graph_ai import Graph_Ai
 
-DF = pd.read_csv("../../../data/mac/Mac_2k.log_structured.csv")
+DF = pd.read_csv("../../data/mac/Mac_2k.log_structured.csv")
 
 def start_agent(state: list):
     print('start agent')
