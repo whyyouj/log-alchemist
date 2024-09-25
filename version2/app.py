@@ -3,6 +3,7 @@ from PIL import Image, ImageEnhance
 import logging
 import base64
 import time
+from version_2.graph import lang_graph
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -107,7 +108,21 @@ def on_chat_submit(chat_input):
     st.session_state.conversation_history.append({"role": "user", "content": user_input})
 
     try:
-        assistant_reply = ""
+        
+        # import matplotlib.pyplot
+        # import pandas as pd
+        # df = pd.read_csv('../EDA/data/mac/Mac_2k.log_structured.csv')
+        # import pandasai as pai
+        # from langchain_community.llms import Ollama
+        
+        # llm = Ollama(
+        #     model = "llama3.1",
+        #     temperature = 0.2
+        # )
+        # pandas_ai_agent = pai.SmartDataframe(df, config={"llm":llm})
+        # pandas_ai_agent.chat(user_input)
+        time.sleep(1)
+        assistant_reply = len(st.session_state.history)
 
 
         st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
@@ -352,28 +367,68 @@ def main():
         
 
     if st.session_state.mode == "Chat with VantageAI":
-        chat_input = st.chat_input("Ask me about a question:")
-
-        if chat_input:
-            on_chat_submit(chat_input)
-
-        # Display chat history
+        
+        st.markdown(
+                    """
+                    <style>
+                        .stChatMessage.st-emotion-cache-1c7y2kd.eeusbqq4 {
+                            flex-direction: row-reverse; /* Align children to the right */
+                            text-align: right; /* Align text to the right */
+                        }
+                    </style>
+                    """,
+                        unsafe_allow_html=True,
+                    )
+        
         for message in st.session_state.history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-            role = message["role"]
+                    role = message["role"]
+                    avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+                    with st.chat_message(role, avatar=avatar_image):
+                        st.write(message["content"])
+        
+        if chat_input := st.chat_input("Ask a question:"):
+
+            role = "user"
             avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
-            st.markdown(
-            """
-            <style>
-                .stChatMessage.st-emotion-cache-1c7y2kd.eeusbqq4 {
-                    flex-direction: row-reverse; /* Align children to the right */
-                    text-align: right; /* Align text to the right */
-                }
-            </style>
-             """,
-                unsafe_allow_html=True,
-            )
             with st.chat_message(role, avatar=avatar_image):
-                st.write(message["content"])
+                        st.write(chat_input)
+                        
+            with st.spinner("thinking..."):
+                on_chat_submit(chat_input)
+            role = st.session_state.history[-1]['role']
+            content = st.session_state.history[-1]['content']
+            avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+            with st.chat_message(role, avatar=avatar_image):
+                st.write(content)
+            print(st.session_state.history[-3:])
+            
+        # chat_input = st.chat_input()
+        # spinner_placeholder = st.empty()
+        # with st.spinner("thinking..."):
+        #     if chat_input:
+        #         spinner_placeholder = st.empty()
+        #         with spinner_placeholder:
+                    
+        #                 on_chat_submit(chat_input)
+            
+            # Display chat history
+            
+                # for message in st.session_state.history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
+                #     role = message["role"]
+                #     avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+                #     st.markdown(
+                #     """
+                #     <style>
+                #         .stChatMessage.st-emotion-cache-1c7y2kd.eeusbqq4 {
+                #             flex-direction: row-reverse; /* Align children to the right */
+                #             text-align: right; /* Align text to the right */
+                #         }
+                #     </style>
+                #     """,
+                #         unsafe_allow_html=True,
+                #     )
+                #     with st.chat_message(role, avatar=avatar_image):
+                #         st.write(message["content"])
 
     if st.session_state.mode =="Upload File":
         display_file_uploader()
@@ -383,6 +438,5 @@ def main():
         st.rerun()
 
 
-           
-if __name__ == "__main__":
+if __name__=="__main__":
     main()
