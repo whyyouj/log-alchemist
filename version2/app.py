@@ -3,7 +3,7 @@ from PIL import Image, ImageEnhance
 import logging
 import base64
 import time
-from version_2.graph import lang_graph
+# from version_2.graph import lang_graph
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
