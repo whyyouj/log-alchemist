@@ -124,9 +124,9 @@ def on_chat_submit(chat_input):
         # pandas_ai_agent = pai.SmartDataframe(df, config={"llm":llm})
         # pandas_ai_agent.chat(user_input)
         #time.sleep(1)
-        # graph = st.session_state.graph
-        # out = graph.run(user_input)
-        assistant_reply = 'exports/charts/d772a0b7-7737-410f-9464-1427a93b2a1d.png' #out
+        graph = st.session_state.graph
+        out = graph.run(user_input)
+        assistant_reply = out #'exports/charts/d772a0b7-7737-410f-9464-1427a93b2a1d.png'
 
 
         st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
