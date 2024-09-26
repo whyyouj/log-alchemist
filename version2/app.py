@@ -3,7 +3,9 @@ from PIL import Image, ImageEnhance
 import logging
 import base64
 import time
-# from version_2.graph import lang_graph
+from version_temp.lang_graph.lang_graph import Graph
+from version_temp.python_agent.python_ai import Python_Ai 
+import pandas as pd
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -121,8 +123,10 @@ def on_chat_submit(chat_input):
         # )
         # pandas_ai_agent = pai.SmartDataframe(df, config={"llm":llm})
         # pandas_ai_agent.chat(user_input)
-        time.sleep(1)
-        assistant_reply = len(st.session_state.history)
+        #time.sleep(1)
+        # graph = st.session_state.graph
+        # out = graph.run(user_input)
+        assistant_reply = 'exports/charts/d772a0b7-7737-410f-9464-1427a93b2a1d.png' #out
 
 
         st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
@@ -145,6 +149,13 @@ def initialize_session_state():
         st.session_state.mode = "Chat with VantageAI"
     if "button" not in st.session_state:
         st.session_state.button = False
+    if "graph" not in st.session_state:
+        df = pd.read_csv("../EDA/data/mac/Mac_2k.log_structured.csv")
+        llm = Python_Ai(df = df)
+        pandas_llm = llm.pandas_legend()
+        graph = Graph(pandas_llm=pandas_llm, df=df)
+        st.session_state.graph = graph
+        print("pandas legend intialise")
 
 
 def main():
@@ -384,8 +395,21 @@ def main():
                     role = message["role"]
                     avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
                     with st.chat_message(role, avatar=avatar_image):
-                        st.write(message["content"])
-        
+                        if "exports/charts/" in message['content']:
+                            img_base64 = img_to_base64(message['content'])
+                            if img_base64:
+                                st.markdown(
+                                        f"""
+                                        Here is the Chart!
+                                        <img src='data:image/png;base64,{img_base64}'/>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+                            else:
+                                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
+                        else:
+                            st.write(message["content"])
+
         if chat_input := st.chat_input("Ask a question:"):
 
             role = "user"
@@ -399,8 +423,21 @@ def main():
             content = st.session_state.history[-1]['content']
             avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
             with st.chat_message(role, avatar=avatar_image):
-                st.write(content)
-            print(st.session_state.history[-3:])
+                if "exports/charts/" in message['content']:
+                    img_base64 = img_to_base64(message['content'])
+                    if img_base64:
+                        st.markdown(
+                                f"""
+                                Here is the Chart!
+                                <img src='data:image/png;base64,{img_base64}'/>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                    else:
+                        st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
+                else:
+                    st.write(message["content"])
+                    
             
         # chat_input = st.chat_input()
         # spinner_placeholder = st.empty()
