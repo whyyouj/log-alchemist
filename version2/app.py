@@ -150,7 +150,7 @@ def initialize_session_state():
     if "button" not in st.session_state:
         st.session_state.button = False
     if "graph" not in st.session_state:
-        df = pd.read_csv("../EDA/data/mac/Mac_2k.log_structured.csv")
+        df = pd.read_csv("../data/mac/Mac_2k.log_structured.csv")
         llm = Python_Ai(df = df)
         pandas_llm = llm.pandas_legend()
         graph = Graph(pandas_llm=pandas_llm, df=df)
@@ -350,6 +350,11 @@ def main():
     if st.sidebar.button("Restart Chat"):
         st.session_state.history = []
         st.session_state.conversation_history = []
+        df = pd.read_csv("../data/mac/Mac_2k.log_structured.csv")
+        llm = Python_Ai(df = df)
+        pandas_llm = llm.pandas_legend()
+        graph = Graph(pandas_llm=pandas_llm, df=df)
+        st.session_state.graph = graph
         initial_bot_message = "Hello! I am Vantage AI. How can I assist you today?"
         st.session_state.history.append({"role": "assistant", "content": initial_bot_message})
         st.session_state.conversation_history = initialize_conversation()
@@ -395,7 +400,7 @@ def main():
                     role = message["role"]
                     avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
                     with st.chat_message(role, avatar=avatar_image):
-                        if "exports/charts/" in message['content']:
+                        if "exports/charts/" in str(message['content']):
                             img_base64 = img_to_base64(message['content'])
                             if img_base64:
                                 st.markdown(
@@ -423,20 +428,23 @@ def main():
             content = st.session_state.history[-1]['content']
             avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
             with st.chat_message(role, avatar=avatar_image):
-                if "exports/charts/" in message['content']:
-                    img_base64 = img_to_base64(message['content'])
-                    if img_base64:
-                        st.markdown(
-                                f"""
-                                Here is the Chart!
-                                <img src='data:image/png;base64,{img_base64}'/>
-                                """,
-                                unsafe_allow_html=True
-                            )
+                try:
+                    if "exports/charts/" in str(content):
+                        img_base64 = img_to_base64(content)
+                        if img_base64:
+                            st.markdown(
+                                    f"""
+                                    Here is the Chart!
+                                    <img src='data:image/png;base64,{img_base64}'/>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
+                        else:
+                            st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
                     else:
-                        st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
-                else:
-                    st.write(message["content"])
+                        st.write(content)
+                except:
+                    st.write("Please rephrase your question or restart the chat.")
                     
             
         # chat_input = st.chat_input()

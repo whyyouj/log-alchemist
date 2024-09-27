@@ -17,7 +17,6 @@ def router(state: list):
     action = state["agent_out"]
     out = llm.query_agent(query = action + "\n Is the code related to the question. Answer with a yes or a no only.")
     if 'yes' in out.lower():
-        # return 'python_agent'
         return "python_pandas_ai"
     else:
         return 'final_agent'
