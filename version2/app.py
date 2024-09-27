@@ -150,7 +150,7 @@ def initialize_session_state():
     if "button" not in st.session_state:
         st.session_state.button = False
     if "graph" not in st.session_state:
-        df = pd.read_csv("../data/mac/Mac_2k.log_structured.csv")
+        df = pd.read_csv("../logs/Mac/Mac_2k.log_structured.csv")
         llm = Python_Ai(df = df)
         pandas_llm = llm.pandas_legend()
         graph = Graph(pandas_llm=pandas_llm, df=df)
