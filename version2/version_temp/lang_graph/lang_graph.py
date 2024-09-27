@@ -1,11 +1,13 @@
 from typing import TypedDict, Annotated, List, Union
 from langchain_core.agents import AgentAction, AgentFinish
 import operator
-from langgraph.graph import StateGraph, END
+from langgraph.graph import StateGraph, END, START
 import pandas as pd
+import os, sys
+sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
-from lang_graph.lang_graph_utils import start_agent, python_pandas_ai, final_agent, router    
+from lang_graph.lang_graph_utils import start_agent, python_pandas_ai, final_agent, router, router_agent, router_agent_decision    
 
 class AgentState(TypedDict):
     input: str
@@ -22,18 +24,27 @@ class Graph:
     
     def get_graph(self):
         graph = StateGraph(AgentState)
-        graph.add_node("start_agent", start_agent)
+        # graph.add_node("start_agent", start_agent)
+        graph.add_node('router_agent', router_agent)
         graph.add_node('final_agent', final_agent)
         graph.add_node("python_pandas_ai", python_pandas_ai)
-        graph.set_entry_point("start_agent")
+        # graph.set_entry_point("start_agent")
+        # graph.add_conditional_edges(
+        #     "start_agent",
+        #     router,
+        #     {
+        #         "python_pandas_ai":"python_pandas_ai",
+        #         "final_agent":"final_agent"
+        #     }
+        # )
+        graph.add_edge(START, 'router_agent')
         graph.add_conditional_edges(
-            "start_agent",
-            router,
+            "router_agent",
+            router_agent_decision,
             {
                 "python_pandas_ai":"python_pandas_ai",
                 "final_agent":"final_agent"
             }
-
         )
         graph.add_edge("python_pandas_ai", END)
         graph.add_edge("final_agent", END)
@@ -48,7 +59,7 @@ class Graph:
         If the question is not about retrying, respond with 'No'.
         Only answer 'Yes' or 'No'"""
         ans = llm.query_agent(prompt)
-        print(f'Try again agent: {ans}')
+        print(f'[STAGE] Try again agent: {ans}')
         if 'yes' in ans.lower():
             if self.qns != '':
                 query = self.qns

@@ -1,4 +1,3 @@
-
 from langchain_core.prompts import PromptTemplate
 
 PREFIX = """
@@ -6,9 +5,13 @@ PREFIX = """
     This is the result of `print(df.head())`:
     {df_head}."""
 SUFFIX = """
-    Here is the Qustion:
+    Here is the Question:
     {input}
-    Does this question require the manipulating the dataframe above.
+    Can this question be answered by using Python code to manipulate the dataframe?
+
+    Important:
+    - Answer with a *yes* or a *no* only.
+    - DO NOT supplement your answer with anything else.
     """
 class Agent_Prompt:
     def __init__(self, df):
