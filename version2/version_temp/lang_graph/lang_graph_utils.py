@@ -3,12 +3,11 @@ import os, sys
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 from regular_agent.agent_ai import Agent_Ai
 from python_agent.python_ai import Python_Ai
-# DF = pd.read_csv("../EDA/data/mac/Mac_2k.log_structured.csv")
 
 graph_stage_prefix = '[STAGE]'
 
 def start_agent(state: list):
-    print(graph_stage_prefix, 'start agent')
+    print(graph_stage_prefix, 'Start agent')
     df = state['df']
     query = state['input']
     llm = Agent_Ai(model = 'llama3.1', df=df)
@@ -16,7 +15,7 @@ def start_agent(state: list):
     return {"agent_out": out}
 
 def router_agent(state: list):
-    print(graph_stage_prefix, 'router agent')
+    print(graph_stage_prefix, 'Router agent')
     df = state['df']
     query = state['input']
     llm = Agent_Ai(model = 'llama3.1', df=df)
@@ -32,7 +31,7 @@ def router_agent_decision(state: list):
         return 'final_agent'
 
 def router(state: list):
-    print("routing")
+    print("Routing")
     llm = Agent_Ai(model = 'llama3.1')
     action = state["agent_out"]
     out = llm.query_agent(query = action + "\n Is the code related to the question. Answer with a yes or a no only.")
@@ -42,14 +41,25 @@ def router(state: list):
         return 'final_agent'
     
 def python_pandas_ai(state:list):
-    print(graph_stage_prefix, 'pandas ai agent')
+    print(graph_stage_prefix, 'Pandas AI agent')
     llm = state['pandas']
     query = state['input']
-    out = llm.chat(query)
+    prompt = f"""
+    The following is the query from the user:
+    {query}
+
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+    You are to following the instructions below strictly:
+    - dfs: list[pd.DataFrame] is already provided.
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    """
+    out = llm.chat(prompt)
     return {"agent_out": out}
 
 def final_agent(state:list):
-    print(graph_stage_prefix, "final agent")
+    print(graph_stage_prefix, "Final agent")
     llm = Agent_Ai(model = "llama3.1")
     query = state['input']
     out = llm.query_agent(query=query)

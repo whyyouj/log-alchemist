@@ -24,19 +24,9 @@ class Graph:
     
     def get_graph(self):
         graph = StateGraph(AgentState)
-        # graph.add_node("start_agent", start_agent)
         graph.add_node('router_agent', router_agent)
         graph.add_node('final_agent', final_agent)
         graph.add_node("python_pandas_ai", python_pandas_ai)
-        # graph.set_entry_point("start_agent")
-        # graph.add_conditional_edges(
-        #     "start_agent",
-        #     router,
-        #     {
-        #         "python_pandas_ai":"python_pandas_ai",
-        #         "final_agent":"final_agent"
-        #     }
-        # )
         graph.add_edge(START, 'router_agent')
         graph.add_conditional_edges(
             "router_agent",

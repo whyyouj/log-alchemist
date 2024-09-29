@@ -102,7 +102,7 @@ def on_chat_submit(chat_input):
     Returns:
     - None: Updates the chat history in Streamlit's session state.
     """
-    user_input = chat_input.strip().lower()
+    user_input = chat_input
 
     if 'conversation_history' not in st.session_state:
         st.session_state.conversation_history = initialize_conversation()
@@ -350,7 +350,7 @@ def main():
     if st.sidebar.button("Restart Chat"):
         st.session_state.history = []
         st.session_state.conversation_history = []
-        df = pd.read_csv("../data/mac/Mac_2k.log_structured.csv")
+        df = pd.read_csv("../logs/mac/Mac_2k.log_structured.csv")
         llm = Python_Ai(df = df)
         pandas_llm = llm.pandas_legend()
         graph = Graph(pandas_llm=pandas_llm, df=df)
