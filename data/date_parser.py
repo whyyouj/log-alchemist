@@ -115,6 +115,7 @@ def combine_datetime_columns(df, default_year=2024):
     for col in df.columns:
         if 'date' == col.lower():
             # Attempt to break down the 'Date' column
+            df[col] = df[col].astype(str)
             date_parts = df[col].apply(break_down_date_component)
             df['Year'] = [date.get('year', default_year) for date in date_parts]
             df['Month'] = df["Month"] if "Month" in df.columns else [date.get('month', None) for date in date_parts]
@@ -143,3 +144,7 @@ def combine_datetime_columns(df, default_year=2024):
         print(f"Error converting to datetime: {e}. Please check the format of the combined column.")
 
     return df
+
+file_name = "Linux_2k.log_structured.csv"
+df = pd.read_csv(f"../logs/Linux/{file_name}")
+combine_datetime_columns(df, 2024).to_csv(file_name)
