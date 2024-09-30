@@ -145,6 +145,6 @@ def combine_datetime_columns(df, default_year=2024):
 
     return df
 
-file_name = "Linux_2k.log_structured.csv"
-df = pd.read_csv(f"../logs/Linux/{file_name}")
-combine_datetime_columns(df, 2024).to_csv(file_name)
+file_name = "Mac_2k.log_structured.csv"
+df = pd.read_csv(f"../logs/Mac/{file_name}")
+combine_datetime_columns(df, 2024).to_csv(file_name, index = False)
