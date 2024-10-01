@@ -4,10 +4,10 @@ import operator
 from langgraph.graph import StateGraph, END, START
 import pandas as pd
 import os, sys
-sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+# sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
-from lang_graph.lang_graph_utils import start_agent, python_pandas_ai, final_agent, router, router_agent, router_agent_decision    
+from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, python_summary_agent
 
 class AgentState(TypedDict):
     input: str
@@ -25,18 +25,31 @@ class Graph:
     def get_graph(self):
         graph = StateGraph(AgentState)
         graph.add_node('router_agent', router_agent)
+        graph.add_node('router_summary_agent', router_summary_agent)
         graph.add_node('final_agent', final_agent)
         graph.add_node("python_pandas_ai", python_pandas_ai)
+        graph.add_node("python_summary_agent", python_summary_agent)
         graph.add_edge(START, 'router_agent')
         graph.add_conditional_edges(
             "router_agent",
             router_agent_decision,
             {
-                "python_pandas_ai":"python_pandas_ai",
+                "router_summary_agent":"router_summary_agent",
                 "final_agent":"final_agent"
             }
         )
+        graph.add_conditional_edges(
+            "router_summary_agent",
+            router_summary_agent_decision,
+            {
+                "python_summary_agent":"python_summary_agent",
+                "python_pandas_ai":"python_pandas_ai"
+            }
+        )
         graph.add_edge("python_pandas_ai", END)
+        
+        # graph.add_edge(START, "python_summary_agent")
+        graph.add_edge("python_summary_agent", END)
         graph.add_edge("final_agent", END)
         runnable = graph.compile()
         return runnable
@@ -76,7 +89,7 @@ class Graph:
         return "./image/lang_chain_graph_pandas.png"
     
 if __name__ == "__main__":
-    df = pd.read_csv('../../../EDA/data/mac/Mac_2k.log_structured.csv')
+    df = pd.read_csv('../../../data/Mac_2k.log_structured.csv')
     pandas_ai = Python_Ai(df=df).pandas_legend()
     graph = Graph(pandas_llm= pandas_ai, df = df)
     graph.show()
