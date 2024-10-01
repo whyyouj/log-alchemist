@@ -18,7 +18,7 @@ def router_agent(state: list):
     print(graph_stage_prefix, 'Router agent')
     df = state['df']
     query = state['input']
-    llm = Agent_Ai(model = 'llama3.1', df=df)
+    llm = Agent_Ai(model = 'llama3', df=df)
     out = llm.prompt_agent(query=query)
     print('ROUTER AGENT OUT: ', out)
     return {"agent_out": out}
