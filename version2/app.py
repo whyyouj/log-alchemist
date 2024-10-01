@@ -1,12 +1,15 @@
 import streamlit as st
 from PIL import Image, ImageEnhance
+import streamlit.components.v1 as components
 import logging
 import base64
 import time
 from version_temp.lang_graph.lang_graph import Graph
 from version_temp.python_agent.python_ai import Python_Ai 
 import pandas as pd
+import asyncio
 import os
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -30,7 +33,7 @@ st.set_page_config(
     }
 )
 
-# st.title("Vantage AI")
+
 def img_to_base64(image_path):
     try:
         with open(image_path, 'rb') as file:
@@ -58,13 +61,6 @@ def long_running_task(duration):
     time.sleep(duration)
     return "Long-running task completed"
 
-# @st.cache_data(show_spinner = False)
-# def load_and_enhance_image(image_path, enhance=True):
-#     img = Image.open(image_path)
-#     if enhance:
-#         enhancer = ImageEnhance.Contrast(img)
-#         img = enhancer(1.8)
-#     return img
 
 def display_file_uploader():
     with st.expander("**File Upload**", expanded=False):
@@ -91,55 +87,6 @@ def initialize_conversation():
     ]
     return conversation_history
 
-
-# @st.cache_data(show_spinner=True)
-def on_chat_submit(chat_input):
-    """
-    Handle chat input submissions and interact with the llm.
-
-    Parameters:
-    - chat_input (str): The chat input from the user.
-
-    Returns:
-    - None: Updates the chat history in Streamlit's session state.
-    """
-    user_input = chat_input
-
-    if 'conversation_history' not in st.session_state:
-        st.session_state.conversation_history = initialize_conversation()
-
-    st.session_state.conversation_history.append({"role": "user", "content": user_input})
-
-    try:
-        
-        # import matplotlib.pyplot
-        # import pandas as pd
-        # df = pd.read_csv('../EDA/data/mac/Mac_2k.log_structured.csv')
-        # import pandasai as pai
-        # from langchain_community.llms import Ollama
-        
-        # llm = Ollama(
-        #     model = "llama3.1",
-        #     temperature = 0.2
-        # )
-        # pandas_ai_agent = pai.SmartDataframe(df, config={"llm":llm})
-        # pandas_ai_agent.chat(user_input)
-        #time.sleep(1)
-        graph = st.session_state.graph
-        out = graph.run(user_input)
-        assistant_reply = out #'exports/charts/d772a0b7-7737-410f-9464-1427a93b2a1d.png'
-
-
-        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
-        st.session_state.history.append({"role": "user", "content": user_input})
-        st.session_state.history.append({"role": "assistant", "content": assistant_reply})
-
-    except Exception as e:
-        logging.error(f"Error occurred: {e}")
-        error_message = st.error(f"AI Error: {str(e)}")
-        time.sleep(3)
-        error_message.empty()
-        
 def output(message):
     role = message["role"]
     avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
@@ -152,7 +99,7 @@ def output(message):
                 st.write("### Here is a summary of the data!")
                 path = summary_dict['path']
 
-                import streamlit.components.v1 as components
+                
 
 
                 # Check if the file exists
@@ -165,6 +112,8 @@ def output(message):
 
                 
                 return
+            
+                ## dont remove plsssssssss
                 '''
                 for key in summary_dict.keys():
                     if key == 'type':
@@ -203,8 +152,53 @@ def output(message):
             else:
                 st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
         else:
-            st.write(message["content"])      
+            st.write(message["content"])   
 
+async def on_chat_submit(chat_input):
+    """
+    Handle chat input submissions and interact with the llm.
+
+    Parameters:
+    - chat_input (str): The chat input from the user.
+
+    Returns:
+    - None: Updates the chat history in Streamlit's session state.
+    """
+    user_input = chat_input
+
+    if 'conversation_history' not in st.session_state:
+        st.session_state.conversation_history = initialize_conversation()
+
+    st.session_state.conversation_history.append({"role": "user", "content": user_input})
+
+    try:
+        
+        graph = st.session_state.graph
+        out = graph.run(user_input)
+        assistant_reply = out 
+
+
+        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
+        st.session_state.history.append({"role": "user", "content": user_input})
+        st.session_state.history.append({"role": "assistant", "content": assistant_reply})
+
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        error_message = st.error(f"AI Error: {str(e)}")
+        time.sleep(3)
+        error_message.empty()
+        
+   
+
+def run_async_task(chat_input):
+    
+    with st.spinner("Thinking..."):
+        # Run the async function within an event loop
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(on_chat_submit(chat_input))
+        output(st.session_state.history[-1])
+        
 def initialize_session_state():
     """Initialize session state variables."""
     if "history" not in st.session_state:
@@ -471,46 +465,17 @@ def main():
             avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
             with st.chat_message(role, avatar=avatar_image):
                         st.write(chat_input)
-                        
-            with st.spinner("thinking..."):
-                on_chat_submit(chat_input)
-            message = st.session_state.history[-1]
-
             try:
-                output(message=message)
+                run_async_task(chat_input)
+
 
             except Exception as e:
                     print(e)
                     st.write(f"<App> Please rephrase your question or restart the chat.")
+
+
+            
                     
-            
-        # chat_input = st.chat_input()
-        # spinner_placeholder = st.empty()
-        # with st.spinner("thinking..."):
-        #     if chat_input:
-        #         spinner_placeholder = st.empty()
-        #         with spinner_placeholder:
-                    
-        #                 on_chat_submit(chat_input)
-            
-            # Display chat history
-            
-                # for message in st.session_state.history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-                #     role = message["role"]
-                #     avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
-                #     st.markdown(
-                #     """
-                #     <style>
-                #         .stChatMessage.st-emotion-cache-1c7y2kd.eeusbqq4 {
-                #             flex-direction: row-reverse; /* Align children to the right */
-                #             text-align: right; /* Align text to the right */
-                #         }
-                #     </style>
-                #     """,
-                #         unsafe_allow_html=True,
-                #     )
-                #     with st.chat_message(role, avatar=avatar_image):
-                #         st.write(message["content"])
 
     if st.session_state.mode =="Upload File":
         display_file_uploader()
