@@ -139,6 +139,54 @@ def on_chat_submit(chat_input):
         time.sleep(3)
         error_message.empty()
         
+def output(message):
+    role = message["role"]
+    avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+    with st.chat_message(role, avatar=avatar_image):
+        if type(message['content']) is dict:
+            
+            summary_dict = message['content']
+            summary_type = summary_dict.get('type', '')
+            if summary_type == 'Python_AI_Summary':
+                st.write("### Here is a summary of the data!")
+                for key in summary_dict.keys():
+                    if key == 'type':
+                        continue
+                    st.write(f"**{key}**")
+                    for content_key in summary_dict[key].keys():
+                        if content_key == 'GRAPH':
+                            img_base64 = img_to_base64(summary_dict[key][content_key])
+                            if img_base64:
+                                st.markdown(
+                                        f"""
+                                        Here is the Chart!
+                                        <img src='data:image/png;base64,{img_base64}'/>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+                            else:
+                                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")                                        
+                        else:
+                            st.write(content_key)
+                            st.write(summary_dict[key][content_key])
+            else:
+                st.write(message['content'])
+                
+        elif "exports/charts/" in str(message['content']):
+            img_base64 = img_to_base64(message['content'])
+            if img_base64:
+                st.markdown(
+                        f"""
+                        Here is the Chart!
+                        <img src='data:image/png;base64,{img_base64}'/>
+                        """,
+                        unsafe_allow_html=True
+                    )
+            else:
+                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
+        else:
+            st.write(message["content"])      
+
 def initialize_session_state():
     """Initialize session state variables."""
     if "history" not in st.session_state:
@@ -397,52 +445,7 @@ def main():
                     )
         
         for message in st.session_state.history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-                    role = message["role"]
-                    avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
-                    with st.chat_message(role, avatar=avatar_image):
-                        if type(message['content']) is dict:
-                            
-                            summary_dict = message['content']
-                            summary_type = summary_dict.get('type', '')
-                            if summary_type == 'Python_AI_Summary':
-                                st.write("##Here is a summary of the data!")
-                                for key in summary_dict.keys():
-                                    if key == 'type':
-                                        continue
-                                    st.write(f"**{key}**")
-                                    for content_key in summary_dict[key].keys():
-                                        if content_key == 'GRAPH':
-                                            img_base64 = img_to_base64(summary_dict[key][content_key])
-                                            if img_base64:
-                                                st.markdown(
-                                                        f"""
-                                                        Here is the Chart!
-                                                        <img src='data:image/png;base64,{img_base64}'/>
-                                                        """,
-                                                        unsafe_allow_html=True
-                                                    )
-                                            else:
-                                                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")                                        
-                                        else:
-                                            st.write(content_key)
-                                            st.write(summary_dict[key][content_key])
-                            else:
-                                st.write(message['content'])
-                                
-                        elif "exports/charts/" in str(message['content']):
-                            img_base64 = img_to_base64(message['content'])
-                            if img_base64:
-                                st.markdown(
-                                        f"""
-                                        Here is the Chart!
-                                        <img src='data:image/png;base64,{img_base64}'/>
-                                        """,
-                                        unsafe_allow_html=True
-                                    )
-                            else:
-                                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
-                        else:
-                            st.write(message["content"])
+            output(message= message)
 
         if chat_input := st.chat_input("Ask a question:"):
 
@@ -453,54 +456,12 @@ def main():
                         
             with st.spinner("thinking..."):
                 on_chat_submit(chat_input)
-            role = st.session_state.history[-1]['role']
-            content = st.session_state.history[-1]['content']
-            avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
-            with st.chat_message(role, avatar=avatar_image):
-                try:
-                    if type(content) is dict:
-                        summary_dict = content
-                        summary_type = summary_dict.get('type', '')
-                        if summary_type == 'Python_AI_Summary':
-                            st.write("##Here is a summary of the data!")
-                            for key in summary_dict.keys():
-                                if key == 'type':
-                                    continue
-                                st.write(f"**{key}**")
-                                for content_key in summary_dict[key].keys():
-                                    if content_key == 'GRAPH':
-                                        img_base64 = img_to_base64(summary_dict[key][content_key])
-                                        if img_base64:
-                                            st.markdown(
-                                                    f"""
-                                                    Here is the Chart!
-                                                    <img src='data:image/png;base64,{img_base64}'/>
-                                                    """,
-                                                    unsafe_allow_html=True
-                                                )
-                                        else:
-                                            st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
-                                    else:
-                                        st.write(content_key)
-                                        st.write(summary_dict[key][content_key])
-                        else:
-                            st.write(summary_dict)
-                    
-                    elif "exports/charts/" in str(content):
-                        img_base64 = img_to_base64(content)
-                        if img_base64:
-                            st.markdown(
-                                    f"""
-                                    Here is the Chart!
-                                    <img src='data:image/png;base64,{img_base64}'/>
-                                    """,
-                                    unsafe_allow_html=True
-                                )
-                        else:
-                            st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
-                    else:
-                        st.write(content)
-                except Exception as e:
+            message = st.session_state.history[-1]
+
+            try:
+                output(message=message)
+
+            except Exception as e:
                     print(e)
                     st.write(f"<App> Please rephrase your question or restart the chat.")
                     

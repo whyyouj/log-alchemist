@@ -1,6 +1,6 @@
 from pandasai import Agent
 import os, sys, ast
-# sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 from regular_agent.agent_ai import Agent_Ai
 from pandasai.responses.streamlit_response import StreamlitResponse
 import pandas as pd
