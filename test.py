@@ -24,7 +24,7 @@ questions = [
 ]
 
 df = pd.read_csv("./data/Mac_2k.log_structured.csv")
-questions2 =["plot the graph of the cynapse "]
+questions2 =["hi"]
 
 llm = Agent_Ai(model = 'llama3', df = df)
 for i in questions2:

@@ -6,6 +6,7 @@ import time
 from version_temp.lang_graph.lang_graph import Graph
 from version_temp.python_agent.python_ai import Python_Ai 
 import pandas as pd
+import os
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -149,6 +150,22 @@ def output(message):
             summary_type = summary_dict.get('type', '')
             if summary_type == 'Python_AI_Summary':
                 st.write("### Here is a summary of the data!")
+                path = summary_dict['path']
+
+                import streamlit.components.v1 as components
+
+
+                # Check if the file exists
+                if os.path.exists(path):
+                    # Read the file and render it in an iframe
+                    with open(path, 'r', encoding='utf-8') as f:
+                        html_content = f.read()
+                    # Display the HTML report in Streamlit
+                    components.html(html_content, height=800, scrolling=True)
+
+                
+                return
+                '''
                 for key in summary_dict.keys():
                     if key == 'type':
                         continue
@@ -168,9 +185,10 @@ def output(message):
                                 st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")                                        
                         else:
                             st.write(content_key)
-                            st.write(summary_dict[key][content_key])
+                            st.write(summary_dict[key][content_key])'''
             else:
                 st.write(message['content'])
+                return
                 
         elif "exports/charts/" in str(message['content']):
             img_base64 = img_to_base64(message['content'])

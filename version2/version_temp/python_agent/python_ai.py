@@ -3,6 +3,7 @@ import os, sys, ast
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 from regular_agent.agent_ai import Agent_Ai
 from pandasai.responses.streamlit_response import StreamlitResponse
+import tempfile
 import pandas as pd
 
 class Python_Ai:
@@ -104,7 +105,7 @@ class Python_Ai:
             return False
         
     
-    def get_summary(self):
+    def get_summary_old(self):
         query=f"""This is the head of the dataframe: {self.df.head(10).to_json()}
                 Based on the given data, analyze each key and determine which categorical variables are suitable for analysis. 
                 - LineID is simply a row identifier and does not need to be included 
@@ -155,7 +156,17 @@ class Python_Ai:
             print(e)
             return '<Python Agent get Summary> Please Try Again'
         
-                
+    def get_summary(self):
+        # from skimpy import skim
+        # from pandas_profiling import ProfileReport
+       #profile = ProfileReport(self.df, title="Pandas Profiling Report", explorative=True)
+        import sweetviz as sv
+        with tempfile.NamedTemporaryFile(suffix='.html', delete= False) as f:
+            tempfile_path = f.name
+            report = sv.analyze(self.df)
+            report.show_html(filepath =tempfile_path, layout='vertical', scale=0.65, open_browser=False)
+            
+        return {'type': 'Python_AI_Summary' , 'path': tempfile_path}
         
 
 if __name__=="__main__":
