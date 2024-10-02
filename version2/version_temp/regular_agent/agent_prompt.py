@@ -6,13 +6,16 @@ PREFIX = """
 
     """
 SUFFIX = """
-    Here is the Question:
+    Here is the question from the user:
     {input}
-    Can this question be answered by using Python code to manipulate the dataframe?
+
+    Your task is to determine if the user question is related to manipulating the above dataframe(s) using Python.
+    In particular, can the user question be answered by using Python code to manipulate the dataframe(s)?
 
     Important:
     - Answer with a *yes* or a *no* only.
     - DO NOT supplement your answer with anything else.
+    - If the question is unrelated to Python data manipulation (like greetings or general questions), answer with a *no*
     """
 class Agent_Prompt:
     def __init__(self, df):

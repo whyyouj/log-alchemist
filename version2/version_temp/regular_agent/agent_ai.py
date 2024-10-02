@@ -1,7 +1,8 @@
 from langchain_community.llms import Ollama
 from regular_agent.agent_prompt import Agent_Prompt
+
 class Agent_Ai:
-    def __init__(self, model = "llama3.1", df =None, temperature=0):
+    def __init__(self, model = "llama3.1", df=None, temperature=0):
         self.llm = Ollama(model=model, temperature=temperature)
         self.df = df
     

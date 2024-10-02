@@ -1,5 +1,6 @@
 import streamlit as st
 from PIL import Image, ImageEnhance
+import streamlit.components.v1 as components
 import logging
 import base64
 import time
@@ -9,6 +10,8 @@ from version_temp.regular_agent.agent_ai import Agent_Ai
 import pandas as pd
 import tempfile
 import os
+import asyncio
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -36,10 +39,7 @@ def apply_css():
     # Insert custom CSS for glowing effect
     st.markdown(
         """
-
-     <style>
-
-
+        <style>
         /* Custom sidebar styling */
         [data-testid="stSidebar"] {
             background-color: rgba(0, 0, 0, 0.1);  /* 50% transparency */
@@ -52,10 +52,10 @@ def apply_css():
             color: #66CCFF;  /* Accent color for titles */
         }
 
-
         [data-testid="stExpander"]:hover details {
             border-style: none;
         }
+
         [data-testid="stExpander"]:hover {
             width: 100%;
             height: auto;
@@ -70,8 +70,6 @@ def apply_css():
             transition: transform 0.3s ease, box-shadow 0.5s ease, margin 0.3s ease; /* Smooth transition for hover */
         }
         
-
-        
         [data-testid="stChatInput"]:hover{
             box-shadow: 
                 0 0 0.5em rgba(0, 170, 255, 0.2), /* Much lighter */
@@ -80,8 +78,6 @@ def apply_css():
                 0 0 1.2em rgba(0, 170, 255, 0.8);   /* Keep this as is for contrast */
             border:0px;
         }
-
-
 
         .cover_glow {
             width: 100%;
@@ -94,8 +90,6 @@ def apply_css():
                 0 0 1.8em rgba(0, 170, 255, 1.2);
             transition: transform 0.3s ease, box-shadow 0.5s ease; /* Smooth transition for hover */
         }
-        
-
         </style>""",
         unsafe_allow_html=True,
     )
@@ -170,8 +164,6 @@ def st_sidebar():
         transition: background-color 0.3s ease; /* Smooth transition */
         width: 100%; /* Full width */
     }
-    
-
     
     .element-container:has(#remove_chat) + div button {
     background-color: #ff4c4c; /* Primary red color */
@@ -339,7 +331,7 @@ def on_folder_submit(abs_folderpath):
             print('CSV FILE PATHS: ', st.session_state.csv_filepaths)
             update_langgraph()
 
-def on_chat_submit(chat_input):
+def on_chat_submit_old(chat_input):
     """
     Handle chat input submissions and interact with the llm.
 
@@ -382,6 +374,105 @@ def on_chat_submit(chat_input):
         time.sleep(3)
         error_message.empty()
 
+def output(message):
+    role = message["role"]
+    avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+    with st.chat_message(role, avatar=avatar_image):
+        if type(message['content']) is dict:
+            summary_dict = message['content']
+            summary_type = summary_dict.get('type', '')
+            if summary_type == 'Python_AI_Summary':
+                st.write("### Here is a summary of the data!")
+                path = summary_dict['path']
+
+                # Check if the file exists
+                if os.path.exists(path):
+                    # Read the file and render it in an iframe
+                    with open(path, 'r', encoding='utf-8') as f:
+                        html_content = f.read()
+                    # Display the HTML report in Streamlit
+                    components.html(html_content, height=800, scrolling=True)
+              
+                return
+            
+                ## dont remove plsssssssss
+                '''
+                for key in summary_dict.keys():
+                    if key == 'type':
+                        continue
+                    st.write(f"**{key}**")
+                    for content_key in summary_dict[key].keys():
+                        if content_key == 'GRAPH':
+                            img_base64 = img_to_base64(summary_dict[key][content_key])
+                            if img_base64:
+                                st.markdown(
+                                        f"""
+                                        Here is the Chart!
+                                        <img src='data:image/png;base64,{img_base64}'/>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+                            else:
+                                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")                                        
+                        else:
+                            st.write(content_key)
+                            st.write(summary_dict[key][content_key])'''
+            else:
+                st.write(message['content'])
+                return
+                
+        elif "exports/charts/" in str(message['content']):
+            img_base64 = img_to_base64(message['content'])
+            if img_base64:
+                st.markdown(
+                        f"""
+                        Here is the Chart!
+                        <img src='data:image/png;base64,{img_base64}'/>
+                        """,
+                        unsafe_allow_html=True
+                    )
+            else:
+                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
+        else:
+            st.write(message["content"])   
+
+async def on_chat_submit(chat_input):
+    """
+    Handle chat input submissions and interact with the llm.
+
+    Parameters:
+    - chat_input (str): The chat input from the user.
+
+    Returns:
+    - None: Updates the chat history in Streamlit's session state.
+    """
+    user_input = chat_input
+
+    st.session_state.conversation_history.append({"role": "user", "content": user_input})
+
+    try:
+        graph = st.session_state.graph
+        out = graph.run(user_input)
+        assistant_reply = out 
+
+        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
+        st.session_state.history.append({"role": "user", "content": user_input})
+        st.session_state.history.append({"role": "assistant", "content": assistant_reply})
+
+    except Exception as e:
+        logging.error(f"Error occurred: {e}")
+        error_message = st.error(f"AI Error: {str(e)}")
+        time.sleep(3)
+        error_message.empty()
+
+def run_async_task(chat_input):
+    with st.spinner("Thinking..."):
+        # Run the async function within an event loop
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(on_chat_submit(chat_input))
+        output(st.session_state.history[-1])
+
 def initialize_conversation():
     assistant_message = "Hello! I am Vantage AI. How can I assist you today?"
     conversation_history = [
@@ -408,12 +499,11 @@ def initialize_session_state():
         st.session_state.filepaths = {}
     if "csv_filepaths" not in st.session_state:
         st.session_state.csv_filepaths = {}
+        #for testing: set a fixed directory from which to retrieve the logs
+        default_abs_folder = os.path.abspath('../logs/Test')
+        on_folder_submit(default_abs_folder)
     if "graph" not in st.session_state:
         st.session_state.graph = initialize_langgraph()
-
-    #for testing: set a fixed directory from which to retrieve the logs
-    default_abs_folder = os.path.abspath('../logs/Test')
-    on_folder_submit(default_abs_folder)
 
 def reset_session_state():
     st.session_state.history = initialize_conversation()
@@ -459,85 +549,21 @@ def main():
                     )
         
         for message in st.session_state.history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-            role = message["role"]
-            avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
-            with st.chat_message(role, avatar=avatar_image):
-                if "exports/charts/" in str(message['content']):
-                    img_base64 = img_to_base64(message['content'])
-                    if img_base64:
-                        st.markdown(
-                                f"""
-                                Here is the Chart!
-                                <img src='data:image/png;base64,{img_base64}'/>
-                                """,
-                                unsafe_allow_html=True
-                            )
-                    else:
-                        st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
-                else:
-                    st.write(message["content"])
+            output(message= message)
 
         if chat_input := st.chat_input("Ask a question"):
-
             role = "user"
             avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
             with st.chat_message(role, avatar=avatar_image):
-                        st.write(chat_input)
-                        
-            with st.spinner("Thinking..."):
-                on_chat_submit(chat_input)
-            role = st.session_state.history[-1]['role']
-            content = st.session_state.history[-1]['content']
-            avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
-            with st.chat_message(role, avatar=avatar_image):
-                try:
-                    if "exports/charts/" in str(content):
-                        img_base64 = img_to_base64(content)
-                        if img_base64:
-                            st.markdown(
-                                    f"""
-                                    Here is the Chart!
-                                    <img src='data:image/png;base64,{img_base64}'/>
-                                    """,
-                                    unsafe_allow_html=True
-                                )
-                        else:
-                            st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
-                    else:
-                        st.write(content)
-                except:
-                    st.write("Please rephrase your question or restart the chat.")
-                    
-            
-        # chat_input = st.chat_input()
-        # spinner_placeholder = st.empty()
-        # with st.spinner("thinking..."):
-        #     if chat_input:
-        #         spinner_placeholder = st.empty()
-        #         with spinner_placeholder:
-                    
-        #                 on_chat_submit(chat_input)
-            
-            # Display chat history
-            
-                # for message in st.session_state.history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-                #     role = message["role"]
-                #     avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
-                #     st.markdown(
-                #     """
-                #     <style>
-                #         .stChatMessage.st-emotion-cache-1c7y2kd.eeusbqq4 {
-                #             flex-direction: row-reverse; /* Align children to the right */
-                #             text-align: right; /* Align text to the right */
-                #         }
-                #     </style>
-                #     """,
-                #         unsafe_allow_html=True,
-                #     )
-                #     with st.chat_message(role, avatar=avatar_image):
-                #         st.write(message["content"])
+                st.write(chat_input)
 
-    if st.session_state.mode =="Upload File":
+            try:
+                run_async_task(chat_input)
+            except Exception as e:
+                print(e)
+                st.write(f"<App> Please rephrase your question or restart the chat.")                
+
+    if st.session_state.mode == "Upload File":
         st_fileuploader()
 
     if st.session_state.button:
