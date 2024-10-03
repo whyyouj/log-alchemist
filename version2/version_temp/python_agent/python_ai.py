@@ -6,21 +6,58 @@ from pandasai.responses.streamlit_response import StreamlitResponse
 from pandasai.skills import skill
 import tempfile
 import pandas as pd
+from langchain_core.tools import tool
+from pandasai.llm import LLM
+from langchain_core.language_models import BaseLanguageModel
+from langchain_core.language_models.chat_models import BaseChatModel
+from pandasai.prompts.base import BasePrompt
+from pandasai.responses import StreamlitResponse
+from pandasai.pipelines.pipeline_context import PipelineContext
+class LangchainLLM(LLM):
+    """
+    Class to wrap Langchain LLMs and make PandasAI interoperable
+    with LangChain.
+    """
+
+    langchain_llm: BaseLanguageModel
+
+    def __init__(self, langchain_llm: BaseLanguageModel):
+        self.langchain_llm = langchain_llm
+
+    def call(
+        self, instruction: BasePrompt, context: PipelineContext = None, suffix: str = ""
+    ) -> str:
+        prompt = instruction.to_string() + suffix
+        memory = context.memory if context else None
+        prompt = self.prepend_system_prompt(prompt, memory)
+        self.last_prompt = prompt
+        
+        res = self.langchain_llm.invoke(prompt)
+        print("mm", prompt, 'mm.')
+        print('m', res, '.')
+        return res.content if isinstance(self.langchain_llm, BaseChatModel) else res
+
+    @property
+    def type(self) -> str:
+        return f"langchain_{self.langchain_llm._llm_type}"
+
+
 
 @skill
-def summarise_df(df: pd.DataFrame):
+def summary_skill(df):
     """
-    Use 'sweetviz' module to get a summary of the selected dataframe 'df'
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
     Args:
-        df (pd.DataFrame): Pandas dataframe to be summarised using 'sweetviz'
+        df (pd.DataFrame): A pandas dataframe 
     """
     import sweetviz as sv
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as f:
         tempfile_path = f.name
         report = sv.analyze(df)
         report.show_html(filepath=tempfile_path, layout='vertical', scale=0.65, open_browser=False)
-        
-    return {'type': 'Python_AI_Summary' , 'path': tempfile_path}
+    result = {'type': 'Python_AI_Summary' , 'path': {tempfile_path}}
+    return tempfile_path
 
 class Python_Ai:
     def __init__(self, model = "codellama:7b", df=None, temperature=0.1):
@@ -53,7 +90,26 @@ class Python_Ai:
                 "custom_whitelisted_dependencies": ["sweetviz"]
             }
         )
-        # pandas_ai.add_skills(summarise_df)
+        #pandas_ai.add_skills(summarise_df)
+        return pandas_ai
+    
+    def pandas_legend_with_summary_skill(self):
+        llm  = LangchainLLM(self.get_llm().llm)
+
+        pandas_ai = Agent(
+            self.df, 
+
+            config={
+                "llm":llm,
+                "open_charts":False,
+                "enable_cache" : False,
+                "save_charts": True,
+                "max_retries":3,
+                "response_parser": StreamlitResponse,
+                "custom_whitelisted_dependencies": ["sweetviz"]
+            }
+        )
+        pandas_ai.add_skills(summary_skill)
         return pandas_ai
     
     def dataframe_selector(self):

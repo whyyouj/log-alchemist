@@ -7,7 +7,7 @@ import os, sys
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
-from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, python_summary_agent
+from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, router_python_output, python_summary_agent
 
 class AgentState(TypedDict):
     input: str
@@ -35,6 +35,7 @@ class Graph:
             router_agent_decision,
             {
                 "router_summary_agent":"router_summary_agent",
+                # "python_pandas_ai":"python_pandas_ai",
                 "final_agent":"final_agent"
             }
         )
@@ -46,10 +47,28 @@ class Graph:
                 "python_pandas_ai":"python_pandas_ai"
             }
         )
+        
+        graph.add_conditional_edges(
+            "python_pandas_ai",
+            router_python_output,
+            {
+                "final_agent":"final_agent",
+                "__end__":"__end__"
+            }
+        )
+        
+        graph.add_conditional_edges(
+            "python_summary_agent",
+            router_python_output,
+            {
+                "final_agent":"final_agent",
+                "__end__":"__end__"
+            }
+        )
         graph.add_edge("python_pandas_ai", END)
         
         # graph.add_edge(START, "python_summary_agent")
-        graph.add_edge("python_summary_agent", END)
+        # graph.add_edge("python_summary_agent", END)
         graph.add_edge("final_agent", END)
         runnable = graph.compile()
         return runnable
@@ -85,8 +104,8 @@ class Graph:
         png_data = runnable.get_graph().draw_png()
         image = PILImage.open(io.BytesIO(png_data))
         os.makedirs("./image", exist_ok=True)
-        image.save("./image/lang_chain_graph_pandas.png")
-        return "./image/lang_chain_graph_pandas.png"
+        image.save("./image/lang_chain_graph_pandas_new.png")
+        return "./image/lang_chain_graph_pandas_new.png"
     
 if __name__ == "__main__":
     df = pd.read_csv('../../../data/Mac_2k.log_structured.csv')

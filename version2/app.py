@@ -420,6 +420,17 @@ def output(message):
             else:
                 st.write(message['content'])
                 return
+        elif str(message['content']).endswith(".html"):
+            st.write("### Here is a summary of the data!")
+            print("[APP]", message['content'])
+            if os.path.exists(message['content']):
+                    # Read the file and render it in an iframe
+                    with open(message['content'], 'r', encoding='utf-8') as f:
+                        html_content = f.read()
+                    # Display the HTML report in Streamlit
+                    components.html(html_content, height=800, scrolling=True)
+              
+                    return
                 
         elif "exports/charts/" in str(message['content']):
             img_base64 = img_to_base64(message['content'])
@@ -435,6 +446,7 @@ def output(message):
                 st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
         else:
             st.write(message["content"])   
+        return
 
 async def on_chat_submit(chat_input):
     """
@@ -517,7 +529,7 @@ def update_langgraph():
         df_list.append(df)
 
     llm = Python_Ai(df = df_list)
-    pandas_llm = llm.pandas_legend()
+    pandas_llm = llm.pandas_legend_with_summary_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     print("langgraph updated")
