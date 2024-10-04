@@ -49,14 +49,29 @@ def summary_skill(df):
     Use this for any question regarding an Overall Summary
     The output type will be a string
     Args:
-        df (pd.DataFrame): A pandas dataframe 
+        df pd.DataFrame: A pandas dataframe 
     """
     import sweetviz as sv
+    # if type(df) != list:
+    #     dfs = [df]
+    # else:
+    #     dfs = df
+    # tempfile_paths = []
+    # for i, d in enumerate(dfs):
+
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as f:
         tempfile_path = f.name
-        report = sv.analyze(df)
+        try:
+            report = sv.analyze([df,'logs'])
+        except:
+            try:
+                report = sv.analyze(df)
+            except Exception as e:
+                raise(Exception)
         report.show_html(filepath=tempfile_path, layout='vertical', scale=0.65, open_browser=False)
+        # tempfile_paths.append(tempfile_path)
     result = {'type': 'Python_AI_Summary' , 'path': {tempfile_path}}
+
     return tempfile_path
 
 class Python_Ai:

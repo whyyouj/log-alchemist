@@ -9,8 +9,11 @@ from version_temp.python_agent.python_ai import Python_Ai
 from version_temp.regular_agent.agent_ai import Agent_Ai
 import pandas as pd
 import tempfile
-import os
 import asyncio
+import ast
+import os
+import re
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -423,14 +426,17 @@ def output(message):
         elif str(message['content']).endswith(".html"):
             st.write("### Here is a summary of the data!")
             print("[APP]", message['content'])
-            if os.path.exists(message['content']):
-                    # Read the file and render it in an iframe
-                    with open(message['content'], 'r', encoding='utf-8') as f:
-                        html_content = f.read()
-                    # Display the HTML report in Streamlit
-                    components.html(html_content, height=800, scrolling=True)
+            html_files = re.findall(r'/[\w\/\.\-]+\.html', message['content'])
+            print(html_files)
+            for content in html_files:
+                if os.path.exists(content):
+                        # Read the file and render it in an iframe
+                        with open(content, 'r', encoding='utf-8') as f:
+                            html_content = f.read()
+                        # Display the HTML report in Streamlit
+                        components.html(html_content, height=800, scrolling=True)
               
-                    return
+            return
                 
         elif "exports/charts/" in str(message['content']):
             img_base64 = img_to_base64(message['content'])
