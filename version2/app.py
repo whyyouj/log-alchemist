@@ -24,7 +24,7 @@ NUMBER_OF_MESSAGES_TO_DISPLAY = 20
 st.set_page_config(
     page_title="Vantage Assistant",
     page_icon="imgs/vantage_logo.png",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="auto",
     menu_items={
         "About": """
@@ -428,6 +428,7 @@ def output(message):
             print("[APP]", message['content'])
             html_files = re.findall(r'/[\w\/\.\-]+\.html', message['content'])
             print(html_files)
+            html_files = [r"C:\Users\regan\AppData\Local\Temp\tmpkzdszs7u.html"]
             for content in html_files:
                 if os.path.exists(content):
                         # Read the file and render it in an iframe

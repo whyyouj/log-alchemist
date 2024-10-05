@@ -2128,3 +2128,147 @@ print(result)
 3  ARPT: <*>.<*>: AirPort_<*>::syncPowerState: WW...  2024-07-01 09:02:26  
 4  ARPT: <*>.<*>: AirPort_<*>::platformWoWEnable:...  2024-07-01 09:02:26  }
 2024-10-05 13:34:14 [INFO] Executing Step 8: ResultParsing
+2024-10-05 20:32:08 [INFO] Question: Give me a summary.
+2024-10-05 20:32:09 [INFO] Running PandasAI with langchain_ollama-llm LLM...
+2024-10-05 20:32:09 [INFO] Prompt ID: 620bb6f6-4bc1-4be2-87f4-c0b09eef18a3
+2024-10-05 20:32:09 [INFO] Executing Pipeline: GenerateChatPipeline
+2024-10-05 20:32:09 [INFO] Executing Step 0: ValidatePipelineInput
+2024-10-05 20:32:09 [INFO] Executing Step 1: CacheLookup
+2024-10-05 20:32:09 [INFO] Executing Step 2: PromptGeneration
+2024-10-05 20:32:09 [INFO] Using prompt: <dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+423,calvisitor-10-105-162-105,com.apple.SecurityServer,31480,[33523],6404223738,E34,"VDCAssistant:  Found a camera (<*>) , but was not able to start it up (<*> -- (os/kern) successful)",2024-07-03 19:46:35
+1007,calvisitor-10-105-160-226,AddressBookSourceSync,33373,,5888551980,E104,"Setting BTCoex Config: enable_<*>:<*>, profile_<*>:<*>, enable_<*>:<*>, profile_<*>:<*>",2024-07-08 00:44:20
+307,calvisitor-10-105-162-108,com.apple.WebKit.WebContent,32160,com.apple.xpc.launchd.domain.pid.WebContent.32564,8364217372,E158,hibernate_rebuild started,2024-07-01 22:08:16
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ Give me a summary.
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+2024-10-05 20:32:09 [INFO] Executing Step 3: CodeGenerator
+2024-10-05 20:32:15 [INFO] Prompt used:
+            
+<dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+423,calvisitor-10-105-162-105,com.apple.SecurityServer,31480,[33523],6404223738,E34,"VDCAssistant:  Found a camera (<*>) , but was not able to start it up (<*> -- (os/kern) successful)",2024-07-03 19:46:35
+1007,calvisitor-10-105-160-226,AddressBookSourceSync,33373,,5888551980,E104,"Setting BTCoex Config: enable_<*>:<*>, profile_<*>:<*>, enable_<*>:<*>, profile_<*>:<*>",2024-07-08 00:44:20
+307,calvisitor-10-105-162-108,com.apple.WebKit.WebContent,32160,com.apple.xpc.launchd.domain.pid.WebContent.32564,8364217372,E158,hibernate_rebuild started,2024-07-01 22:08:16
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ Give me a summary.
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+            
+2024-10-05 20:32:15 [INFO] Code generated:
+            ```
+            # TODO: import the required dependencies
+import pandas as pd
+
+# Declare result var: 
+result = { "type": "string", "value": "" }
+
+# Write code here
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+    return f"The dataframe has {len(df)} rows and {len(df.columns)} columns."
+
+# Call the function with the provided dataframe
+result["value"] = summary_skill(dfs[0])
+
+print(result)
+            ```
+            
+2024-10-05 20:32:15 [INFO] Executing Step 4: CachePopulation
+2024-10-05 20:32:15 [INFO] Executing Step 5: CodeCleaning
+2024-10-05 20:32:15 [INFO] 
+Code running:
+```
+result = {'type': 'string', 'value': ''}
+result['value'] = summary_skill(dfs[0])
+print(result)
+        ```
+2024-10-05 20:32:15 [INFO] Executing Step 6: CodeExecution
+2024-10-05 20:32:22 [INFO] Executing Step 7: ResultValidation
+2024-10-05 20:32:22 [INFO] Answer: {'type': 'string', 'value': 'C:\\Users\\regan\\AppData\\Local\\Temp\\tmpxyazoglz.html'}
+2024-10-05 20:32:22 [INFO] Executing Step 8: ResultParsing
