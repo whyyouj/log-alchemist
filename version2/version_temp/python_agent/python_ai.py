@@ -13,6 +13,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from pandasai.prompts.base import BasePrompt
 from pandasai.responses import StreamlitResponse
 from pandasai.pipelines.pipeline_context import PipelineContext
+
 class LangchainLLM(LLM):
     """
     Class to wrap Langchain LLMs and make PandasAI interoperable
@@ -261,7 +262,7 @@ class Python_Ai:
             print(e)
             return '<Python Agent get Summary> Please Try Again'
         
-    def get_summary(self):
+    def get_summary(self): 
         # from skimpy import skim
         # from pandas_profiling import ProfileReport
         #profile = ProfileReport(self.df, title="Pandas Profiling Report", explorative=True)

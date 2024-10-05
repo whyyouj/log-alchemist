@@ -5,6 +5,7 @@ from langgraph.graph import StateGraph, END, START
 import pandas as pd
 import os, sys
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
 from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, router_python_output, python_summary_agent
@@ -24,18 +25,21 @@ class Graph:
     
     def get_graph(self):
         graph = StateGraph(AgentState)
-        graph.add_node('router_agent', router_agent)
-        graph.add_node('router_summary_agent', router_summary_agent)
-        graph.add_node('final_agent', final_agent)
-        graph.add_node("python_pandas_ai", python_pandas_ai)
-        graph.add_node("python_summary_agent", python_summary_agent)
-        graph.add_edge(START, 'router_agent')
+
+        # LangGraph Nodes
+        graph.add_node('router_agent', router_agent) # Determining if question is related to dataset
+        graph.add_node('router_summary_agent', router_summary_agent) # Determining if question is asking for summary
+        graph.add_node("python_pandas_ai", python_pandas_ai) # Answering specific dataset related questions
+        graph.add_node("python_summary_agent", python_summary_agent) # Answering summary related questions by outputting sweetviz framework
+        graph.add_node('final_agent', final_agent) 
+
+        # LangGraph Edges
+        graph.add_edge(START, 'router_agent') # Initialising LangGraph
         graph.add_conditional_edges(
             "router_agent",
             router_agent_decision,
             {
                 "router_summary_agent":"router_summary_agent",
-                # "python_pandas_ai":"python_pandas_ai",
                 "final_agent":"final_agent"
             }
         )
@@ -66,11 +70,9 @@ class Graph:
             }
         )
         graph.add_edge("python_pandas_ai", END)
-        
-        # graph.add_edge(START, "python_summary_agent")
-        # graph.add_edge("python_summary_agent", END)
         graph.add_edge("final_agent", END)
         runnable = graph.compile()
+
         return runnable
     
     def run(self, query):
@@ -81,7 +83,7 @@ class Graph:
         If the question is not about retrying, respond with 'No'.
         Only answer 'Yes' or 'No'"""
         ans = llm.query_agent(prompt)
-        print(f'[STAGE] Try again agent: {ans}')
+        print(f'[STAGE] Try again agent:{ans}')
         if 'yes' in ans.lower():
             if self.qns != '':
                 query = self.qns
@@ -108,7 +110,7 @@ class Graph:
         return "./image/lang_chain_graph_pandas_new.png"
     
 if __name__ == "__main__":
-    df = pd.read_csv('../../../data/Mac_2k.log_structured.csv')
+    df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
     pandas_ai = Python_Ai(df=df).pandas_legend()
     graph = Graph(pandas_llm= pandas_ai, df = df)
-    graph.show()
+    # graph.show()

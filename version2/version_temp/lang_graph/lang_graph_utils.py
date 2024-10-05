@@ -6,48 +6,40 @@ from python_agent.python_ai import Python_Ai
 
 graph_stage_prefix = '[STAGE]'
 
-# def start_agent(state: list):
-#     print(graph_stage_prefix, 'Start agent')
-#     df = state['df']
-#     query = state['input']
-#     llm = Agent_Ai(model = 'llama3.1', df=df)
-#     out = llm.prompt_agent(query=query)
-#     return {"agent_out": out}
-
 def router_agent(state: list):
-    print(graph_stage_prefix, 'Router agent')
+    print(graph_stage_prefix, 'Router Agent')
     df = state['df']
     query = state['input']
     llm = Agent_Ai(model = 'llama3.1', df=df)
     out = llm.prompt_agent(query=query)
-    print('ROUTER AGENT OUT: ', out)
+    print('ROUTER AGENT OUTPUT: ', out)
     return {"agent_out": out}
 
 def router_agent_decision(state: list):
     router_out = state['agent_out']
     router_out = router_out.lower()
-    out = router_out[router_out.rfind("answer")+5:]
+    out = router_out[router_out.rfind("answer") + 5:]
     if 'yes' in out.lower():
-        return 'router_summary_agent'#"python_pandas_ai"
+        return 'router_summary_agent'
     else:
         return 'final_agent'
 
 def router_summary_agent(state: list):
     print(graph_stage_prefix, 'Router summary agent')
-    llm = Agent_Ai(model='llama3')
+    llm = Agent_Ai(model='llama3.1')
     query = state['input']
     query_summary = f"""
-    You are suppose to determine if the <Question> is explicitly asking for a summary. When determining whether a question is asking for a summary, focus on whether the question is requesting a high-level overview of the data (summary), or if it’s asking for a specific value, action, or detail (non-summary) Always think before answering.
+    You are suppose to determine if the <Question> is explicitly asking for a summary. When determining whether a question is asking for a summary, focus on whether the question is requesting a high-level overview of the data (summary), or if it’s asking for a specific value, action, or detail (non-summary). Always think before answering.
     
-    <Question>Is this asking for a summary: {query} 
+    <Question> Is this asking for a summary: {query} 
     <Thought> ...
-    <Answer> should always be a Yes or No only
+    <Answer> Always a Yes or No only
     """
     out = llm.query_agent(query=query_summary)
     out = out.lower()
     ans = out[out.rfind('answer')+ 5:]
-    print('SUMMARY AGENT OUT: ', ans)
-    return {"agent_out": ans}
+    print('ROUTER SUMMARY AGENT OUTPUT: ', out)
+    return {"agent_out": out}
 
 def router_summary_agent_decision(state: list):
     router_out = state['agent_out']
@@ -55,16 +47,6 @@ def router_summary_agent_decision(state: list):
         return 'python_summary_agent'
     else:
         return 'python_pandas_ai'
-    
-# def router(state: list):
-#     print("Routing")
-#     llm = Agent_Ai(model = 'llama3.1')
-#     action = state["agent_out"]
-#     out = llm.query_agent(query = action + "\n Is the code related to the question. Answer with a yes or a no only.")
-#     if 'yes' in out.lower():
-#         return "python_pandas_ai"
-#     else:
-#         return 'final_agent'
     
 def python_pandas_ai(state:list):
     print(graph_stage_prefix, 'Pandas AI agent')
@@ -85,31 +67,9 @@ def python_pandas_ai(state:list):
     return {"agent_out": out}
 
 def python_summary_agent(state: list):
-    print(graph_stage_prefix, 'Summary agent')
+    print(graph_stage_prefix, 'Summary Agent')
     df = state['df']
-    # llm = Python_Ai(model = 'mistral', df=df)
-    # out = llm.get_summary()
     query = state['input']
-    # prompt = f"""
-    # The following is the query from the user:
-    # {query}
-
-    # The following is a list of Python dictionaries, where each dictionary has a 'path' value which is a html summary report:
-    # {out}
-
-    # You are to respond with a code output that answers the user query. The code must not be a function and must NOT have a return statement.
-
-    # You are to following the instructions below strictly:
-    # - dfs: list[pd.DataFrame] is already provided.
-    # - Parse through the html summary report for each Python dictionary above, print the Python dictionary/dictionaries whose html summary report answers the user query.
-    # """
-    # # - dfs: list[pd.DataFrame] is already provided.
-    # # - summarise_df(df: pd.DataFrame) function is already provided. You MUST use this function.
-    # # - For each dataframe that the user wants to summarise, use the summarise_df(df: pd.DataFrame) function provided to summarise the dataframe as such: summarise_df(df), where df 
-    # # is the pd.DataFrame to be summarised
-    # # - Print the summary results for each dataframe the user wants to summarise.
-    # # - Import all required dependencies in the function.
-    # # - Generate a random id for each dataframe to differentiate them.
     llm = Python_Ai(model = "llama3.1", df = df)
     pandasai_llm  = llm.pandas_legend_with_summary_skill()
     out = pandasai_llm.chat(query) #state['pandas'].chat(prompt)
@@ -118,13 +78,13 @@ def python_summary_agent(state: list):
 
 def router_python_output(state:list):
     router_out = state["agent_out"]
-    if "Unfortunately, I was not able to answer your question, because of the following error:" in router_out:
+    if "Unfortunately, I was not able to answer your question, because of the following error:" in str(router_out):
         return "final_agent"
     else:
         return "__end__"
     
 def final_agent(state:list):
-    print(graph_stage_prefix, "Final agent")
+    print(graph_stage_prefix, "Final Agent")
     llm = Agent_Ai(model = "llama3.1")
     query = state['input']
     out = llm.query_agent(query=query)

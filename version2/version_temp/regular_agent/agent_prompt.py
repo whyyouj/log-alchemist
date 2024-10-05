@@ -21,6 +21,7 @@ SUFFIX = """
     <Answer> yes or no only.
 
     """
+
 PREFIX_1 = ""
 SUFFIX_1 =  """
     Your task is to determine if the <USER INPUT> is related to manipulating the dataframe(s) using Python.
