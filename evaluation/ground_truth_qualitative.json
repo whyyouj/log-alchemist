@@ -1,0 +1,4 @@
+{
+    "reason_for_restart": "The system restarted due to a scheduled maintenance update at 02:00 AM.",
+    "reason_for_crash": "The system crashed because of an unhandled exception caused by a null pointer in the application code."
+}
