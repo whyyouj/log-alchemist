@@ -69,7 +69,7 @@ def summary_skill(df):
                 report = sv.analyze(df)
             except Exception as e:
                 raise(Exception)
-        report.show_html(filepath=tempfile_path, layout='vertical', scale=0.65, open_browser=False)
+        report.show_html(filepath=tempfile_path, layout='vertical', open_browser=False)
         # tempfile_paths.append(tempfile_path)
     result = {'type': 'Python_AI_Summary' , 'path': {tempfile_path}}
 
