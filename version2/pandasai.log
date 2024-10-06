@@ -2272,3 +2272,144 @@ print(result)
 2024-10-05 20:32:22 [INFO] Executing Step 7: ResultValidation
 2024-10-05 20:32:22 [INFO] Answer: {'type': 'string', 'value': 'C:\\Users\\regan\\AppData\\Local\\Temp\\tmpxyazoglz.html'}
 2024-10-05 20:32:22 [INFO] Executing Step 8: ResultParsing
+2024-10-06 13:39:45 [INFO] Question: Give me a summary of the data.
+2024-10-06 13:39:46 [INFO] Running PandasAI with langchain_ollama-llm LLM...
+2024-10-06 13:39:46 [INFO] Prompt ID: 39dcf8b5-42dd-42f8-a981-348de666c5aa
+2024-10-06 13:39:46 [INFO] Executing Pipeline: GenerateChatPipeline
+2024-10-06 13:39:46 [INFO] Executing Step 0: ValidatePipelineInput
+2024-10-06 13:39:46 [INFO] Executing Step 1: CacheLookup
+2024-10-06 13:39:46 [INFO] Executing Step 2: PromptGeneration
+2024-10-06 13:39:46 [INFO] Using prompt: <dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+501,calvisitor-10-105-160-85,sharingd,37644,com.apple.xpc.launchd.domain.pid.WebContent.32564,"Path not allowed in target domain: type = pid, path = /System/Library/StagedFrameworks/Safari/SafariShared.framework/Versions/A/XPCServices/com.apple.Safari.WebFeedParser.xpc/Contents/MacOS/com.apple.Safari.WebFeedParser error = 147: The specified service did not ship in the requestor's bundle, origin = /System/Library/StagedFrameworks/Safari/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.WebContent.xpc",E330,WARNING: hibernate_page_list_setall skipped <*> xpmapped pages,2024-07-01 11:51:11
+90,calvisitor-10-105-160-179,AirPlayUIAgent,35628,com.apple.xpc.launchd.domain.pid.WebContent.37963,[11:34:44.290] itemasync_CopyProperty signalled err=-12785 (kFigBaseObjectError_Invalidated) (invalidated) at /Library/Caches/com.apple.xbs/Sources/CoreMedia/CoreMedia-1731.15.207/Prototypes/Player/FigPlayer_Async.c line 2092,E9,Wake reason: RTC (Alarm),2024-07-06 17:23:46
+321,calvisitor-10-105-160-47,ChromeExistion,34670,,"com.apple.EscrowSecurityAlert.daily: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for 10319 seconds.  Ignoring.",E281,Wake reason: EC.SleepTimer (SleepTimer),2024-07-07 00:43:06
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ Give me a summary of the data.
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+2024-10-06 13:39:46 [INFO] Executing Step 3: CodeGenerator
+2024-10-06 13:39:52 [INFO] Prompt used:
+            
+<dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+501,calvisitor-10-105-160-85,sharingd,37644,com.apple.xpc.launchd.domain.pid.WebContent.32564,"Path not allowed in target domain: type = pid, path = /System/Library/StagedFrameworks/Safari/SafariShared.framework/Versions/A/XPCServices/com.apple.Safari.WebFeedParser.xpc/Contents/MacOS/com.apple.Safari.WebFeedParser error = 147: The specified service did not ship in the requestor's bundle, origin = /System/Library/StagedFrameworks/Safari/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.WebContent.xpc",E330,WARNING: hibernate_page_list_setall skipped <*> xpmapped pages,2024-07-01 11:51:11
+90,calvisitor-10-105-160-179,AirPlayUIAgent,35628,com.apple.xpc.launchd.domain.pid.WebContent.37963,[11:34:44.290] itemasync_CopyProperty signalled err=-12785 (kFigBaseObjectError_Invalidated) (invalidated) at /Library/Caches/com.apple.xbs/Sources/CoreMedia/CoreMedia-1731.15.207/Prototypes/Player/FigPlayer_Async.c line 2092,E9,Wake reason: RTC (Alarm),2024-07-06 17:23:46
+321,calvisitor-10-105-160-47,ChromeExistion,34670,,"com.apple.EscrowSecurityAlert.daily: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for 10319 seconds.  Ignoring.",E281,Wake reason: EC.SleepTimer (SleepTimer),2024-07-07 00:43:06
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ Give me a summary of the data.
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+            
+2024-10-06 13:39:52 [INFO] Code generated:
+            ```
+            # TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+    return "The data contains {} rows and {} columns.".format(len(df), len(df.columns))
+
+# Declare result var: 
+result = { "type": "string", "value": summary_skill(dfs[0]) }
+
+print(result)
+            ```
+            
+2024-10-06 13:39:52 [INFO] Executing Step 4: CachePopulation
+2024-10-06 13:39:52 [INFO] Executing Step 5: CodeCleaning
+2024-10-06 13:39:52 [INFO] 
+Code running:
+```
+result = {'type': 'string', 'value': summary_skill(dfs[0])}
+print(result)
+        ```
+2024-10-06 13:39:52 [INFO] Executing Step 6: CodeExecution
+2024-10-06 13:40:01 [INFO] Executing Step 7: ResultValidation
+2024-10-06 13:40:02 [INFO] Answer: {'type': 'string', 'value': 'C:\\Users\\regan\\AppData\\Local\\Temp\\tmphlwrcafk.html'}
+2024-10-06 13:40:02 [INFO] Executing Step 8: ResultParsing

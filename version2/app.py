@@ -426,17 +426,19 @@ def output(message):
         elif str(message['content']).endswith(".html"):
             st.write("### Here is a summary of the data!")
             print("[APP]", message['content'])
-            html_files = re.findall(r'/[\w\/\.\-]+\.html', message['content'])
+            pattern = r"([A-Z]:(?:\\\\|\\)(?:[^\\/:*?\"<>|\r\n]+(?:\\\\|\\))*[^\\/:*?\"<>|\r\n]+\.[a-zA-Z0-9]+|(?:\/[^\/\s]+)+\/[^\/\s]+\.[a-zA-Z0-9]+)"
+            html_files = re.findall(pattern, message['content'])
             print(html_files)
-            html_files = [r"C:\Users\regan\AppData\Local\Temp\tmpkzdszs7u.html"]
-            for content in html_files:
-                if os.path.exists(content):
-                        # Read the file and render it in an iframe
-                        with open(content, 'r', encoding='utf-8') as f:
-                            html_content = f.read()
-                        # Display the HTML report in Streamlit
-                        components.html(html_content, height=800, scrolling=True)
-              
+            for path in html_files:
+                if os.path.exists(path):
+                    # Read the file and render it in an iframe
+                    with open(path, 'r', encoding='utf-8') as f:
+                        html_content = f.read()
+                    # Display the HTML report in Streamlit
+                    components.html(html_content, height=800, scrolling=True)
+            
+                    # Deleting temporary file after outputing
+                    os.remove(path)
             return
                 
         elif "exports/charts/" in str(message['content']):
