@@ -2413,3 +2413,146 @@ print(result)
 2024-10-06 13:40:01 [INFO] Executing Step 7: ResultValidation
 2024-10-06 13:40:02 [INFO] Answer: {'type': 'string', 'value': 'C:\\Users\\regan\\AppData\\Local\\Temp\\tmphlwrcafk.html'}
 2024-10-06 13:40:02 [INFO] Executing Step 8: ResultParsing
+2024-10-06 17:27:44 [INFO] Question: How many rows of data are there in the Mac OS dataset?
+2024-10-06 17:27:44 [INFO] Running PandasAI with langchain_ollama-llm LLM...
+2024-10-06 17:27:44 [INFO] Prompt ID: 4ebdde80-ac01-4866-86e1-46ebecfd40d6
+2024-10-06 17:27:44 [INFO] Executing Pipeline: GenerateChatPipeline
+2024-10-06 17:27:45 [INFO] Executing Step 0: ValidatePipelineInput
+2024-10-06 17:27:45 [INFO] Executing Step 1: CacheLookup
+2024-10-06 17:27:45 [INFO] Executing Step 2: PromptGeneration
+2024-10-06 17:27:45 [INFO] Using prompt: <dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+1440,calvisitor-10-105-163-28,ChromeExistion,36544,com.apple.xpc.launchd.domain.pid.WebContent.35412,in6_unlink_ifa: IPv6 address 0x77c911454f152b8b has no prefix,E3,<IMMacNotificationCenterManager: <*>>: Updating enabled: YES   (Topics: (<*>)),2024-07-02 22:24:15
+1006,calvisitor-10-105-162-98,wirelessproxd,38603,com.apple.xpc.launchd.domain.pid.WebContent.32564,en0: Supported channels 1 2 3 4 5 6 7 8 9 10 11 12 13 36 40 44 48 52 56 60 64 100 104 108 112 116 120 124 128 132 136 140 144 149 153 157 161 165,E152,send_datagram_available_ping: pid <*> failed to act on a ping it dequeued before timing out.,2024-07-02 12:29:56
+1326,calvisitor-10-105-161-231,com.apple.WebKit.WebContent,82,,ARPT: 621342.242614: AirPort_Brcm43xx::platformWoWEnable: WWEN[enable],E153,"ARPT: <*>.<*>: IOPMPowerSource Information: onSleep,  SleepType: Normal Sleep,  'ExternalConnected': No, 'TimeRemaining': <*>,",2024-07-02 17:01:19
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ How many rows of data are there in the Mac OS dataset?
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+2024-10-06 17:27:45 [INFO] Executing Step 3: CodeGenerator
+2024-10-06 17:29:48 [INFO] Prompt used:
+            
+<dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+1440,calvisitor-10-105-163-28,ChromeExistion,36544,com.apple.xpc.launchd.domain.pid.WebContent.35412,in6_unlink_ifa: IPv6 address 0x77c911454f152b8b has no prefix,E3,<IMMacNotificationCenterManager: <*>>: Updating enabled: YES   (Topics: (<*>)),2024-07-02 22:24:15
+1006,calvisitor-10-105-162-98,wirelessproxd,38603,com.apple.xpc.launchd.domain.pid.WebContent.32564,en0: Supported channels 1 2 3 4 5 6 7 8 9 10 11 12 13 36 40 44 48 52 56 60 64 100 104 108 112 116 120 124 128 132 136 140 144 149 153 157 161 165,E152,send_datagram_available_ping: pid <*> failed to act on a ping it dequeued before timing out.,2024-07-02 12:29:56
+1326,calvisitor-10-105-161-231,com.apple.WebKit.WebContent,82,,ARPT: 621342.242614: AirPort_Brcm43xx::platformWoWEnable: WWEN[enable],E153,"ARPT: <*>.<*>: IOPMPowerSource Information: onSleep,  SleepType: Normal Sleep,  'ExternalConnected': No, 'TimeRemaining': <*>,",2024-07-02 17:01:19
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ How many rows of data are there in the Mac OS dataset?
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+            
+2024-10-06 17:29:48 [INFO] Code generated:
+            ```
+            # TODO: import the required dependencies
+import pandas as pd
+
+# Declare result var: 
+result = {}
+
+# Write code here
+dfs[0].info() # This will print out information about the dataframe, including number of rows and columns.
+num_rows = dfs[0].shape[0] # Get the number of rows from the shape attribute of the dataframe.
+
+# Declare result var: 
+result = {
+    "type": "string",
+    "value": f"There are {num_rows} rows in the Mac OS dataset."
+}
+
+print(result)
+            ```
+            
+2024-10-06 17:29:48 [INFO] Executing Step 4: CachePopulation
+2024-10-06 17:29:49 [INFO] Executing Step 5: CodeCleaning
+2024-10-06 17:29:49 [INFO] 
+Code running:
+```
+result = {}
+dfs[0].info()
+num_rows = dfs[0].shape[0]
+result = {'type': 'string', 'value': f'There are {num_rows} rows in the Mac OS dataset.'}
+print(result)
+        ```
+2024-10-06 17:29:49 [INFO] Executing Step 6: CodeExecution
+2024-10-06 17:29:49 [INFO] Executing Step 7: ResultValidation
+2024-10-06 17:29:49 [INFO] Answer: {'type': 'string', 'value': 'There are 2000 rows in the Mac OS dataset.'}
+2024-10-06 17:29:49 [INFO] Executing Step 8: ResultParsing
