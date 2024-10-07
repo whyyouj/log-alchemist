@@ -111,9 +111,12 @@ def combine_datetime_columns(df, default_year=2024):
         print("No datetime components found.")
         return df
 
+    #keep copy of the original df to return in case conversion fails
+    df_orig = df.copy()
+
     # Check if "Date" column already contains full or partial date components
     for col in df.columns:
-        if 'date' == col.lower():
+        if 'date' in col.lower():
             # Attempt to break down the 'Date' column
             df[col] = df[col].astype(str)
             date_parts = df[col].apply(break_down_date_component)
@@ -139,13 +142,17 @@ def combine_datetime_columns(df, default_year=2024):
         df['Datetime'] = pd.to_datetime(df['Datetime'])
         # Drop the original datetime-related columns after successful conversion
         cols_to_drop = datetime_cols
+        if 'Datetime' in cols_to_drop:
+            cols_to_drop.remove('Datetime')
         df.drop(columns=cols_to_drop, inplace=True)
-    except ValueError as e:
-        print(f"Error converting to datetime: {e}. Please check the format of the combined column.")
+        return df
+    except Exception as e:
+        print(f"Error converting to datetime, please check the format of the combined column: {e}")
 
-    return df
+    return df_orig
 
-file_name = "auditrecords.csv"
-df = pd.read_csv(f"../logs/{file_name}")
-path = f"../logs/Test/{file_name}"
-combine_datetime_columns(df, 2024).to_csv(path, index = False)
+if __name__ == '__main__':
+    file_name = "auditrecords.csv"
+    df = pd.read_csv(f"../logs/{file_name}")
+    path = f"../logs/Test/{file_name}"
+    combine_datetime_columns(df, 2024).to_csv(path, index = False)
