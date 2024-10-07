@@ -503,7 +503,7 @@ def initialize_conversation():
 
 def initialize_langgraph():
     graph = Agent_Ai()
-    print('langgraph initialized')
+    print('Langgraph Initialized')
     return graph
 
 def initialize_session_state():
@@ -541,7 +541,7 @@ def update_langgraph():
     pandas_llm = llm.pandas_legend_with_summary_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
-    print("langgraph updated")
+    print("Langgraph Updated")
 
 def main():
     

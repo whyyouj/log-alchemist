@@ -63,7 +63,7 @@ def summary_skill(df):
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as f:
         tempfile_path = f.name
         try:
-            report = sv.analyze([df,'logs'])
+            report = sv.analyze([df,'Logs'])
         except:
             try:
                 report = sv.analyze(df)
@@ -94,7 +94,7 @@ class Python_Ai:
             self.df, 
             description = """
                 You are a data analysis agent tasked with the main goal to answer any data related queries. 
-                Everytime I ask you a question, you should provide the code to that specifically answers the question.
+                Everytime I ask you a question, you should provide the code that specifically answers the question.
             """,
             config={
                 "llm":llm,
@@ -114,7 +114,9 @@ class Python_Ai:
 
         pandas_ai = Agent(
             self.df, 
-
+            description = """
+            You are a data analyst that has been tasked with the goal of providing a summary of the data using your skill when required. Everytime I ask you a question about summary, you should use your summary skill.
+            """,
             config={
                 "llm":llm,
                 "open_charts":False,
