@@ -2413,3 +2413,548 @@ print(result)
 2024-10-06 13:40:01 [INFO] Executing Step 7: ResultValidation
 2024-10-06 13:40:02 [INFO] Answer: {'type': 'string', 'value': 'C:\\Users\\regan\\AppData\\Local\\Temp\\tmphlwrcafk.html'}
 2024-10-06 13:40:02 [INFO] Executing Step 8: ResultParsing
+2024-10-06 15:27:35 [INFO] Question: How many rows of data are there?
+2024-10-06 15:27:36 [INFO] Running PandasAI with langchain_ollama-llm LLM...
+2024-10-06 15:27:36 [INFO] Prompt ID: ece7d62d-eb66-4d84-9e3c-c0b40ed46da2
+2024-10-06 15:27:36 [INFO] Executing Pipeline: GenerateChatPipeline
+2024-10-06 15:27:36 [INFO] Executing Step 0: ValidatePipelineInput
+2024-10-06 15:27:36 [INFO] Executing Step 1: CacheLookup
+2024-10-06 15:27:36 [INFO] Executing Step 2: PromptGeneration
+2024-10-06 15:27:36 [INFO] Using prompt: <dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+566,calvisitor-10-105-160-37,com.apple.ncplugin.weather,31206,com.apple.xpc.launchd.domain.pid.WebContent.37146,Captive: CNPluginHandler en0: Evaluating,E198,<<<< MediaValidator >>>> mv_<*>: Unrecognized codec <*>.(null). Failed codec specific check.,2024-07-03 17:25:31
+1754,calvisitor-10-105-162-228,secd,35391,[37617],"Opened file /var/log/SleepWakeStacks.bin, size 172032, extents 1, maxio 2000000 ssd 1",E165,Location icon should now be in state 'Active',2024-07-07 19:43:09
+1671,calvisitor-10-105-163-9,loginwindow,34604,,"ARPT: 621131.293163: wl0: Roamed or switched channel, reason #8, bssid 5c:50:15:4c:18:13, last RSSI -64",E40,DB Path: <*>,2024-07-03 16:27:10
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ How many rows of data are there?
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+2024-10-06 15:27:36 [INFO] Executing Step 3: CodeGenerator
+2024-10-06 15:27:41 [INFO] Prompt used:
+            
+<dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+566,calvisitor-10-105-160-37,com.apple.ncplugin.weather,31206,com.apple.xpc.launchd.domain.pid.WebContent.37146,Captive: CNPluginHandler en0: Evaluating,E198,<<<< MediaValidator >>>> mv_<*>: Unrecognized codec <*>.(null). Failed codec specific check.,2024-07-03 17:25:31
+1754,calvisitor-10-105-162-228,secd,35391,[37617],"Opened file /var/log/SleepWakeStacks.bin, size 172032, extents 1, maxio 2000000 ssd 1",E165,Location icon should now be in state 'Active',2024-07-07 19:43:09
+1671,calvisitor-10-105-163-9,loginwindow,34604,,"ARPT: 621131.293163: wl0: Roamed or switched channel, reason #8, bssid 5c:50:15:4c:18:13, last RSSI -64",E40,DB Path: <*>,2024-07-03 16:27:10
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ How many rows of data are there?
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+            
+2024-10-06 15:27:41 [INFO] Code generated:
+            ```
+            # TODO: import the required dependencies
+import pandas as pd
+
+# Declare result var: 
+result = { "type": "string", "value": "" }
+
+# Write code here
+dfs[0].shape[0]
+
+# How many rows of data are there?
+num_rows = dfs[0].shape[0]
+result["value"] = f"There are {num_rows} rows of data."
+
+print(result)
+            ```
+            
+2024-10-06 15:27:41 [INFO] Executing Step 4: CachePopulation
+2024-10-06 15:27:41 [INFO] Executing Step 5: CodeCleaning
+2024-10-06 15:27:42 [INFO] 
+Code running:
+```
+result = {'type': 'string', 'value': ''}
+dfs[0].shape[0]
+num_rows = dfs[0].shape[0]
+result['value'] = f'There are {num_rows} rows of data.'
+print(result)
+        ```
+2024-10-06 15:27:42 [INFO] Executing Step 6: CodeExecution
+2024-10-06 15:27:42 [INFO] Executing Step 7: ResultValidation
+2024-10-06 15:27:42 [INFO] Answer: {'type': 'string', 'value': 'There are 2000 rows of data.'}
+2024-10-06 15:27:42 [INFO] Executing Step 8: ResultParsing
+2024-10-06 15:29:04 [INFO] Question: How many rows of data are there?
+2024-10-06 15:29:04 [INFO] Running PandasAI with langchain_ollama-llm LLM...
+2024-10-06 15:29:04 [INFO] Prompt ID: 3d0af54e-9923-47c1-96e2-86cabd81f538
+2024-10-06 15:29:04 [INFO] Executing Pipeline: GenerateChatPipeline
+2024-10-06 15:29:04 [INFO] Executing Step 0: ValidatePipelineInput
+2024-10-06 15:29:04 [INFO] Executing Step 1: CacheLookup
+2024-10-06 15:29:04 [INFO] Executing Step 2: PromptGeneration
+2024-10-06 15:29:04 [INFO] Using prompt: <dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+1173,authorMacBook-Pro,mds,38490,,AppleThunderboltNHIType2::waitForOk2Go2Sx - intel_rp = 1 dlla_reporting_supported = 0,E129,[HID] [ATC] [Error] AppleDeviceManagementHIDEventService::start Could not make a string from out connection notification key,2024-07-05 19:00:34
+302,calvisitor-10-105-162-32,TCIM,30299,[32626],[0706/011106:WARNING:dns_config_service_posix.cc(306)] Failed to read DnsConfig.,E218,tcp_connection_destination_handle_tls_close_notify <*> closing socket due to TLS CLOSE_NOTIFY alert,2024-07-03 01:06:48
+181,calvisitor-10-105-163-10,com.apple.cts,37602,[36919],Sandbox: com.apple.Addres(32885) deny(1) network-outbound /private/var/run/mDNSResponder,E128,dnssd_clientstub ConnectToServer: connect() failed path:/var/run/mDNSResponder Socket:<*> Err:<*> Errno:<*> Operation not permitted,2024-07-03 08:45:12
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ How many rows of data are there?
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+2024-10-06 15:29:04 [INFO] Executing Step 3: CodeGenerator
+2024-10-06 15:29:17 [ERROR] Pipeline failed on step 3: No code found in the response
+2024-10-06 20:12:45 [INFO] Question: 
+    The following is the query from the user:
+    How many rows of data are there?
+
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+    You are to following the instructions below strictly:
+    - dfs: list[pd.DataFrame] is already provided.
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    
+2024-10-06 20:12:46 [INFO] Running PandasAI with langchain_ollama-llm LLM...
+2024-10-06 20:12:46 [INFO] Prompt ID: 731ce9f1-ab45-40bf-ad5c-9f143f94859a
+2024-10-06 20:12:46 [INFO] Executing Pipeline: GenerateChatPipeline
+2024-10-06 20:12:46 [INFO] Executing Step 0: ValidatePipelineInput
+2024-10-06 20:12:46 [INFO] Executing Step 1: CacheLookup
+2024-10-06 20:12:46 [INFO] Executing Step 2: PromptGeneration
+2024-10-06 20:12:46 [INFO] Using prompt: <dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+637,calvisitor-10-105-163-147,sandboxd,37059,com.apple.xpc.launchd.domain.user.501,<IMMacNotificationCenterManager: 0x7ff1b2e00ba0>:   DND Enabled: NO,E128,"CCFile::captureLog Received Capture notice id: <*>, reason = RoamFail:sts:<NUM>_rsn:<NUM>",2024-07-07 13:42:17
+1205,authorMacBook-Pro,Mail,34457,[38179],"PM response took 2010 ms (54, powerd)",E165,[<*>:<*>:<*>.<*>] mv_LowLevelCheckIfVideoPlayableUsingDecoder signalled err=<*> (kFigMediaValidatorError_VideoCodecNotSupported) (video codec <*>) at  line <*>,2024-07-05 19:00:37
+1101,airbears2-10-142-108-38,com.apple.xpc.launchd,35461,,__42-[NETClientConnection evaluateCrazyIvan46]_block_invoke CI46 - Hit by torpedo! QQ.10018 tc21519 184.105.67.74:443,E280,hibernate_flush_memory: buffer_cache_gc freed up <*> wired pages,2024-07-03 06:45:42
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ 
+    The following is the query from the user:
+    How many rows of data are there?
+
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+    You are to following the instructions below strictly:
+    - dfs: list[pd.DataFrame] is already provided.
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+2024-10-06 20:12:46 [INFO] Executing Step 3: CodeGenerator
+2024-10-06 20:12:53 [INFO] Prompt used:
+             
+                You are a data analysis agent tasked with the main goal to answer any data related queries. 
+                Everytime I ask you a question, you should provide the code to that specifically answers the question.
+             
+<dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+637,calvisitor-10-105-163-147,sandboxd,37059,com.apple.xpc.launchd.domain.user.501,<IMMacNotificationCenterManager: 0x7ff1b2e00ba0>:   DND Enabled: NO,E128,"CCFile::captureLog Received Capture notice id: <*>, reason = RoamFail:sts:<NUM>_rsn:<NUM>",2024-07-07 13:42:17
+1205,authorMacBook-Pro,Mail,34457,[38179],"PM response took 2010 ms (54, powerd)",E165,[<*>:<*>:<*>.<*>] mv_LowLevelCheckIfVideoPlayableUsingDecoder signalled err=<*> (kFigMediaValidatorError_VideoCodecNotSupported) (video codec <*>) at  line <*>,2024-07-05 19:00:37
+1101,airbears2-10-142-108-38,com.apple.xpc.launchd,35461,,__42-[NETClientConnection evaluateCrazyIvan46]_block_invoke CI46 - Hit by torpedo! QQ.10018 tc21519 184.105.67.74:443,E280,hibernate_flush_memory: buffer_cache_gc freed up <*> wired pages,2024-07-03 06:45:42
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ 
+    The following is the query from the user:
+    How many rows of data are there?
+
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+    You are to following the instructions below strictly:
+    - dfs: list[pd.DataFrame] is already provided.
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+            
+2024-10-06 20:12:53 [INFO] Code generated:
+            ```
+            import pandas as pd
+
+# Declare result var: 
+result = { "type": "number", "value": len(dfs[0]) }
+
+print(result)
+            ```
+            
+2024-10-06 20:12:53 [INFO] Executing Step 4: CachePopulation
+2024-10-06 20:12:53 [INFO] Executing Step 5: CodeCleaning
+2024-10-06 20:12:53 [INFO] 
+Code running:
+```
+result = {'type': 'number', 'value': len(dfs[0])}
+print(result)
+        ```
+2024-10-06 20:12:53 [INFO] Executing Step 6: CodeExecution
+2024-10-06 20:12:53 [INFO] Executing Step 7: ResultValidation
+2024-10-06 20:12:53 [INFO] Answer: {'type': 'number', 'value': 2000}
+2024-10-06 20:12:53 [INFO] Executing Step 8: ResultParsing
+2024-10-06 20:13:22 [INFO] Question: 
+    The following is the query from the user:
+    Give me a summary of the dataset.
+
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+    You are to following the instructions below strictly:
+    - dfs: list[pd.DataFrame] is already provided.
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    
+2024-10-06 20:13:22 [INFO] Running PandasAI with langchain_ollama-llm LLM...
+2024-10-06 20:13:22 [INFO] Prompt ID: d6039f32-4f13-4a4d-b63f-3f568cf96582
+2024-10-06 20:13:22 [INFO] Executing Pipeline: GenerateChatPipeline
+2024-10-06 20:13:22 [INFO] Executing Step 0: ValidatePipelineInput
+2024-10-06 20:13:22 [INFO] Executing Step 1: CacheLookup
+2024-10-06 20:13:22 [INFO] Executing Step 2: PromptGeneration
+2024-10-06 20:13:22 [INFO] Using prompt: <dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+637,calvisitor-10-105-163-147,sandboxd,37059,com.apple.xpc.launchd.domain.user.501,<IMMacNotificationCenterManager: 0x7ff1b2e00ba0>:   DND Enabled: NO,E128,"CCFile::captureLog Received Capture notice id: <*>, reason = RoamFail:sts:<NUM>_rsn:<NUM>",2024-07-07 13:42:17
+1205,authorMacBook-Pro,Mail,34457,[38179],"PM response took 2010 ms (54, powerd)",E165,[<*>:<*>:<*>.<*>] mv_LowLevelCheckIfVideoPlayableUsingDecoder signalled err=<*> (kFigMediaValidatorError_VideoCodecNotSupported) (video codec <*>) at  line <*>,2024-07-05 19:00:37
+1101,airbears2-10-142-108-38,com.apple.xpc.launchd,35461,,__42-[NETClientConnection evaluateCrazyIvan46]_block_invoke CI46 - Hit by torpedo! QQ.10018 tc21519 184.105.67.74:443,E280,hibernate_flush_memory: buffer_cache_gc freed up <*> wired pages,2024-07-03 06:45:42
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ 
+    The following is the query from the user:
+    Give me a summary of the dataset.
+
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+    You are to following the instructions below strictly:
+    - dfs: list[pd.DataFrame] is already provided.
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+2024-10-06 20:13:22 [INFO] Executing Step 3: CodeGenerator
+2024-10-06 20:13:32 [INFO] Prompt used:
+             
+                You are a data analysis agent tasked with the main goal to answer any data related queries. 
+                Everytime I ask you a question, you should provide the code to that specifically answers the question.
+             
+
+### PREVIOUS CONVERSATION
+### QUERY
+ 
+    The following is the query from the user:
+    How many rows of data are there?
+
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+    You are to following the instructions below strictly:
+    - dfs: list[pd.DataFrame] is already provided.
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    
+### ANSWER
+ 2000
+<dataframe>
+dfs[0]:2000x9
+LineId,User,Component,PID,Address,Content,EventId,EventTemplate,Datetime
+637,calvisitor-10-105-163-147,sandboxd,37059,com.apple.xpc.launchd.domain.user.501,<IMMacNotificationCenterManager: 0x7ff1b2e00ba0>:   DND Enabled: NO,E128,"CCFile::captureLog Received Capture notice id: <*>, reason = RoamFail:sts:<NUM>_rsn:<NUM>",2024-07-07 13:42:17
+1205,authorMacBook-Pro,Mail,34457,[38179],"PM response took 2010 ms (54, powerd)",E165,[<*>:<*>:<*>.<*>] mv_LowLevelCheckIfVideoPlayableUsingDecoder signalled err=<*> (kFigMediaValidatorError_VideoCodecNotSupported) (video codec <*>) at  line <*>,2024-07-05 19:00:37
+1101,airbears2-10-142-108-38,com.apple.xpc.launchd,35461,,__42-[NETClientConnection evaluateCrazyIvan46]_block_invoke CI46 - Hit by torpedo! QQ.10018 tc21519 184.105.67.74:443,E280,hibernate_flush_memory: buffer_cache_gc freed up <*> wired pages,2024-07-03 06:45:42
+</dataframe>
+
+
+
+You are already provided with the following functions that you can call:
+
+<function>
+def summary_skill(df):
+    """
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
+    """
+</function>
+
+
+Update this initial code:
+```python
+# TODO: import the required dependencies
+import pandas as pd
+
+# Write code here
+
+# Declare result var: 
+type (possible values "string", "number", "dataframe", "plot"). Examples: { "type": "string", "value": f"The highest salary is {highest_salary}." } or { "type": "number", "value": 125 } or { "type": "dataframe", "value": pd.DataFrame({...}) } or { "type": "plot", "value": "temp_chart.png" }
+
+```
+
+
+
+### QUERY
+ 
+    The following is the query from the user:
+    Give me a summary of the dataset.
+
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+    You are to following the instructions below strictly:
+    - dfs: list[pd.DataFrame] is already provided.
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    
+
+Variable `dfs: list[pd.DataFrame]` is already declared.
+
+At the end, declare "result" variable as a dictionary of type and value.
+
+If you are asked to plot a chart, use "matplotlib" for charts, save as png.
+
+
+Generate python code and return full updated code:
+            
+2024-10-06 20:13:32 [INFO] Code generated:
+            ```
+            import pandas as pd
+import matplotlib.pyplot as plt
+
+# Declare result var: 
+result = {
+    "type": "string",
+    "value": summary_skill(dfs[0])
+}
+
+if result["type"] == "plot":
+    # Save the plot to a file
+    plt.savefig("temp_chart.png")
+            ```
+            
+2024-10-06 20:13:32 [INFO] Executing Step 4: CachePopulation
+2024-10-06 20:13:32 [INFO] Executing Step 5: CodeCleaning
+2024-10-06 20:13:32 [INFO] Saving charts to exports\charts\d6039f32-4f13-4a4d-b63f-3f568cf96582.png
+2024-10-06 20:13:32 [INFO] 
+Code running:
+```
+result = {'type': 'string', 'value': summary_skill(dfs[0])}
+if result['type'] == 'plot':
+    plt.savefig('exports/charts/d6039f32-4f13-4a4d-b63f-3f568cf96582.png')
+        ```
+2024-10-06 20:13:32 [INFO] Executing Step 6: CodeExecution
+2024-10-06 20:13:42 [INFO] Executing Step 7: ResultValidation
+2024-10-06 20:13:42 [INFO] Answer: {'type': 'string', 'value': 'C:\\Users\\regan\\AppData\\Local\\Temp\\tmpbeo6fqes.html'}
+2024-10-06 20:13:42 [INFO] Executing Step 8: ResultParsing
