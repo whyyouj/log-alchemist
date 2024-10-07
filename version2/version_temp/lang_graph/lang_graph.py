@@ -22,8 +22,10 @@ class Graph:
         self.pandas = pandas_llm
         self.df = df
         self.qns=''
+        self.graph = Graph.get_graph()
     
-    def get_graph(self):
+    @staticmethod
+    def get_graph():
         graph = StateGraph(AgentState)
 
         # LangGraph Nodes
@@ -51,7 +53,6 @@ class Graph:
                 "python_pandas_ai":"python_pandas_ai"
             }
         )
-        
         graph.add_conditional_edges(
             "python_pandas_ai",
             router_python_output,
@@ -59,8 +60,7 @@ class Graph:
                 "final_agent":"final_agent",
                 "__end__":"__end__"
             }
-        )
-        
+        )      
         graph.add_conditional_edges(
             "python_summary_agent",
             router_python_output,
@@ -69,7 +69,7 @@ class Graph:
                 "__end__":"__end__"
             }
         )
-        graph.add_edge("python_pandas_ai", END)
+        # graph.add_edge("python_pandas_ai", END)
         graph.add_edge("final_agent", END)
         runnable = graph.compile()
 
@@ -94,7 +94,7 @@ class Graph:
                 return f"Hi! Please ask a question {option[num]}"
         else:
             self.qns = query
-        runnable = self.get_graph()
+        runnable = self.graph
         out = runnable.invoke({"input":f"{query}", "pandas":self.pandas, "df":self.df})
         return out['agent_out']
     
@@ -102,7 +102,7 @@ class Graph:
         from PIL import Image as PILImage
         import io
         import os
-        runnable = self.get_graph()
+        runnable = self.graph
         png_data = runnable.get_graph().draw_png()
         image = PILImage.open(io.BytesIO(png_data))
         os.makedirs("./image", exist_ok=True)
