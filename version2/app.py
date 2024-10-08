@@ -13,6 +13,7 @@ import asyncio
 import os, sys
 import re
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from data.date_parser import combine_datetime_columns
 
 # Configure logging
