@@ -427,7 +427,8 @@ def output(message):
                                 st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")                                        
                         else:
                             st.write(content_key)
-                            st.write(summary_dict[key][content_key])'''
+                            st.write(summary_dict[key][content_key])
+                '''
             else:
                 st.write(message['content'])
                 return
