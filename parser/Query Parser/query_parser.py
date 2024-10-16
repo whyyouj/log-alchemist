@@ -2,142 +2,294 @@ import spacy
 import pandas as pd
 
 # Load spaCy's small English Language Model
+
 nlp = spacy.load("en_core_web_sm")
 
 class QueryParser:
     def __init__(self, dataframe):
-        self.dataframe = dataframe
-
+        self.df = dataframe
+        self.columns = [col.lower() for col in dataframe.columns]
+    
     def parse_query(self, query):
-        # Use spaCy to process the query
         doc = nlp(query.lower())
-
-        # Convert the processed query back to a string for easier matching
-        query_text = doc.text
-
-        # Identify common intents based on keywords and structure
-        if "how many" in query_text and ("where" in query_text or "given" in query_text):
-            return self.parse_filter_count_query(doc)
-
-        elif "how many" in query_text or "count" in query_text:
-            return "len(df)"  
-
-        elif "mean" in query_text and ("where" in query_text or "given" in query_text):
-            return self.parse_filter_mean_query(doc)
-
-        elif "mean" in query_text:
-            column = self.extract_column_name(doc)
-            if column:
-                return f"df['{column}'].mean()"
-            else:
-                return None
-
-        elif "filter" in query_text or "where" in query_text:
-            return self.handle_filter(doc)
-
-        elif "describe" in query_text or "summary" in query_text:
-            return "df.describe()"
-
-        else:
-            return None
-
-    def parse_filter_count_query(self, doc):
-        """Parse queries like 'How many rows are there given that age > 30 AND sales < 300?'"""
-        conditions = self.extract_conditions(doc)
-        if conditions:
-            return f"len(df[{conditions}])"
-        else:
-            return None
-
-    def parse_filter_mean_query(self, doc):
-        """Parse queries like 'What is the mean of sales where age > 30 AND sales < 400?'"""
-        column = self.extract_column_name(doc)
-        conditions = self.extract_conditions(doc)
-        if column and conditions:
-            return f"df[{conditions}]['{column}'].mean()"
-        else:
-            return None
-
-    def extract_conditions(self, doc):
-        """Extracts multiple conditions from the query (e.g., 'age > 30 AND sales < 300', 'component == kernel')."""
-        conditions = []
-        column = None
-        operator = None
-        value = None
-
+        
+        # Extract key components
+        intent = self.identify_intent(doc)
+        target_columns = self.extract_target_columns(doc)
+        filters = self.extract_filters(doc)
+        group_by = self.extract_group_by(doc)
+        aggregation = self.extract_aggregation(doc, intent)
+        sort = self.extract_sort(doc)
+        limit = self.extract_limit(doc)
+        
+        # Construct the prompt template
+        prompt_template = {
+            "intent": intent,
+            "target_columns": target_columns,
+            "filters": filters,
+            "group_by": group_by,
+            "aggregation": aggregation,
+            "sort": sort,
+            "limit": limit
+        }
+        
+        return prompt_template
+    
+    def identify_intent(self, doc):
+        intents = {
+            'describe': ['describe', 'summary', 'statistics', "summarise"],
+            'count': ['how many', 'count', 'number of'],
+            'average': ['average', 'mean', 'avg'],
+            'max': ['maximum', 'max', 'highest', 'biggest', 'largest'],
+            'min': ['minimum', 'min', 'lowest', 'smallest'],
+            'filter': ['filter', 'show me', 'get', 'list'],
+            'top_n': ['top', 'highest', 'largest'],
+            'group_by': ['group by', 'per', 'by'],
+            'sort': ['sort', 'order'],
+        }
+        query_text = doc.text.lower()
+        for intent, keywords in intents.items():
+            for phrase in keywords:
+                if phrase in query_text:
+                    return intent
+        return 'unknown'
+    
+    def extract_target_columns(self, doc):
+        columns = set()
         for token in doc:
-            # Detect column name
-            if token.pos_ == "NOUN":
-                if column and operator and value:
-                    # If a previous condition exists, append it
-                    conditions.append(f"df['{column}'] {operator} {value}")
-                if token.text.capitalize() in self.dataframe.columns:
-                    column = token.text.capitalize()
-                elif token.text in self.dataframe.columns:
-                    column = token.text  # New condition starts here
+            if token.text in self.columns:
+                columns.add(token.text)
+            elif token.lemma_ in self.columns:
+                columns.add(token.lemma_)
+        return list(columns) if columns else None
+    
+    def extract_filters(self, doc):
+        """
+        We assume that the user can only add 1 logical operator. Only one "AND" or "OR"
+        """
+        filters = []
+        tokens = [token for token in doc]
+        i = 0
+        logical_operator = None
+        while i < len(tokens):
+            if tokens[i].text in self.columns:
+                # New filter with a column name
+                column = tokens[i].text
+                i += 1
 
-            # Detect operator
-            if token.text in [">", "greater than"]:
-                operator = ">"
-            if token.text in ["<", "less than"]:
-                operator = "<"
-            if token.text in ["=", "equals", "equal", "=="]:
-                operator = "=="
+                # Skip any tokens until an operator
+                while i < len(tokens) and tokens[i].lemma_ not in ["=", "==", 'be', 'equals', 'equal', 'is', 'not', 'greater', 'less', 'more', '>=', '<=', '>', '<']:
+                    i += 1
 
-            # Detect numerical value
-            if token.text.isdigit():
-                value = int(token.text)
+                if i < len(tokens):
+                    operator_token = tokens[i]
+                    operator = self.map_operator(operator_token.lemma_)
+                    i += 1
+                else:
+                    operator = '=='
 
-            # Detect categorical value (either wrapped in quotes or identified as a categorical variable)
-            if token.pos_ == "NOUN" and column:
-                if column.capitalize() in self.dataframe:
-                    column = column.capitalize()
+                # Skip any tokens that are not NUM or NOUN
+                while i < len(tokens) and tokens[i].pos_ not in ["NUM", "NOUN"]:
+                    i += 1
 
-                if (token.text in self.dataframe[column].unique() or
-                    token.text.capitalize() in self.dataframe[column].unique()):
-                    value = f"'{token.text}'"
-
-            # Handle logical operators (AND, OR)
-            if token.text in ["and", "or"]:
-                if column and operator and value:
-                    conditions.append(f"df['{column}'] {operator} {value}")
-                    column = None
-                    operator = None
+                if i < len(tokens):
+                    value_token = tokens[i]
+                    if tokens[i].pos_ == "NUM":
+                        value = self.parse_value(value_token.text.strip('\'"'))
+                    else:
+                        value = value_token.text
+                    i += 1
+                else:
                     value = None
-                if token.text == "and":
-                    conditions.append("&")
-                if token.text == "or":
-                    conditions.append("|")
-        # Append the last condition
-        if column and operator and value:
-            conditions.append(f"df['{column}'] {operator} {value}")
-        return " ".join(conditions)
 
-    def extract_column_name(self, doc):
-        """Extracts column names from the query using spaCy's entity recognition."""
-        # Search for nouns in the query that match DataFrame column names
-        for token in doc:
-            if token.pos_ == "NOUN" and token.text in self.dataframe.columns:
-                return token.text
+                filters.append({
+                    "column": column,
+                    "operator": operator,
+                    "value": value,
+                    "logical_operator": logical_operator
+                })
+                logical_operator = None
+
+            elif tokens[i].text.upper() in ['AND', 'OR']:
+                # Handle logical operator
+                logical_operator = tokens[i].text.upper()
+                i += 1
+
+                # Check what's next
+                if i < len(tokens) and tokens[i].lemma_ in ["=", "==", 'be', 'equals', 'equal', 'is', 'not', 'greater', 'less', 'more', '>=', '<=', '>', '<']:
+                        operator_token = tokens[i]
+                        operator = self.map_operator(operator_token.lemma_)
+                        i += 1
+
+                # Skip tokens that are not NUM or NOUN
+                while i < len(tokens) and tokens[i].pos_ not in ["NUM", "NOUN"]:
+                    i += 1
+
+                if i < len(tokens):
+                    value_token = tokens[i]
+                    if tokens[i].pos_ == "NUM":
+                        value = self.parse_value(value_token.text.strip('\'"'))
+                    else:
+                        value = value_token.text
+                    i += 1
+                else:
+                    value = None
+
+                filters.append({
+                    "column": column,
+                    "operator": operator,
+                    "value": value,
+                    "logical_operator": logical_operator
+                })
+                logical_operator = None
+            else:
+                i += 1
+        return filters if filters else None
+    
+    def map_operator(self, operator):
+        operator_map = {
+            'equal': '==',
+            'equals': '==',
+            'be': '==',
+            'is': '==',
+            'not': '!=',
+            'greater': '>',
+            'more': '>',
+            'less': '<',
+            'greater equal': '>=',
+            'less equal': '<=',
+            '>=': '>=',
+            '<=': '<=',
+            '>': '>',
+            '<': '<'
+        }
+        return operator_map.get(operator, '==')
+    
+    def parse_value(self, value):
+        try:
+            # Try to parse as a number
+            if '.' in value:
+                return float(value)
+            else:
+                return int(value)
+        except ValueError:
+            # Return as string
+            return value.strip('\'"')
+    
+    def extract_group_by(self, doc):
+        group_by_words = ['per', 'by', 'group by']
+        group_by_columns = []
+        tokens = [token for token in doc]
+        for i, token in enumerate(tokens):
+            if token.text in group_by_words:
+                if i + 1 < len(tokens):
+                    next_token = tokens[i + 1]
+                    if next_token.text in self.columns:
+                        group_by_columns.append(next_token.text)
+        return group_by_columns if group_by_columns else None
+    
+    def extract_aggregation(self, doc, intent):
+        aggregations = {
+            'average': ['average', 'mean', 'avg'],
+            'max': ['maximum', 'max', 'highest', 'biggest', 'largest'],
+            'min': ['minimum', 'min', 'lowest', 'smallest'],
+            'count': ['count', 'number of', 'how many']
+        }
+        query_text = doc.text.lower()
+        for function, keywords in aggregations.items():
+            for word in keywords:
+                if word in query_text:
+                    # Try to find the column to aggregate
+                    for token in doc:
+                        if token.text in self.columns or token.lemma_ in self.columns:
+                            return {
+                                "function": function,
+                                "column": token.text
+                            }
+                    # If no specific column is mentioned
+                    return {
+                        "function": function,
+                        "column": None
+                    }
+        # If intent matches an aggregation but no keywords found
+        if intent in aggregations:
+            return {
+                "function": intent,
+                "column": None
+            }
         return None
-
-    def handle_filter(self, doc):
-        """Parse basic filter queries like 'Filter rows where age > 30'."""
-        conditions = self.extract_conditions(doc)
-        if conditions:
-            return f"df[{conditions}]"
-        else:
-            return None
+    
+    def extract_sort(self, doc):
+        sort_order = None
+        sort_columns = []
+        tokens = [token for token in doc]
+        for i, token in enumerate(tokens):
+            if token.lemma_ in ['sort', 'order', 'highest', 'largest', 'smallest', 'lowest', 'descending', 'ascending']:
+                # Determine order
+                if token.lemma_ in ['highest', 'largest', 'descending', 'descend']:
+                    sort_order = 'descending'
+                elif token.lemma_ in ['smallest', 'lowest', 'ascending', 'ascend']:
+                    sort_order = 'ascending'
+                # Look for columns to sort by
+                if i + 1 < len(tokens):
+                    next_token = tokens[i + 1]
+                    if next_token.text in self.columns:
+                        sort_columns.append(next_token.text)
+                continue
+            # Also check for phrases like "top 5 by sales"
+            if token.text == 'by' and i + 1 < len(tokens):
+                next_token = tokens[i + 1]
+                if next_token.text in self.columns:
+                    sort_columns.append(next_token.text)
+        return {
+            "columns": sort_columns if sort_columns else None,
+            "order": sort_order
+        } if sort_order or sort_columns else None
+    
+    def extract_limit(self, doc):
+        limit = None
+        offset = 0
+        tokens = [token for token in doc]
+        for i, token in enumerate(tokens):
+            if token.text == 'top' and i + 1 < len(tokens):
+                next_token = tokens[i + 1]
+                if next_token.like_num:
+                    limit = int(next_token.text)
+            elif token.text == 'limit' and i + 1 < len(tokens):
+                next_token = tokens[i + 1]
+                if next_token.like_num:
+                    limit = int(next_token.text)
+            elif token.text == 'offset' and i + 1 < len(tokens):
+                next_token = tokens[i + 1]
+                if next_token.like_num:
+                    offset = int(next_token.text)
+        return {
+            "count": limit,
+            "offset": offset
+        } if limit is not None or offset > 0 else None
+    
+    # def extract_output_format(self, doc):
+    #     formats = ['table', 'list', 'summary', 'chart', 'graph']
+    #     for token in doc:
+    #         if token.text in formats:
+    #             return token.text
+    #     return None
 
 if __name__ == "__main__":
     df = pd.read_csv('../../logs/Test/Mac_2k.log_structured.csv')
     parser = QueryParser(df)
     queries = [
         "How many rows are in the dataset?",
-        "How many rows are there given that component = kernel?",
-        "Filter component where it is equal to kernel"
+        "How many rows are there given that component is kernel or user?",
+        "Filter component where it is equal to user",
+        "Summarise the data in a summary."
     ]
     
     for q in queries:
+        print(f"Query: {q}")
+        print("Parsed Output:")
         print(parser.parse_query(q))
+        print("-" * 80)
+
+
     
