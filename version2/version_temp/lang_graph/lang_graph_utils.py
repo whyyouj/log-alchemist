@@ -4,6 +4,7 @@ sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from regular_agent.agent_ai import Agent_Ai
 from python_agent.python_ai import Python_Ai
+from parser.QueryParser import query_parser
 
 graph_stage_prefix = '[STAGE]'
 
@@ -53,11 +54,9 @@ def python_pandas_ai(state:list):
     print(graph_stage_prefix, 'Pandas AI agent')
     llm = state['pandas']
     query = state['input']
+    parsed_query = query_parser(query)
     prompt = f"""
-    The following is the query from the user:
-    {query}
-
-    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+    {parsed_query}
 
     You are to following the instructions below strictly:
     - dfs: list[pd.DataFrame] is already provided.
