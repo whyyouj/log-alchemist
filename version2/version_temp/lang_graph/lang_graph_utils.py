@@ -2,9 +2,10 @@ import pandas as pd
 import os, sys
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from regular_agent.agent_ai import Agent_Ai
 from python_agent.python_ai import Python_Ai
-from parser.QueryParser import query_parser
+from parser.QueryParser.query_parser import QueryParser
 
 graph_stage_prefix = '[STAGE]'
 
@@ -39,7 +40,6 @@ def router_summary_agent(state: list):
     """
     out = llm.query_agent(query=query_summary)
     out = out.lower()
-    ans = out[out.rfind('answer')+ 5:]
     print('ROUTER SUMMARY AGENT OUTPUT: ', out)
     return {"agent_out": out}
 
@@ -54,7 +54,8 @@ def python_pandas_ai(state:list):
     print(graph_stage_prefix, 'Pandas AI agent')
     llm = state['pandas']
     query = state['input']
-    parsed_query = query_parser(query)
+    parser = QueryParser()
+    parsed_query = parser.parse_query(query)
     prompt = f"""
     {parsed_query}
 

@@ -71,7 +71,7 @@ def summary_skill(df):
     return tempfile_path
 
 class Python_Ai:
-    def __init__(self, model = "codellama:7b", df=[], temperature=0.1):
+    def __init__(self, model = "llama3.1", df=[], temperature=0.1):
         self.model = model
         self.temperature = temperature
         self.df = df
