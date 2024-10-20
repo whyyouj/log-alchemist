@@ -95,6 +95,12 @@ def final_agent(state:list):
     print(graph_stage_prefix, "Final Agent")
     llm = Agent_Ai(model = "llama3.1")
     query = state['input']
-    out = llm.query_agent(query=query)
+    prompt = f"""
+    The following is the query from the user:
+    {query}
+
+    Try your best to answer the query. Take your time. If the query relates to any dataframe, assist accordingly to answer the query.
+    """
+    out = llm.query_agent(query=prompt)
     return {"agent_out":out}
     
