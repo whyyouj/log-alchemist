@@ -11,7 +11,6 @@ from pandasai.llm import LLM
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.language_models.chat_models import BaseChatModel
 from pandasai.prompts.base import BasePrompt
-from pandasai.responses import StreamlitResponse
 from pandasai.pipelines.pipeline_context import PipelineContext
 
 class LangchainLLM(LLM):
@@ -19,8 +18,6 @@ class LangchainLLM(LLM):
     Class to wrap Langchain LLMs and make PandasAI interoperable
     with LangChain.
     """
-
-    langchain_llm: BaseLanguageModel
 
     def __init__(self, langchain_llm: BaseLanguageModel):
         self.langchain_llm = langchain_llm
@@ -42,8 +39,6 @@ class LangchainLLM(LLM):
     def type(self) -> str:
         return f"langchain_{self.langchain_llm._llm_type}"
 
-
-
 @skill
 def summary_skill(df):
     """
@@ -63,7 +58,7 @@ def summary_skill(df):
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as f:
         tempfile_path = f.name
         try:
-            report = sv.analyze([df,'logs'])
+            report = sv.analyze([df,'Logs'])
         except:
             try:
                 report = sv.analyze(df)
@@ -76,7 +71,7 @@ def summary_skill(df):
     return tempfile_path
 
 class Python_Ai:
-    def __init__(self, model = "codellama:7b", df=None, temperature=0.1):
+    def __init__(self, model = "codellama:7b", df=[], temperature=0.1):
         self.model = model
         self.temperature = temperature
         self.df = df
@@ -94,7 +89,7 @@ class Python_Ai:
             self.df, 
             description = """
                 You are a data analysis agent tasked with the main goal to answer any data related queries. 
-                Everytime I ask you a question, you should provide the code to that specifically answers the question.
+                Everytime I ask you a question, you should provide the code that specifically answers the question.
             """,
             config={
                 "llm":llm,
@@ -114,27 +109,8 @@ class Python_Ai:
 
         pandas_ai = Agent(
             self.df, 
-
-            config={
-                "llm":llm,
-                "open_charts":False,
-                "enable_cache" : False,
-                "save_charts": True,
-                "max_retries":3,
-                "response_parser": StreamlitResponse,
-                "custom_whitelisted_dependencies": ["sweetviz"]
-            }
-        )
-        pandas_ai.add_skills(summary_skill)
-        return pandas_ai
-    
-    def dataframe_selector(self):
-        llm  = self.get_llm().llm
-        pandas_ai = Agent(
-            self.df, 
             description = """
-                You are a dataframe agent tasked with the main goal of returning the dataframe that I am referring to in my query. 
-                Everytime I provide a query, you should select the dataframe that I am querying and return it.
+            You are a data analyst that has been tasked with the goal of providing a summary of the data using your skill when required. Everytime I ask you a question about summary, you should use your summary skill.
             """,
             config={
                 "llm":llm,
@@ -146,6 +122,7 @@ class Python_Ai:
                 "custom_whitelisted_dependencies": ["sweetviz"]
             }
         )
+        pandas_ai.add_skills(summary_skill)
         return pandas_ai
     
     def freq_tool(self, col_name):

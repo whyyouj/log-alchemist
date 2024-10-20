@@ -10,10 +10,11 @@ from version_temp.regular_agent.agent_ai import Agent_Ai
 import pandas as pd
 import tempfile
 import asyncio
-import ast
-import os
+import os, sys
 import re
-
+sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from data.date_parser import combine_datetime_columns
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -235,8 +236,9 @@ def st_fileuploader():
     col1, col2 = st.columns(2)
     with col1:
         st.subheader('Uploaded Files')
-        if len(st.session_state.filepaths) > 0 or len(st.session_state.csv_filepaths) > 0:
-            all_files = list(st.session_state.filepaths.keys()) + list(st.session_state.csv_filepaths.keys())
+        st.button('Clear', on_click=clear_files)
+        if len(st.session_state.csv_filepaths) > 0: #len(st.session_state.filepaths) > 0 or len(st.session_state.csv_filepaths) > 0:
+            all_files = list(st.session_state.csv_filepaths.keys()) #list(st.session_state.filepaths.keys()) + list(st.session_state.csv_filepaths.keys())
             files_df = pd.DataFrame({'No.': range(1, len(all_files) + 1), 'File': all_files})
             st.dataframe(files_df, hide_index=True)
         else:
@@ -253,7 +255,7 @@ def display_file_uploader():
         Submit = st.form_submit_button(label = "Submit")
     if Submit:
         on_file_submit(uploaded_files)
-        if len(st.session_state.filepaths) > 0 or len(st.session_state.csv_filepaths) > 0:
+        if len(st.session_state.csv_filepaths) > 0: #len(st.session_state.filepaths) > 0 or len(st.session_state.csv_filepaths) > 0:
             success_message = st.success(f"Upload successful!")
             time.sleep(3)
             success_message.empty()
@@ -265,24 +267,25 @@ def display_file_uploader():
         folder_submit = st.form_submit_button(label = "Submit")
     if folder_submit:
         on_folder_submit(abs_folderpath)
-        if len(st.session_state.filepaths) > 0 or len(st.session_state.csv_filepaths) > 0:
+        if len(st.session_state.csv_filepaths) > 0: #len(st.session_state.filepaths) > 0 or len(st.session_state.csv_filepaths) > 0:
             success_message = st.success(f"Upload successful!")
             time.sleep(3)
             success_message.empty()
         st.rerun()
         
 def on_file_submit(uploaded_files):
-    filepaths = {}
-    csv_filepaths = {}
+    filepaths = st.session_state.filepaths.copy()
+    csv_filepaths = st.session_state.csv_filepaths.copy()
 
     for uploaded_file in uploaded_files:
         with tempfile.NamedTemporaryFile(delete=False) as tf:
             tf.write(uploaded_file.getbuffer())
-            file_path = tf.name
+            # file_path = tf.name
+            print('tf type:', type(tf))
             if uploaded_file.name[-3:] == 'csv':
-                csv_filepaths[uploaded_file.name] = file_path
+                csv_filepaths[uploaded_file.name] = tf #file_path
             else:
-                filepaths[uploaded_file.name] = file_path
+                filepaths[uploaded_file.name] = tf #file_path
 
     if filepaths != st.session_state.filepaths:
         st.session_state.filepaths = filepaths
@@ -292,9 +295,6 @@ def on_file_submit(uploaded_files):
         st.session_state.csv_filepaths = csv_filepaths
         print('CSV FILE PATHS: ', st.session_state.csv_filepaths)
         update_langgraph()
-
-    for file in list(st.session_state.filepaths.values()) + list(st.session_state.csv_filepaths.values()):
-        os.remove(file)
 
 def on_folder_submit(abs_folderpath):
     abs_folderpath = abs_folderpath.strip()
@@ -315,8 +315,8 @@ def on_folder_submit(abs_folderpath):
         time.sleep(7)
         err_message.empty()
     else:
-        filepaths = {}
-        csv_filepaths = {}
+        filepaths = st.session_state.filepaths.copy()
+        csv_filepaths = st.session_state.csv_filepaths.copy()
 
         for file in os.listdir(abs_folderpath):
             if os.path.isfile(abs_folderpath + file):
@@ -333,6 +333,14 @@ def on_folder_submit(abs_folderpath):
             st.session_state.csv_filepaths = csv_filepaths
             print('CSV FILE PATHS: ', st.session_state.csv_filepaths)
             update_langgraph()
+
+def clear_files():
+    for file in list(st.session_state.filepaths.values()) + list(st.session_state.csv_filepaths.values()):
+        if isinstance(file, tempfile._TemporaryFileWrapper):
+            os.remove(file.name)
+    st.session_state.filepaths = {}
+    st.session_state.csv_filepaths = {}
+    update_langgraph()
 
 def on_chat_submit_old(chat_input):
     """
@@ -503,7 +511,7 @@ def initialize_conversation():
 
 def initialize_langgraph():
     graph = Agent_Ai()
-    print('langgraph initialized')
+    print('Langgraph Initialized')
     return graph
 
 def initialize_session_state():
@@ -534,14 +542,19 @@ def reset_session_state():
 def update_langgraph():
     df_list = []
     for file in st.session_state.csv_filepaths.values():
-        df = pd.read_csv(file)
-        df_list.append(df)
+        file_path = file
+        if isinstance(file, tempfile._TemporaryFileWrapper):
+            file_path = file.name
+
+        df = pd.read_csv(file_path)
+        date_formatted_df = combine_datetime_columns(df)
+        df_list.append(date_formatted_df)
 
     llm = Python_Ai(df = df_list)
     pandas_llm = llm.pandas_legend_with_summary_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
-    print("langgraph updated")
+    print("Langgraph Updated")
 
 def main():
     

@@ -1,6 +1,7 @@
 import pandas as pd
 import os, sys
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from regular_agent.agent_ai import Agent_Ai
 from python_agent.python_ai import Python_Ai
 
@@ -72,7 +73,14 @@ def python_summary_agent(state: list):
     query = state['input']
     llm = Python_Ai(model = "llama3.1", df = df)
     pandasai_llm  = llm.pandas_legend_with_summary_skill()
-    out = pandasai_llm.chat(query) #state['pandas'].chat(prompt)
+    prompt = f"""
+    The following is the query from the user:
+    {query}
+
+    If the query contains "summary", you must only execute the code for Sweetviz and output that result only.
+    If the query does not contain "summary", you are to try your best to respond to the user query with an executable code.
+    """
+    out = pandasai_llm.chat(prompt) #state['pandas'].chat(prompt)
     print('PYTHON SUMMARY OUT: ', out)
     return {"agent_out": out}
 
