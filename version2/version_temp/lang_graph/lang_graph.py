@@ -109,8 +109,13 @@ class Graph:
         image.save("./image/lang_chain_graph_pandas_new.png")
         return "./image/lang_chain_graph_pandas_new.png"
     
+    def create_graph():
+        global global_graph
+        df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
+        pandas_ai = Python_Ai(df=df).pandas_legend()
+        global_graph = Graph(pandas_llm=pandas_ai, df=df)
+        return global_graph
+    
 if __name__ == "__main__":
-    df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
-    pandas_ai = Python_Ai(df=df).pandas_legend()
-    graph = Graph(pandas_llm= pandas_ai, df = df)
+    graph = Graph.create_graph()
     # graph.show()
