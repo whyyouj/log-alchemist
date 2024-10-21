@@ -6,14 +6,14 @@ import pandas as pd
 from datetime import datetime
 import os
 import time
-from graph_manager import Graph, global_graph
+import  sys
+sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from lang_graph.lang_graph import Graph
 
 class LanguageModelEvaluator:
     def __init__(self):
-        if global_graph is None:
-            self.graph = Graph.create_graph()
-        else:
-            self.graph = global_graph
+        self.graph = Graph.create_graph()
 
     def generate_response(self, prompt: str) -> str:
         response = self.graph.run(prompt)
@@ -117,6 +117,7 @@ def main():
     prompts = [
         "How many times did the event with eventid E189 occur?",
         "How many times did the event with eventid E188 occur?"
+        # ,
         # "How many times did the event with eventid E120 occur?",
         # "How many times did the event with eventid E203 occur?",
         # "How many times did the event with eventid E323 occur?",
@@ -128,7 +129,7 @@ def main():
         # "How many times did the event with the user authorMacBook-Pro occur?",
     ]
     metric_names = ['E189', 'E188']
-    #, 'E120', 'E203', 'E323', 'kernel', 'com.apple.cts', 'corecaptured', 'QQ', 'Microsoft Word', 'authorMacBook-Pro']
+                    # , 'E120', 'E203', 'E323', 'kernel', 'com.apple.cts', 'corecaptured', 'QQ', 'Microsoft Word', 'authorMacBook-Pro']
 
     n = int(input("Enter the number of times to run each evaluation: "))
 
@@ -141,3 +142,5 @@ def main():
 
 if __name__ == "__main__":
     evaluation_results = main()
+    
+global_graph = None
