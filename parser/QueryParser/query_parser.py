@@ -154,7 +154,7 @@ class QueryParser:
             
             Please generate the final Python code that fulfills the user's request, taking your time to think about the solution. 
 
-            Mention to the user to refine or clarify their query should they want a better respond.
+            Mention to the user to refine or clarify their query should they want a better response.
             """
         else:
             parameters = self.extract_parameters(query, intents_detected)
@@ -173,27 +173,27 @@ class QueryParser:
             """
         return prompt_template
 
-# if __name__ == "__main__":
-#     parser = QueryParser()
-#     queries = [
-#         "How many rows are in the dataset?",
-#         "How many rows are there given that component is kernel or user?",
-#         "Filter component where it is equal to user",
-#         "Summarise the data in a summary.",
-#         "What is the sky colour?",
-#         "Show me the top 5 highest salaries",
-#         "What is the average age of employees?",
-#         "Filter the data where department is Sales",
-#         "Sort the data by salary in descending order",
-#         "Group the data by region and sum the sales",
-#         "List employees with age greater than 30",
-#     ]
+if __name__ == "__main__":
+    parser = QueryParser()
+    queries = [
+        "How many rows are in the dataset?",
+        "How many rows are there given that component is kernel or user?",
+        "Filter component where it is equal to user",
+        "Summarise the data in a summary.",
+        "What is the sky colour?",
+        "Show me the top 5 highest salaries",
+        "What is the average age of employees?",
+        "Filter the data where department is Sales",
+        "Sort the data by salary in descending order",
+        "Group the data by region and sum the sales",
+        "List employees with age greater than 30",
+    ]
     
-#     for q in queries:
-#         print(f"Query: {q}")
-#         print("Parsed Output:")
-#         print(parser.parse_query(q))
-#         print("-" * 80)
+    for q in queries:
+        print(f"Query: {q}")
+        print("Parsed Output:")
+        print(parser.parse_query(q))
+        print("-" * 80)
 
 
 """
