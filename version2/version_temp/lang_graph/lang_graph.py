@@ -8,7 +8,7 @@ sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
-from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, router_python_output, python_summary_agent
+from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, router_python_output, python_summary_agent, python_anomaly_agent
 
 class AgentState(TypedDict):
     input: str
@@ -30,9 +30,13 @@ class Graph:
 
         # LangGraph Nodes
         graph.add_node('router_agent', router_agent) # Determining if question is related to dataset
+
         graph.add_node('router_summary_agent', router_summary_agent) # Determining if question is asking for summary
+
         graph.add_node("python_pandas_ai", python_pandas_ai) # Answering specific dataset related questions
         graph.add_node("python_summary_agent", python_summary_agent) # Answering summary related questions by outputting sweetviz framework
+        graph.add_node("python_anomaly_agent", python_anomaly_agent) # Answering anomaly related questions 
+
         graph.add_node('final_agent', final_agent) 
 
         # LangGraph Edges
@@ -50,7 +54,8 @@ class Graph:
             router_summary_agent_decision,
             {
                 "python_summary_agent":"python_summary_agent",
-                "python_pandas_ai":"python_pandas_ai"
+                "python_pandas_ai":"python_pandas_ai",
+                "python_anomaly_agent":"python_anomaly_agent"
             }
         )
         graph.add_conditional_edges(
@@ -69,6 +74,16 @@ class Graph:
                 "__end__":"__end__"
             }
         )
+
+        graph.add_conditional_edges(
+            "python_anomaly_agent",
+            router_python_output,
+            {
+                "final_agent":"final_agent",
+                "__end__":"__end__"
+            }
+        )
+
         # graph.add_edge("python_pandas_ai", END)
         graph.add_edge("final_agent", END)
         runnable = graph.compile()
@@ -106,11 +121,11 @@ class Graph:
         png_data = runnable.get_graph().draw_png()
         image = PILImage.open(io.BytesIO(png_data))
         os.makedirs("./image", exist_ok=True)
-        image.save("./image/lang_chain_graph_pandas_new.png")
-        return "./image/lang_chain_graph_pandas_new.png"
+        image.save("./image/lang_chain_graph_pandas_anomaly.png")
+        return "./image/lang_chain_graph_pandas_anomaly.png"
     
 if __name__ == "__main__":
     df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
     pandas_ai = Python_Ai(df=df).pandas_legend()
     graph = Graph(pandas_llm= pandas_ai, df = df)
-    # graph.show()
+    graph.show()

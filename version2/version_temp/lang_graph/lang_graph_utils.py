@@ -27,16 +27,16 @@ def router_agent_decision(state: list):
 
 def router_summary_agent(state: list):
     print(graph_stage_prefix, 'Router summary agent')
-    llm = Agent_Ai(model='llama3.1')
+    llm = Agent_Ai(model='jiayuan1/summary_anomaly_llm_v3')
     query = state['input']
-    query_summary = f"""
-    You are suppose to determine if the <Question> is explicitly asking for a summary. When determining whether a question is asking for a summary, focus on whether the question is requesting a high-level overview of the data (summary), or if it’s asking for a specific value, action, or detail (non-summary). Always think before answering.
+    # query_summary = f"""
+    # You are suppose to determine if the <Question> is explicitly asking for a summary. When determining whether a question is asking for a summary, focus on whether the question is requesting a high-level overview of the data (summary), or if it’s asking for a specific value, action, or detail (non-summary). Always think before answering.
     
-    <Question> Is this asking for a summary: {query} 
-    <Thought> ...
-    <Answer> Always a Yes or No only
-    """
-    out = llm.query_agent(query=query_summary)
+    # <Question> Is this asking for a summary: {query} 
+    # <Thought> ...
+    # <Answer> Always a Yes or No only
+    # """
+    out = llm.query_agent(query=query)
     out = out.lower()
     ans = out[out.rfind('answer')+ 5:]
     print('ROUTER SUMMARY AGENT OUTPUT: ', out)
@@ -44,9 +44,14 @@ def router_summary_agent(state: list):
 
 def router_summary_agent_decision(state: list):
     router_out = state['agent_out']
-    if 'yes' in router_out.lower():
+    if 'summary' in router_out.lower():
+        print('[INFO] Routed to summary agent')
         return 'python_summary_agent'
+    elif 'anomaly' in router_out.lower():
+        print('[INFO] Routed to anomaly agent')
+        return 'python_anomaly_agent'
     else:
+        print('[INFO] Routed to general agent')
         return 'python_pandas_ai'
     
 def python_pandas_ai(state:list):
@@ -82,6 +87,24 @@ def python_summary_agent(state: list):
     """
     out = pandasai_llm.chat(prompt) #state['pandas'].chat(prompt)
     print('PYTHON SUMMARY OUT: ', out)
+    return {"agent_out": out}
+
+def python_anomaly_agent(state: list):
+    print(graph_stage_prefix, 'Anomaly Agent')
+    df = state['df']
+    query = state['input']
+    llm = Python_Ai(model = "llama3.1", df = df)
+    pandasai_llm  = llm.pandas_legend_with_anomaly_skill() 
+    # prompt = f"""
+    # The following is the query from the user:
+    # {query}
+
+    # If the query contains "anomaly", you must only execute the code for anomaly and output that result only.
+    # If the query does not contain "anomaly", you are to try your best to respond to the user query with an executable code.
+    # """
+    #prompt = 'Use your anomaly skill on the dataframe'
+    out = pandasai_llm.chat(query) 
+    print('PYTHON ANOMALY OUT: ', out)
     return {"agent_out": out}
 
 def router_python_output(state:list):
