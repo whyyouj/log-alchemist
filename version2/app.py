@@ -449,7 +449,7 @@ def output(message):
                     os.remove(path)
             return
                 
-        elif "exports/charts/" in str(message['content']):
+        elif "exports/charts/" in str(message['content']) or 'tabulated_anomalies.png' in str(message['content']):
             img_base64 = img_to_base64(message['content'])
             if img_base64:
                 st.markdown(
