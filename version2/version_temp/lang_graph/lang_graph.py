@@ -91,24 +91,26 @@ class Graph:
         return runnable
     
     def run(self, query):
-        llm = Agent_Ai(model='mistral', temperature=0)
-        prompt = f"""The user has asked: '{query}'.
-        Determine if this question is asking to "try again", "retry", or something with a similar meaning related to repeating an action.
-        If the question is about retrying, respond with 'Yes'.
-        If the question is not about retrying, respond with 'No'.
-        Only answer 'Yes' or 'No'"""
-        ans = llm.query_agent(prompt)
-        print(f'[STAGE] Try again agent:{ans}')
-        if 'yes' in ans.lower():
-            if self.qns != '':
-                query = self.qns
-            else:
-                option = ['😀','🥳','😊','🥳','🤩','😎','😄','🤭']
-                import numpy as np
-                num = np.random.randint(0,len(option)-1)
-                return f"Hi! Please ask a question {option[num]}"
-        else:
-            self.qns = query
+        # llm = Agent_Ai(model='mistral', temperature=0)
+        # prompt = f"""The user has asked: '{query}'.
+        # Determine if this question is asking to "try again", "retry", or something with a similar meaning related to repeating an action.
+        # If the question is about retrying, respond with 'Yes'.
+        # If the question is not about retrying, respond with 'No'.
+        # Only answer 'Yes' or 'No'"""
+        # ans = llm.query_agent(prompt)
+        # print(f'[STAGE] Try again agent:{ans}')
+        # if 'yes' in ans.lower():
+        #     if self.qns != '':
+        #         query = self.qns
+        #     else:
+        #         option = ['😀','🥳','😊','🥳','🤩','😎','😄','🤭']
+        #         import numpy as np
+        #         num = np.random.randint(0,len(option)-1)
+        #         return f"Hi! Please ask a question {option[num]}"
+        # else:
+        #     self.qns = query
+
+        self.qns = query
         runnable = self.graph
         out = runnable.invoke({"input":f"{query}", "pandas":self.pandas, "df":self.df})
         return out['agent_out']
@@ -127,5 +129,5 @@ class Graph:
 if __name__ == "__main__":
     df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
     pandas_ai = Python_Ai(df=df).pandas_legend()
-    graph = Graph(pandas_llm= pandas_ai, df = df)
-    graph.show()
+    graph = Graph(pandas_llm = pandas_ai, df = df)
+    # graph.show()
