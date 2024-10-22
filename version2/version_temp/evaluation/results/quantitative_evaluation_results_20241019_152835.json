@@ -1,0 +1,41 @@
+{
+  "evaluation_time": "2024-10-19T15:28:35.046482",
+  "results": {
+    "E189": {
+      "prompt": "How many times did the event with eventid E189 occur?",
+      "model_responses": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "ground_truth_value": 166,
+      "correct_predictions": 0,
+      "total_runs": 5,
+      "accuracy": 0.0,
+      "total_time": 816.0453748703003
+    },
+    "E188": {
+      "prompt": "How many times did the event with eventid E188 occur?",
+      "model_responses": [
+        "2",
+        "2",
+        "0",
+        "0",
+        "0"
+      ],
+      "ground_truth_value": 71,
+      "correct_predictions": 0,
+      "total_runs": 5,
+      "accuracy": 0.0,
+      "total_time": 724.9626903533936
+    },
+    "overall": {
+      "correct_predictions": 0,
+      "total_runs": 10,
+      "accuracy": 0.0,
+      "total_time": 1541.0080652236938
+    }
+  }
+}
