@@ -50,7 +50,7 @@ for i in range(len(df)):
         
 print(correct)
 print(total)
-#1662/1734
+#1733/1734
 
 #out = llm.query_agent('What category does this question fall under: Summary, Anomaly, General: \nSummarise the data')
 # from langchain_core.prompts import PromptTemplate

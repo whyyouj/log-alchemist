@@ -4,8 +4,57 @@ sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from regular_agent.agent_ai import Agent_Ai
 from python_agent.python_ai import Python_Ai
+from langchain_core.prompts import PromptTemplate
+import re 
+import ast
 
 graph_stage_prefix = '[STAGE]'
+
+def multiple_question_agent(state: list):
+    print(graph_stage_prefix, "Multiple Question Parser")
+    prompt =  """
+
+Please extract all individual actions from the following input and categorize them into one of three categories:
+Pandas (for dataframe-related questions), Explain (for explanation requests), or General (for general questions). 
+
+- Group dependent actions into the same sentence. 
+- Split explanations into separate entries.
+- General questions (non-dataframe related) should also be in seperate entries.
+
+Return each categorized action in a list format, where each entry is a dictionary containing the category and associated action.
+
+Return each sentence in a list format. For example:
+
+Input_1: "Plot the graph of user. Plot the graph of component."
+Output_1: ["Plot the graph of user. Plot the graph of component."]
+Input_2: "Filter for the top user and count it."
+Output_2: ["Filter for the top user and count it."]
+Input_3: "Filter for the top user and explain the user."
+Output_3: ["Filter for the top user and explain the user."]
+
+Now, group the actions that are dependent on one another as a single string and split explanations into separate entries:
+
+Output_1_final: ["Plot the graph of user. Plot the graph of component."]
+Output_2_final: ["Filter for the top user. Count it."]
+Output_3_final: ["Filter for the top user.", "Explain the user."]
+
+
+Now, please apply this to the following input: "{query}"
+
+    """
+    prompt = PromptTemplate.from_template(prompt)
+    prompt = prompt.partial(query = state["input"])
+    llm = Agent_Ai(model = 'llama3.1', df = state['df'], temperature = 0)
+    out = llm.prompt_agent(query="", prompt= prompt)
+    pattern = f'\[[^\]]+\]'
+    try:
+        parse_qns = re.findall(pattern, out)[0]
+        parse_qns_list = ast.literal_eval(parse_qns)
+    except:
+        parse_qns_list =[state['input']]
+        
+    print(parse_qns)
+    return {"input": parse_qns_list[0], "remaining_qns": parse_qns_list[1:]}
 
 def router_agent(state: list):
     print(graph_stage_prefix, 'Router Agent')
@@ -27,24 +76,16 @@ def router_agent_decision(state: list):
 
 def router_summary_agent(state: list):
     print(graph_stage_prefix, 'Router summary agent')
-    llm = Agent_Ai(model='llama3.1')
+    llm = Agent_Ai(model='jiayuan1/summary_anomaly_llm_v3')
     query = state['input']
-    query_summary = f"""
-    You are suppose to determine if the <Question> is explicitly asking for a summary. When determining whether a question is asking for a summary, focus on whether the question is requesting a high-level overview of the data (summary), or if it’s asking for a specific value, action, or detail (non-summary). Always think before answering.
-    
-    <Question> Is this asking for a summary: {query} 
-    <Thought> ...
-    <Answer> Always a Yes or No only
-    """
-    out = llm.query_agent(query=query_summary)
+    out = llm.query_agent(query=query)
     out = out.lower()
-    ans = out[out.rfind('answer')+ 5:]
     print('ROUTER SUMMARY AGENT OUTPUT: ', out)
     return {"agent_out": out}
 
 def router_summary_agent_decision(state: list):
     router_out = state['agent_out']
-    if 'yes' in router_out.lower():
+    if 'summary' in router_out.lower() or 'anomaly' in router_out.lower():
         return 'python_summary_agent'
     else:
         return 'python_pandas_ai'
@@ -89,18 +130,61 @@ def router_python_output(state:list):
     if "Unfortunately, I was not able to answer your question, because of the following error:" in str(router_out):
         return "final_agent"
     else:
-        return "__end__"
+        return "multiple_question_parser"
     
 def final_agent(state:list):
     print(graph_stage_prefix, "Final Agent")
     llm = Agent_Ai(model = "llama3.1")
     query = state['input']
+    previous_ans = state['all_answer']
+    previous_ans_format = "Here is you knowledge base:\n"
+    if previous_ans:
+        for i in previous_ans:
+            qns = i['qns']
+            ans = i['ans']
+            if isinstance(ans, pd.DataFrame):
+                ans = ans.head(10)
+                ans= ans.to_json()
+            previous_ans_format += qns + '\n'
+            previous_ans_format += f"Answer: {ans}" + "\n\n"
+        previous_ans_format += "You should use the information above to answer the following question directly and concisely. If the user's question is not related to the knowledge base, answer it directly without using the knowledge base."
+    else:
+        previous_ans_format = ""
+        
     prompt = f"""
-    The following is the query from the user:
+    {previous_ans_format}
+    
+    Question from the user:
     {query}
 
-    Try your best to answer the query. Take your time. If the query relates to any dataframe, assist accordingly to answer the query.
     """
     out = llm.query_agent(query=prompt)
     return {"agent_out":out}
+
+def multiple_question_parser(state:list):
+    print(graph_stage_prefix, "Multiple Question Parser")
+    qns = state['input']
+    out = state['agent_out']
+    all_answer = state["all_answer"]
+    qns_ans_dict = {}
+
+    qns_ans_dict['qns'] = f'{len(all_answer)+1}. {qns}'
+    qns_ans_dict['ans'] = out
+    
+        
+    all_answer.append(qns_ans_dict)
+    remaining_qns = state['remaining_qns']
+    if remaining_qns:
+        return {"input":remaining_qns[0], "remaining_qns":remaining_qns[1:], "all_answer":all_answer}
+    
+    else:
+        return {"input": "", "remaining_qns":[], "all_answer":all_answer}
+    
+def router_multiple_question(state:list):
+    print(graph_stage_prefix, "Multiple Qestion Router")
+    if state["input"]:
+        return "router_agent"
+    else:
+        return "__end__"
+    
     
