@@ -46,7 +46,7 @@ def apply_css():
         <style>
         /* Custom sidebar styling */
         [data-testid="stSidebar"] {
-            background-color: rgba(0, 0, 0, 0.1);  /* 50% transparency */
+            background-color: #f0f5f7;  /* 50% transparency */
             color: white;
             padding: 10px;
             border-radius: 15px;
@@ -54,6 +54,10 @@ def apply_css():
 
         [data-testid="stSidebar"] {
             color: #66CCFF;  /* Accent color for titles */
+        }
+
+        section[data-testid="stSidebar"] {
+            width: 250px !important;
         }
 
         [data-testid="stExpander"]:hover details {
@@ -80,7 +84,12 @@ def apply_css():
                 0 0 0.8em rgba(0, 170, 255, 0.4), /* Much lighter */
                 0 0 1.0em rgba(0, 170, 255, 0.6), /* Slightly lighter */
                 0 0 1.2em rgba(0, 170, 255, 0.8);   /* Keep this as is for contrast */
-            border:0px;
+        }
+
+        [data-testid="stChatInput"]{
+            border-width: 1px;
+            border-style: solid;
+            border-color: #55B2FF;
         }
 
         .cover_glow {
@@ -118,7 +127,7 @@ def st_title():
         ''', unsafe_allow_html=True)
 
 def st_sidebar():
-    img_path = "imgs/robot.png"
+    img_path = "imgs/chatbot_logo.webp"
     img_base64 = img_to_base64(img_path)
     if img_base64:
         st.sidebar.markdown(
@@ -139,7 +148,7 @@ def st_sidebar():
         opacity: 0.6;
         color: white; /* Text color */
         border: none; /* No border */
-        border-radius: 5px; /* Rounded corners */
+        border-radius: 50px; /* Rounded corners */
         padding: 10px 20px; /* Vertical and horizontal padding */
         font-size: 15px; /* Font size */
         cursor: pointer; /* Pointer cursor */
@@ -161,7 +170,7 @@ def st_sidebar():
         0 0 30px rgba(0, 170, 255, 1); /* Glow effect */
          color: white; /* Text color */
         border: none; /* No border */
-        border-radius: 5px; /* Rounded corners */
+        border-radius: 50px; /* Rounded corners */
         padding: 10px 20px; /* Vertical and horizontal padding */
         font-size: 15px; /* Font size */
         cursor: pointer; /* Pointer cursor */
@@ -174,7 +183,7 @@ def st_sidebar():
     opacity: 0.6;
     color: white; /* Text color */
     border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
+    border-radius: 50px; /* Rounded corners */
     padding: 10px 20px; /* Vertical and horizontal padding */
     font-size: 15px; /* Font size */
     cursor: pointer; /* Pointer cursor */
@@ -203,7 +212,7 @@ def st_sidebar():
         chat_var2 = "chat1"
     
     st.sidebar.markdown(f'<span id={chat_var}></span>', unsafe_allow_html=True)
-    if st.sidebar.button("Chat with Vantage AI", key = "ai"):
+    if st.sidebar.button("My Chat", key = "ai"):
         st.session_state.mode = "Chat with VantageAI"
         st.session_state.button = True
 
@@ -227,7 +236,6 @@ def st_sidebar():
             </div>
             <hr>
             <img src='data:image/png;base64,{img_base64}' style='position: relative; bottom: 0; left: 0; '/>
-    
             """,
             unsafe_allow_html=True
         )
@@ -262,8 +270,7 @@ def display_file_uploader():
         st.rerun()
 
     with st.form(key = "folderupload_form"):
-        st.text('Input an absolute folder path')
-        abs_folderpath = st.text_area('Absolute Folder Path', label_visibility='collapsed')
+        abs_folderpath = st.text_area('Input an absolute folder path')
         folder_submit = st.form_submit_button(label = "Submit")
     if folder_submit:
         on_folder_submit(abs_folderpath)
@@ -281,7 +288,7 @@ def on_file_submit(uploaded_files):
         with tempfile.NamedTemporaryFile(delete=False) as tf:
             tf.write(uploaded_file.getbuffer())
             # file_path = tf.name
-            print('tf type:', type(tf))
+
             if uploaded_file.name[-3:] == 'csv':
                 csv_filepaths[uploaded_file.name] = tf #file_path
             else:
@@ -294,7 +301,7 @@ def on_file_submit(uploaded_files):
     if csv_filepaths != st.session_state.csv_filepaths:
         st.session_state.csv_filepaths = csv_filepaths
         print('CSV FILE PATHS: ', st.session_state.csv_filepaths)
-        update_langgraph()
+        # update_langgraph()
 
 def on_folder_submit(abs_folderpath):
     abs_folderpath = abs_folderpath.strip()
@@ -332,7 +339,7 @@ def on_folder_submit(abs_folderpath):
         if csv_filepaths != st.session_state.csv_filepaths:
             st.session_state.csv_filepaths = csv_filepaths
             print('CSV FILE PATHS: ', st.session_state.csv_filepaths)
-            update_langgraph()
+            # update_langgraph()
 
 def clear_files():
     for file in list(st.session_state.filepaths.values()) + list(st.session_state.csv_filepaths.values()):
@@ -340,7 +347,8 @@ def clear_files():
             os.remove(file.name)
     st.session_state.filepaths = {}
     st.session_state.csv_filepaths = {}
-    update_langgraph()
+    print('Uploaded Files Cleared')
+    # update_langgraph()
 
 def on_chat_submit_old(chat_input):
     """
@@ -387,7 +395,7 @@ def on_chat_submit_old(chat_input):
 
 def output(message):
     role = message["role"]
-    avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+    avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
     with st.chat_message(role, avatar=avatar_image):
         if type(message['content']) is dict:
             summary_dict = message['content']
@@ -556,6 +564,25 @@ def update_langgraph():
     st.session_state.graph = graph
     print("Langgraph Updated")
 
+def update_selected_log(df_option):
+    df_list = []
+
+    if df_option is not None:
+        file = st.session_state.csv_filepaths[df_option]
+        file_path = file
+        if isinstance(file, tempfile._TemporaryFileWrapper):
+            file_path = file.name
+
+        df = pd.read_csv(file_path)
+        date_formatted_df = combine_datetime_columns(df)
+        df_list.append(date_formatted_df)
+
+    llm = Python_Ai(df = df_list)
+    pandas_llm = llm.pandas_legend_with_summary_skill()
+    graph = Graph(pandas_llm=pandas_llm, df=df_list)
+    st.session_state.graph = graph
+    print("Langgraph updated with selected log")
+
 def main():
     
     """
@@ -569,6 +596,16 @@ def main():
     st_sidebar()
 
     if st.session_state.mode == "Chat with VantageAI":
+                
+        main_col1, main_col2 = st.columns([1, 2])
+        with main_col1:
+            df_option = st.selectbox(
+                "Select a log to query",
+                st.session_state.csv_filepaths.keys(),
+                index=None,
+                placeholder="Select a log to query",
+                label_visibility='collapsed'
+            ) 
         
         st.markdown(
                     """
@@ -587,7 +624,9 @@ def main():
 
         if chat_input := st.chat_input("Ask a question"):
             role = "user"
-            avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+            avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
+            update_selected_log(df_option)
+
             with st.chat_message(role, avatar=avatar_image):
                 st.write(chat_input)
 
