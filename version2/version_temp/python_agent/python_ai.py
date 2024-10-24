@@ -302,6 +302,7 @@ class Python_Ai:
                 "enable_cache" : False,
                 "save_charts": True,
                 "max_retries":3,
+                "verbose": True,
                 "response_parser": StreamlitResponse,
                 "custom_whitelisted_dependencies": ["sweetviz", "numpy", "scipy", "pandas", "tabulate", "matplotlib", "datetime"]
             }

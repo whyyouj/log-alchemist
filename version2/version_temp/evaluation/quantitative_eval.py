@@ -6,17 +6,32 @@ import pandas as pd
 from datetime import datetime
 import os
 import time
-import  sys
+import sys
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from lang_graph.lang_graph import Graph
+from python_agent.python_ai import Python_Ai
 
 class LanguageModelEvaluator:
     def __init__(self):
-        self.graph = Graph.create_graph()
+        self.df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
+        
 
     def generate_response(self, prompt: str) -> str:
-        response = self.graph.run(prompt)
+        pandas_ai = Python_Ai(df=self.df).pandas_legend()
+        # graph = Graph(pandas_ai, self.df)
+        # query = f"""
+        # The following is the query from the user:
+        # {prompt}
+
+        # You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+        # You are to following the instructions below strictly:
+        # - Any query related to Date or Time, refer to the 'Datetime' column.
+        # - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+        # """
+        # response = graph.run(prompt)
+        response = pandas_ai.chat(prompt)
         if isinstance(response, bytes):
             return response.decode('utf-8')
         return str(response)
@@ -38,8 +53,9 @@ class LanguageModelEvaluator:
 
         results = {}
         overall_correct = 0
-        overall_total = 0
+        overall_total = n * len(prompts)
         overall_time = 0
+        counter = 1
 
         for prompt, metric_name in zip(prompts, metric_names):
             correct_predictions = 0
@@ -58,7 +74,6 @@ class LanguageModelEvaluator:
                         correct_predictions += 1
                         overall_correct += 1
                     
-                    overall_total += 1
                 except ValueError as e:
                     print(f"Error processing {metric_name}: {str(e)}")
 
@@ -68,7 +83,7 @@ class LanguageModelEvaluator:
 
             accuracy = (correct_predictions / n) * 100
 
-            results[metric_name] = {
+            results[f"Question {counter}"] = {
                 "prompt": prompt,
                 "model_responses": responses,
                 "ground_truth_value": ground_truth[metric_name],
@@ -77,6 +92,7 @@ class LanguageModelEvaluator:
                 "accuracy": accuracy,
                 "total_time": total_time
             }
+            counter += 1
 
             print(f"{metric_name}: {accuracy:.2f}% accuracy ({correct_predictions}/{n} correct), Time: {total_time:.2f} seconds")
 
@@ -115,20 +131,21 @@ def main():
     log_file = "Mac_2k.log_structured.csv"
     ground_truth_file = "mac_ground_truth.json"
     prompts = [
+        "How many rows are there in the dataset?", 
         "How many times did the event with eventid E189 occur?",
-        "How many times did the event with eventid E188 occur?"
-        # ,
+        "How many times did the event E189 occur?",
+        "How many times did the event with eventid E188 occur?",
         # "How many times did the event with eventid E120 occur?",
         # "How many times did the event with eventid E203 occur?",
         # "How many times did the event with eventid E323 occur?",
-        # "How many times did the event with component kernel occur?",
+        "How many times did the event with component kernel occur?",
         # "How many times did the event with component com.apple.cts occur?",
         # "How many times did the event with component corecaptured occur?",
         # "How many times did the event with component QQ occur?",
         # "How many times did the event with component Microsoft Word occur?",
         # "How many times did the event with the user authorMacBook-Pro occur?",
     ]
-    metric_names = ['E189', 'E188']
+    metric_names = ["total_rows", 'E189', "E189", 'E188', "kernel"]
                     # , 'E120', 'E203', 'E323', 'kernel', 'com.apple.cts', 'corecaptured', 'QQ', 'Microsoft Word', 'authorMacBook-Pro']
 
     n = int(input("Enter the number of times to run each evaluation: "))
