@@ -342,127 +342,57 @@ def clear_files():
     st.session_state.csv_filepaths = {}
     update_langgraph()
 
-def on_chat_submit_old(chat_input):
-    """
-    Handle chat input submissions and interact with the llm.
-
-    Parameters:
-    - chat_input (str): The chat input from the user.
-
-    Returns:
-    - None: Updates the chat history in Streamlit's session state.
-    """
-    user_input = chat_input.strip().lower()
-
-    st.session_state.conversation_history.append({"role": "user", "content": user_input})
-
-    try:
-        
-        # import matplotlib.pyplot
-        # import pandas as pd
-        # df = pd.read_csv('../EDA/data/mac/Mac_2k.log_structured.csv')
-        # import pandasai as pai
-        # from langchain_community.llms import Ollama
-        
-        # llm = Ollama(
-        #     model = "llama3.1",
-        #     temperature = 0.2
-        # )
-        # pandas_ai_agent = pai.SmartDataframe(df, config={"llm":llm})
-        # pandas_ai_agent.chat(user_input)
-        #time.sleep(1)
-        graph = st.session_state.graph
-        out = graph.run(user_input)
-        assistant_reply = out #'exports/charts/d772a0b7-7737-410f-9464-1427a93b2a1d.png'
-
-        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
-        st.session_state.history.append({"role": "user", "content": user_input})
-        st.session_state.history.append({"role": "assistant", "content": assistant_reply})
-
-    except Exception as e:
-        logging.error(f"Error occurred: {e}")
-        error_message = st.error(f"AI Error: {str(e)}")
-        time.sleep(3)
-        error_message.empty()
 
 def output(message):
     role = message["role"]
     avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+    
     with st.chat_message(role, avatar=avatar_image):
-        if type(message['content']) is dict:
-            summary_dict = message['content']
-            summary_type = summary_dict.get('type', '')
-            if summary_type == 'Python_AI_Summary':
+        if role == 'user':
+            st.write(message['content'])
+            return 
+        #Determine whether a not to break the question down
+        format = True
+        if len(message['content']) == 1:
+            format = False
+        if format:
+            st.write("Here is the break down of your question:")
+        for dict in message['content']:
+            if format:
+                st.write(dict['qns'])
+            out = dict['ans']
+            if str(out).endswith(".html"):
                 st.write("### Here is a summary of the data!")
-                path = summary_dict['path']
-
-                # Check if the file exists
-                if os.path.exists(path):
-                    # Read the file and render it in an iframe
-                    with open(path, 'r', encoding='utf-8') as f:
-                        html_content = f.read()
-                    # Display the HTML report in Streamlit
-                    components.html(html_content, height=800, scrolling=True)
-              
-                return
-            
-                ## dont remove plsssssssss
-                '''
-                for key in summary_dict.keys():
-                    if key == 'type':
-                        continue
-                    st.write(f"**{key}**")
-                    for content_key in summary_dict[key].keys():
-                        if content_key == 'GRAPH':
-                            img_base64 = img_to_base64(summary_dict[key][content_key])
-                            if img_base64:
-                                st.markdown(
-                                        f"""
-                                        Here is the Chart!
-                                        <img src='data:image/png;base64,{img_base64}'/>
-                                        """,
-                                        unsafe_allow_html=True
-                                    )
-                            else:
-                                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")                                        
-                        else:
-                            st.write(content_key)
-                            st.write(summary_dict[key][content_key])'''
-            else:
-                st.write(message['content'])
-                return
-        elif str(message['content']).endswith(".html"):
-            st.write("### Here is a summary of the data!")
-            print("[APP]", message['content'])
-            pattern = r"([A-Z]:(?:\\\\|\\)(?:[^\\/:*?\"<>|\r\n]+(?:\\\\|\\))*[^\\/:*?\"<>|\r\n]+\.[a-zA-Z0-9]+|(?:\/[^\/\s]+)+\/[^\/\s]+\.[a-zA-Z0-9]+)"
-            html_files = re.findall(pattern, message['content'])
-            print(html_files)
-            for path in html_files:
-                if os.path.exists(path):
-                    # Read the file and render it in an iframe
-                    with open(path, 'r', encoding='utf-8') as f:
-                        html_content = f.read()
-                    # Display the HTML report in Streamlit
-                    components.html(html_content, height=800, scrolling=True)
-            
-                    # Deleting temporary file after outputing
-                    os.remove(path)
-            return
+                print("[APP]", out)
+                pattern = r"([A-Z]:(?:\\\\|\\)(?:[^\\/:*?\"<>|\r\n]+(?:\\\\|\\))*[^\\/:*?\"<>|\r\n]+\.[a-zA-Z0-9]+|(?:\/[^\/\s]+)+\/[^\/\s]+\.[a-zA-Z0-9]+)"
+                html_files = re.findall(pattern, out)
+                print(html_files)
+                for path in html_files:
+                    if os.path.exists(path):
+                        # Read the file and render it in an iframe
+                        with open(path, 'r', encoding='utf-8') as f:
+                            html_content = f.read()
+                        # Display the HTML report in Streamlit
+                        components.html(html_content, height=800, scrolling=True)
                 
-        elif "exports/charts/" in str(message['content']) or 'tabulated_anomalies.png' in str(message['content']):
-            img_base64 = img_to_base64(message['content'])
-            if img_base64:
-                st.markdown(
-                        f"""
-                        Here is the Chart!
-                        <img src='data:image/png;base64,{img_base64}'/>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                        # Deleting temporary file after outputing
+                        os.remove(path)
+                return
+                    
+            elif "exports/charts/" in str(out):
+                img_base64 = img_to_base64(out)
+                if img_base64:
+                    st.markdown(
+                            f"""
+                            Here is the Chart!
+                            <img src='data:image/png;base64,{img_base64}'/>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                else:
+                    st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
             else:
-                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
-        else:
-            st.write(message["content"])   
+                st.write(out)   
         return
 
 async def on_chat_submit(chat_input):
@@ -477,14 +407,12 @@ async def on_chat_submit(chat_input):
     """
     user_input = chat_input
 
-    st.session_state.conversation_history.append({"role": "user", "content": user_input})
 
     try:
         graph = st.session_state.graph
         out = graph.run(user_input)
         assistant_reply = out 
 
-        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
         st.session_state.history.append({"role": "user", "content": user_input})
         st.session_state.history.append({"role": "assistant", "content": assistant_reply})
 
@@ -505,7 +433,7 @@ def run_async_task(chat_input):
 def initialize_conversation():
     assistant_message = "Hello! I am Vantage AI. How can I assist you today?"
     conversation_history = [
-        {"role":"assistant", "content":assistant_message}
+        {"role":"assistant", "content":[{"qns":"Begin", "ans": assistant_message}]}
     ]
     return conversation_history
 
@@ -518,8 +446,6 @@ def initialize_session_state():
     """Initialize session state variables."""
     if "history" not in st.session_state:
         st.session_state.history = initialize_conversation()
-    if 'conversation_history' not in st.session_state:
-        st.session_state.conversation_history = initialize_conversation()
     if "mode" not in st.session_state:
         st.session_state.mode = "Chat with VantageAI"
     if "button" not in st.session_state:
@@ -536,7 +462,6 @@ def initialize_session_state():
 
 def reset_session_state():
     st.session_state.history = initialize_conversation()
-    st.session_state.conversation_history = initialize_conversation()
     st.session_state.mode = "Chat with VantageAI"
 
 def update_langgraph():
@@ -550,8 +475,8 @@ def update_langgraph():
         date_formatted_df = combine_datetime_columns(df)
         df_list.append(date_formatted_df)
 
-    llm = Python_Ai(df = df_list)
-    pandas_llm = llm.pandas_legend()
+    llm = Python_Ai(model = 'llama3.1', df = df_list)
+    pandas_llm = llm.pandas_legend()#.pandas_legend_with_summary_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     print("LangGraph Updated")

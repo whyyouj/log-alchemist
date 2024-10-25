@@ -12,63 +12,53 @@ graph_stage_prefix = '[STAGE]'
 
 def multiple_question_agent(state: list):
     print(graph_stage_prefix, "Multiple Question Parser")
-    prompt =  """
 
-Please extract all individual actions from the following input and categorize them into one of three categories:
-Pandas (for dataframe-related questions), Explain (for explanation requests), or General (for general questions). 
-
-- Group dependent actions into the same sentence. 
-- Split explanations into separate entries.
-- General questions (non-dataframe related) should also be in seperate entries.
-
-Return each categorized action in a list format, where each entry is a dictionary containing the category and associated action.
-
-Return each sentence in a list format. For example:
-
-Input_1: "Plot the graph of user. Plot the graph of component."
-Output_1: ["Plot the graph of user. Plot the graph of component."]
-Input_2: "Filter for the top user and count it."
-Output_2: ["Filter for the top user and count it."]
-Input_3: "Filter for the top user and explain the user."
-Output_3: ["Filter for the top user and explain the user."]
-
-Now, group the actions that are dependent on one another as a single string and split explanations into separate entries:
-
-Output_1_final: ["Plot the graph of user. Plot the graph of component."]
-Output_2_final: ["Filter for the top user. Count it."]
-Output_3_final: ["Filter for the top user.", "Explain the user."]
-
-
-Now, please apply this to the following input: "{query}"
-
-    """
-    prompt = PromptTemplate.from_template(prompt)
-    prompt = prompt.partial(query = state["input"])
-    llm = Agent_Ai(model = 'llama3.1', df = state['df'], temperature = 0)
-    out = llm.prompt_agent(query="", prompt= prompt)
+    llm = Agent_Ai(model = 'jiayuan1/router_llm', df = state['df'], temperature = 0)
+    out = llm.query_agent(state['input'])
     pattern = f'\[[^\]]+\]'
     try:
         parse_qns = re.findall(pattern, out)[0]
-        parse_qns_list = ast.literal_eval(parse_qns)
+        parse_qns = parse_qns.replace("“", """\"""")
+        parse_qns = parse_qns.replace("”", """\"""")
+        parse_qns_list = eval(f"""{parse_qns}""")
     except:
         parse_qns_list =[state['input']]
         
-    print(parse_qns)
-    return {"input": parse_qns_list[0], "remaining_qns": parse_qns_list[1:]}
+    print(parse_qns_list)
+    return {"input": str(parse_qns_list[0]), "remaining_qns": parse_qns_list[1:]}
 
 def router_agent(state: list):
     print(graph_stage_prefix, 'Router Agent')
-    df = state['df']
+    # df = state['df']
+    # query = state['input']
+    # llm = Agent_Ai(model = 'llama3.1', df=df)
+    # out = llm.prompt_agent(query=query)
     query = state['input']
-    llm = Agent_Ai(model = 'llama3.1', df=df)
-    out = llm.prompt_agent(query=query)
-    print('ROUTER AGENT OUTPUT: ', out)
-    return {"agent_out": out}
+    try:
+        parse_dict = eval(query)
+        qns_type = ''
+        qns = ''
+        
+        for i in parse_dict.keys():
+            qns_type = i
+            qns = parse_dict[qns_type]
+        if "pandas" in qns_type.lower():
+            out = 'yes'
+        else:
+            out = 'no'
+        input = qns
+    except:
+        out = 'yes'
+        input = query
+        
+    print('ROUTER AGENT OUTPUT: ', out, 'TYPE', qns_type,'INPUT:', input)
+    return {"agent_out": out, "input": input}
 
 def router_agent_decision(state: list):
-    router_out = state['agent_out']
-    router_out = router_out.lower()
-    out = router_out[router_out.rfind("answer") + 5:]
+    # router_out = state['agent_out']
+    # router_out = router_out.lower()
+    # out = router_out[router_out.rfind("answer") + 5:]
+    out = state['agent_out']
     if 'yes' in out.lower():
         return 'router_summary_agent'
     else:
@@ -168,7 +158,7 @@ def router_python_output(state:list):
     
 def final_agent(state:list):
     print(graph_stage_prefix, "Final Agent")
-    llm = Agent_Ai(model = "llama3.1")
+    llm = Agent_Ai(model = "jiayuan1/nous_llm")
     query = state['input']
     previous_ans = state['all_answer']
     previous_ans_format = "Here is you knowledge base:\n"
@@ -214,7 +204,7 @@ def multiple_question_parser(state:list):
     all_answer.append(qns_ans_dict)
     remaining_qns = state['remaining_qns']
     if remaining_qns:
-        return {"input":remaining_qns[0], "remaining_qns":remaining_qns[1:], "all_answer":all_answer}
+        return {"input":str(remaining_qns[0]), "remaining_qns":remaining_qns[1:], "all_answer":all_answer}
     
     else:
         return {"input": "", "remaining_qns":[], "all_answer":all_answer}
