@@ -387,7 +387,7 @@ def output(message):
                         os.remove(path)
                 return
                     
-            elif "exports/charts/" in str(out):
+            elif "exports/charts/" in str(out) or 'tabulated_anomalies.png' in str(out):
                 img_base64 = img_to_base64(out)
                 if img_base64:
                     st.markdown(
@@ -506,27 +506,7 @@ def update_selected_log(df_option):
         df_list.append(date_formatted_df)
 
     llm = Python_Ai(df = df_list)
-    pandas_llm = llm.pandas_legend_with_summary_skill()
-    graph = Graph(pandas_llm=pandas_llm, df=df_list)
-    st.session_state.graph = graph
-    st.session_state.selected_df = df_option
-    print("Langgraph updated with selected log:", df_option)
-
-def update_selected_log(df_option):
-    df_list = []
-
-    if df_option is not None:
-        file = st.session_state.csv_filepaths[df_option]
-        file_path = file
-        if isinstance(file, tempfile._TemporaryFileWrapper):
-            file_path = file.name
-
-        df = pd.read_csv(file_path)
-        date_formatted_df = combine_datetime_columns(df)
-        df_list.append(date_formatted_df)
-
-    llm = Python_Ai(df = df_list)
-    pandas_llm = llm.pandas_legend_with_summary_skill()
+    pandas_llm = llm.pandas_legend()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     st.session_state.selected_df = df_option

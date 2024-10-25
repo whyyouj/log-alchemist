@@ -8,7 +8,7 @@ sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
-from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, router_python_output, python_summary_agent, multiple_question_agent, multiple_question_parser, router_multiple_question
+from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, router_python_output, python_summary_agent, multiple_question_agent, multiple_question_parser, router_multiple_question, python_anomaly_agent
 
 class AgentState(TypedDict):
     input: str
@@ -89,14 +89,14 @@ class Graph:
             }
         )
 
-        graph.add_conditional_edges(
-            "python_anomaly_agent",
-            router_python_output,
-            {
-                "final_agent":"final_agent",
-                "__end__":"__end__"
-            }
-        )
+        # graph.add_conditional_edges(
+        #     "python_anomaly_agent",
+        #     router_python_output,
+        #     {
+        #         "final_agent":"final_agent",
+        #         "__end__":"__end__"
+        #     }
+        # )
         # graph.add_edge("python_pandas_ai", END)
         graph.add_edge("final_agent", "multiple_question_parser")
         
