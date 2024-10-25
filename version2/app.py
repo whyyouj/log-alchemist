@@ -46,7 +46,7 @@ def apply_css():
         <style>
         /* Custom sidebar styling */
         [data-testid="stSidebar"] {
-            background-color: rgba(0, 0, 0, 0.1);  /* 50% transparency */
+            background-color: #f0f5f7;  /* 50% transparency */
             color: white;
             padding: 10px;
             border-radius: 15px;
@@ -54,6 +54,10 @@ def apply_css():
 
         [data-testid="stSidebar"] {
             color: #66CCFF;  /* Accent color for titles */
+        }
+
+        section[data-testid="stSidebar"] {
+            width: 250px !important;
         }
 
         [data-testid="stExpander"]:hover details {
@@ -80,7 +84,12 @@ def apply_css():
                 0 0 0.8em rgba(0, 170, 255, 0.4), /* Much lighter */
                 0 0 1.0em rgba(0, 170, 255, 0.6), /* Slightly lighter */
                 0 0 1.2em rgba(0, 170, 255, 0.8);   /* Keep this as is for contrast */
-            border:0px;
+        }
+
+        [data-testid="stChatInput"]{
+            border-width: 1px;
+            border-style: solid;
+            border-color: #55B2FF;
         }
 
         .cover_glow {
@@ -118,7 +127,7 @@ def st_title():
         ''', unsafe_allow_html=True)
 
 def st_sidebar():
-    img_path = "imgs/robot.png"
+    img_path = "imgs/chatbot_logo.webp"
     img_base64 = img_to_base64(img_path)
     if img_base64:
         st.sidebar.markdown(
@@ -139,7 +148,7 @@ def st_sidebar():
         opacity: 0.6;
         color: white; /* Text color */
         border: none; /* No border */
-        border-radius: 5px; /* Rounded corners */
+        border-radius: 50px; /* Rounded corners */
         padding: 10px 20px; /* Vertical and horizontal padding */
         font-size: 15px; /* Font size */
         cursor: pointer; /* Pointer cursor */
@@ -161,7 +170,7 @@ def st_sidebar():
         0 0 30px rgba(0, 170, 255, 1); /* Glow effect */
          color: white; /* Text color */
         border: none; /* No border */
-        border-radius: 5px; /* Rounded corners */
+        border-radius: 50px; /* Rounded corners */
         padding: 10px 20px; /* Vertical and horizontal padding */
         font-size: 15px; /* Font size */
         cursor: pointer; /* Pointer cursor */
@@ -174,7 +183,7 @@ def st_sidebar():
     opacity: 0.6;
     color: white; /* Text color */
     border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
+    border-radius: 50px; /* Rounded corners */
     padding: 10px 20px; /* Vertical and horizontal padding */
     font-size: 15px; /* Font size */
     cursor: pointer; /* Pointer cursor */
@@ -203,7 +212,7 @@ def st_sidebar():
         chat_var2 = "chat1"
     
     st.sidebar.markdown(f'<span id={chat_var}></span>', unsafe_allow_html=True)
-    if st.sidebar.button("Chat with Vantage AI", key = "ai"):
+    if st.sidebar.button("My Chat", key = "ai"):
         st.session_state.mode = "Chat with VantageAI"
         st.session_state.button = True
 
@@ -227,7 +236,6 @@ def st_sidebar():
             </div>
             <hr>
             <img src='data:image/png;base64,{img_base64}' style='position: relative; bottom: 0; left: 0; '/>
-    
             """,
             unsafe_allow_html=True
         )
@@ -262,8 +270,7 @@ def display_file_uploader():
         st.rerun()
 
     with st.form(key = "folderupload_form"):
-        st.text('Input an absolute folder path')
-        abs_folderpath = st.text_area('Absolute Folder Path', label_visibility='collapsed')
+        abs_folderpath = st.text_area('Input an absolute folder path')
         folder_submit = st.form_submit_button(label = "Submit")
     if folder_submit:
         on_folder_submit(abs_folderpath)
@@ -281,7 +288,7 @@ def on_file_submit(uploaded_files):
         with tempfile.NamedTemporaryFile(delete=False) as tf:
             tf.write(uploaded_file.getbuffer())
             # file_path = tf.name
-            print('tf type:', type(tf))
+
             if uploaded_file.name[-3:] == 'csv':
                 csv_filepaths[uploaded_file.name] = tf #file_path
             else:
@@ -294,7 +301,7 @@ def on_file_submit(uploaded_files):
     if csv_filepaths != st.session_state.csv_filepaths:
         st.session_state.csv_filepaths = csv_filepaths
         print('CSV FILE PATHS: ', st.session_state.csv_filepaths)
-        update_langgraph()
+        # update_langgraph()
 
 def on_folder_submit(abs_folderpath):
     abs_folderpath = abs_folderpath.strip()
@@ -332,7 +339,7 @@ def on_folder_submit(abs_folderpath):
         if csv_filepaths != st.session_state.csv_filepaths:
             st.session_state.csv_filepaths = csv_filepaths
             print('CSV FILE PATHS: ', st.session_state.csv_filepaths)
-            update_langgraph()
+            # update_langgraph()
 
 def clear_files():
     for file in list(st.session_state.filepaths.values()) + list(st.session_state.csv_filepaths.values()):
@@ -340,129 +347,60 @@ def clear_files():
             os.remove(file.name)
     st.session_state.filepaths = {}
     st.session_state.csv_filepaths = {}
-    update_langgraph()
+    print('Uploaded Files Cleared')
+    # update_langgraph()
 
-def on_chat_submit_old(chat_input):
-    """
-    Handle chat input submissions and interact with the llm.
-
-    Parameters:
-    - chat_input (str): The chat input from the user.
-
-    Returns:
-    - None: Updates the chat history in Streamlit's session state.
-    """
-    user_input = chat_input.strip().lower()
-
-    st.session_state.conversation_history.append({"role": "user", "content": user_input})
-
-    try:
-        
-        # import matplotlib.pyplot
-        # import pandas as pd
-        # df = pd.read_csv('../EDA/data/mac/Mac_2k.log_structured.csv')
-        # import pandasai as pai
-        # from langchain_community.llms import Ollama
-        
-        # llm = Ollama(
-        #     model = "llama3.1",
-        #     temperature = 0.2
-        # )
-        # pandas_ai_agent = pai.SmartDataframe(df, config={"llm":llm})
-        # pandas_ai_agent.chat(user_input)
-        #time.sleep(1)
-        graph = st.session_state.graph
-        out = graph.run(user_input)
-        assistant_reply = out #'exports/charts/d772a0b7-7737-410f-9464-1427a93b2a1d.png'
-
-        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
-        st.session_state.history.append({"role": "user", "content": user_input})
-        st.session_state.history.append({"role": "assistant", "content": assistant_reply})
-
-    except Exception as e:
-        logging.error(f"Error occurred: {e}")
-        error_message = st.error(f"AI Error: {str(e)}")
-        time.sleep(3)
-        error_message.empty()
 
 def output(message):
     role = message["role"]
-    avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+    avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
+    
     with st.chat_message(role, avatar=avatar_image):
-        if type(message['content']) is dict:
-            summary_dict = message['content']
-            summary_type = summary_dict.get('type', '')
-            if summary_type == 'Python_AI_Summary':
+        if role == 'user':
+            st.write(message['content'])
+            return 
+        #Determine whether a not to break the question down
+        format = True
+        if len(message['content']) == 1:
+            format = False
+        if format:
+            st.write("Here is the break down of your question:")
+        for dict in message['content']:
+            if format:
+                st.write(dict['qns'])
+            out = dict['ans']
+            if str(out).endswith(".html"):
                 st.write("### Here is a summary of the data!")
-                path = summary_dict['path']
-
-                # Check if the file exists
-                if os.path.exists(path):
-                    # Read the file and render it in an iframe
-                    with open(path, 'r', encoding='utf-8') as f:
-                        html_content = f.read()
-                    # Display the HTML report in Streamlit
-                    components.html(html_content, height=800, scrolling=True)
-              
-                return
-            
-                ## dont remove plsssssssss
-                '''
-                for key in summary_dict.keys():
-                    if key == 'type':
-                        continue
-                    st.write(f"**{key}**")
-                    for content_key in summary_dict[key].keys():
-                        if content_key == 'GRAPH':
-                            img_base64 = img_to_base64(summary_dict[key][content_key])
-                            if img_base64:
-                                st.markdown(
-                                        f"""
-                                        Here is the Chart!
-                                        <img src='data:image/png;base64,{img_base64}'/>
-                                        """,
-                                        unsafe_allow_html=True
-                                    )
-                            else:
-                                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")                                        
-                        else:
-                            st.write(content_key)
-                            st.write(summary_dict[key][content_key])'''
-            else:
-                st.write(message['content'])
-                return
-        elif str(message['content']).endswith(".html"):
-            st.write("### Here is a summary of the data!")
-            print("[APP]", message['content'])
-            pattern = r"([A-Z]:(?:\\\\|\\)(?:[^\\/:*?\"<>|\r\n]+(?:\\\\|\\))*[^\\/:*?\"<>|\r\n]+\.[a-zA-Z0-9]+|(?:\/[^\/\s]+)+\/[^\/\s]+\.[a-zA-Z0-9]+)"
-            html_files = re.findall(pattern, message['content'])
-            print(html_files)
-            for path in html_files:
-                if os.path.exists(path):
-                    # Read the file and render it in an iframe
-                    with open(path, 'r', encoding='utf-8') as f:
-                        html_content = f.read()
-                    # Display the HTML report in Streamlit
-                    components.html(html_content, height=800, scrolling=True)
-            
-                    # Deleting temporary file after outputing
-                    os.remove(path)
-            return
+                print("[APP]", out)
+                pattern = r"([A-Z]:(?:\\\\|\\)(?:[^\\/:*?\"<>|\r\n]+(?:\\\\|\\))*[^\\/:*?\"<>|\r\n]+\.[a-zA-Z0-9]+|(?:\/[^\/\s]+)+\/[^\/\s]+\.[a-zA-Z0-9]+)"
+                html_files = re.findall(pattern, out)
+                print(html_files)
+                for path in html_files:
+                    if os.path.exists(path):
+                        # Read the file and render it in an iframe
+                        with open(path, 'r', encoding='utf-8') as f:
+                            html_content = f.read()
+                        # Display the HTML report in Streamlit
+                        components.html(html_content, height=800, scrolling=True)
                 
-        elif "exports/charts/" in str(message['content']):
-            img_base64 = img_to_base64(message['content'])
-            if img_base64:
-                st.markdown(
-                        f"""
-                        Here is the Chart!
-                        <img src='data:image/png;base64,{img_base64}'/>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                        # Deleting temporary file after outputing
+                        os.remove(path)
+                return
+                    
+            elif "exports/charts/" in str(out) or 'tabulated_anomalies.png' in str(out):
+                img_base64 = img_to_base64(out)
+                if img_base64:
+                    st.markdown(
+                            f"""
+                            Here is the Chart!
+                            <img src='data:image/png;base64,{img_base64}'/>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                else:
+                    st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
             else:
-                st.write(f"I'm so sorry. But I am unable to show you the plotted graph.")
-        else:
-            st.write(message["content"])   
+                st.write(out)   
         return
 
 async def on_chat_submit(chat_input):
@@ -477,14 +415,12 @@ async def on_chat_submit(chat_input):
     """
     user_input = chat_input
 
-    st.session_state.conversation_history.append({"role": "user", "content": user_input})
 
     try:
         graph = st.session_state.graph
         out = graph.run(user_input)
         assistant_reply = out 
 
-        st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
         st.session_state.history.append({"role": "user", "content": user_input})
         st.session_state.history.append({"role": "assistant", "content": assistant_reply})
 
@@ -505,21 +441,19 @@ def run_async_task(chat_input):
 def initialize_conversation():
     assistant_message = "Hello! I am Vantage AI. How can I assist you today?"
     conversation_history = [
-        {"role":"assistant", "content":assistant_message}
+        {"role":"assistant", "content":[{"qns":"Begin", "ans": assistant_message}]}
     ]
     return conversation_history
 
 def initialize_langgraph():
     graph = Agent_Ai()
-    print('Langgraph Initialized')
+    print('LangGraph Initialized')
     return graph
 
 def initialize_session_state():
     """Initialize session state variables."""
     if "history" not in st.session_state:
         st.session_state.history = initialize_conversation()
-    if 'conversation_history' not in st.session_state:
-        st.session_state.conversation_history = initialize_conversation()
     if "mode" not in st.session_state:
         st.session_state.mode = "Chat with VantageAI"
     if "button" not in st.session_state:
@@ -533,11 +467,13 @@ def initialize_session_state():
         on_folder_submit(default_abs_folder)
     if "graph" not in st.session_state:
         st.session_state.graph = initialize_langgraph()
+    if "selected_df" not in st.session_state:
+        st.session_state.selected_df = None
 
 def reset_session_state():
     st.session_state.history = initialize_conversation()
-    st.session_state.conversation_history = initialize_conversation()
     st.session_state.mode = "Chat with VantageAI"
+    st.session_state.selected_df = None
 
 def update_langgraph():
     df_list = []
@@ -550,11 +486,31 @@ def update_langgraph():
         date_formatted_df = combine_datetime_columns(df)
         df_list.append(date_formatted_df)
 
-    llm = Python_Ai(df = df_list)
-    pandas_llm = llm.pandas_legend_with_summary_skill()
+    llm = Python_Ai(model = 'llama3.1', df = df_list)
+    pandas_llm = llm.pandas_legend()#.pandas_legend_with_summary_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
-    print("Langgraph Updated")
+    print("LangGraph Updated")
+
+def update_selected_log(df_option):
+    df_list = []
+
+    if df_option is not None:
+        file = st.session_state.csv_filepaths[df_option]
+        file_path = file
+        if isinstance(file, tempfile._TemporaryFileWrapper):
+            file_path = file.name
+
+        df = pd.read_csv(file_path)
+        date_formatted_df = combine_datetime_columns(df)
+        df_list.append(date_formatted_df)
+
+    llm = Python_Ai(df = df_list)
+    pandas_llm = llm.pandas_legend()
+    graph = Graph(pandas_llm=pandas_llm, df=df_list)
+    st.session_state.graph = graph
+    st.session_state.selected_df = df_option
+    print("LangGraph updated with selected log:", df_option)
 
 def main():
     
@@ -569,6 +525,19 @@ def main():
     st_sidebar()
 
     if st.session_state.mode == "Chat with VantageAI":
+                
+        main_col1, main_col2 = st.columns([1, 2])
+        with main_col1:
+            df_option = st.selectbox(
+                "Select a log to query",
+                st.session_state.csv_filepaths.keys(),
+                index=None,
+                placeholder="Select a log to query",
+                label_visibility='collapsed'
+            ) 
+
+            if df_option != st.session_state.selected_df:
+                update_selected_log(df_option)
         
         st.markdown(
                     """
@@ -587,7 +556,8 @@ def main():
 
         if chat_input := st.chat_input("Ask a question"):
             role = "user"
-            avatar_image = "imgs/ai.png" if role == "assistant" else "imgs/person.png" if role == "user" else None
+            avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
+
             with st.chat_message(role, avatar=avatar_image):
                 st.write(chat_input)
 

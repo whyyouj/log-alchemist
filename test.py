@@ -1,4 +1,5 @@
 from regular_agent.agent_ai import Agent_Ai
+from python_agent.python_ai import Python_Ai
 import pandas as pd
 questions = [
     "How can I calculate the mean of the 'Price' column?",
@@ -23,11 +24,26 @@ questions = [
     "What is the meaning of life?"
 ]
 
-df = pd.read_csv("./data/Mac_2k.log_structured.csv")
-questions2 =["hi"]
+df = pd.read_csv("./logs/Sales Transaction v.4a.csv")
+# questions2 =["how many rows are there"]
+# df = pd.read_csv('train2.csv')
 
-llm = Agent_Ai(model = 'llama3', df = df)
-for i in questions2:
-    print(i)
-    print(llm.prompt_agent(i))
-# print(llm.query_agent(prompt))
+
+# llm= Python_Ai(model='mistral', df = df).pandas_legend_with_summary_skill()
+# correct = 0
+# total = 0
+# for i in pd.read_csv('train2.csv').iterrows():
+#     # print(i)
+#     #print(llm.chat(i))
+    
+#     out = llm.query_agent(f'What category does this question fall under: Summary, Anomaly, General: {i['Input']}')
+#     total += 1
+#     if out == i["Output"]:
+#         correct += 1
+        
+# print(correct)
+# print(total)
+
+
+llm = Python_Ai(model = 'jiayuan1/nous_llm', df = df)
+print(llm.pandas_legend_with_summary_skill().chat("filter for greece and count the number of occurance"))

@@ -13,7 +13,7 @@ SUFFIX = """
     In particular, can the user question be answered by using Python code to manipulate the dataframe(s)?
 
     Important:
-    - If the question is unrelated to Python data manipulation (like greetings or general questions), answer with a *no*
+    - If the question is unrelated to Python data manipulation (like greetings or general questions or general explanation question), answer with a *no*
     Can this be answered by using Python code to manipulate the dataframe?
     
     Answer Should be formatted 
