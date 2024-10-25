@@ -541,11 +541,14 @@ def initialize_session_state():
         on_folder_submit(default_abs_folder)
     if "graph" not in st.session_state:
         st.session_state.graph = initialize_langgraph()
+    if "selected_df" not in st.session_state:
+        st.session_state.selected_df = None
 
 def reset_session_state():
     st.session_state.history = initialize_conversation()
     st.session_state.conversation_history = initialize_conversation()
     st.session_state.mode = "Chat with VantageAI"
+    st.session_state.selected_df = None
 
 def update_langgraph():
     df_list = []
@@ -581,7 +584,8 @@ def update_selected_log(df_option):
     pandas_llm = llm.pandas_legend_with_summary_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
-    print("Langgraph updated with selected log")
+    st.session_state.selected_df = df_option
+    print("Langgraph updated with selected log:", df_option)
 
 def main():
     
@@ -606,6 +610,9 @@ def main():
                 placeholder="Select a log to query",
                 label_visibility='collapsed'
             ) 
+
+            if df_option != st.session_state.selected_df:
+                update_selected_log(df_option)
         
         st.markdown(
                     """
@@ -625,7 +632,6 @@ def main():
         if chat_input := st.chat_input("Ask a question"):
             role = "user"
             avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
-            update_selected_log(df_option)
 
             with st.chat_message(role, avatar=avatar_image):
                 st.write(chat_input)
