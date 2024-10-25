@@ -24,9 +24,9 @@ questions = [
     "What is the meaning of life?"
 ]
 
-# df = pd.read_csv("../../data/Mac_2k.log_structured.csv")
+df = pd.read_csv("./logs/Sales Transaction v.4a.csv")
 # questions2 =["how many rows are there"]
-df = pd.read_csv('train2.csv')
+# df = pd.read_csv('train2.csv')
 
 
 # llm= Python_Ai(model='mistral', df = df).pandas_legend_with_summary_skill()
@@ -41,5 +41,9 @@ df = pd.read_csv('train2.csv')
 #     if out == i["Output"]:
 #         correct += 1
         
-print(correct)
-print(total)
+# print(correct)
+# print(total)
+
+
+llm = Python_Ai(model = 'llama3.1', df = df)
+print(llm.pandas_legend_with_summary_skill().chat("how many row are there"))
