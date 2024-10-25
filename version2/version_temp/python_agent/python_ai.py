@@ -85,6 +85,11 @@ def anomaly_skill(df):
     log_df = df
     anomalies = {}
 
+    #########################
+    ### 0. Number of Rows ###
+    #########################
+    anomalies['Number of rows'] = len(df)
+
     ###########################################
     ### 1. Check for missing or null values ###
     ###########################################
