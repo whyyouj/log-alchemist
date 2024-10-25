@@ -180,7 +180,7 @@ class Graph:
     
 if __name__ == "__main__":
     df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
-    pandas_ai = Python_Ai(df=df).pandas_legend()
+    pandas_ai = Python_Ai(model = "llama3.1", df=df).pandas_legend()
     graph = Graph(pandas_llm = pandas_ai, df = df)
-    # graph.show()
-    graph.run('how many rows are there')
+    graph.show()
+    #graph.run('how many rows are there')
