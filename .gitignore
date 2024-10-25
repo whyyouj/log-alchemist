@@ -5,4 +5,4 @@ venv/
 __pycache__
 build/
 pandasai.log
-version2/pandasai.log
+*.log

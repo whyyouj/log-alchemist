@@ -45,5 +45,5 @@ df = pd.read_csv("./logs/Sales Transaction v.4a.csv")
 # print(total)
 
 
-llm = Python_Ai(model = 'llama3.1', df = df)
-print(llm.pandas_legend_with_summary_skill().chat("how many row are there"))
+llm = Python_Ai(model = 'jiayuan1/nous_llm', df = df)
+print(llm.pandas_legend_with_summary_skill().chat("filter for greece and count the number of occurance"))

@@ -131,10 +131,11 @@ class Graph:
     def create_graph():
         global global_graph
         df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
-        pandas_ai = Python_Ai(df=df).pandas_legend()
+        pandas_ai = Python_Ai(model='llama3.1',df=df).pandas_legend()
         global_graph = Graph(pandas_llm=pandas_ai, df=df)
         return global_graph
     
 if __name__ == "__main__":
     graph = Graph.create_graph()
     # graph.show()
+    graph.run('how many rows are there')
