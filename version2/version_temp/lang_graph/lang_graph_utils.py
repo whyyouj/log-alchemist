@@ -77,7 +77,6 @@ def router_agent_decision(state: list):
 def router_summary_agent(state: list):
     print(graph_stage_prefix, 'Router summary agent')
     llm = Agent_Ai(model='jiayuan1/summary_anomaly_llm_v3')
-    llm = Agent_Ai(model='jiayuan1/summary_anomaly_llm_v3')
     query = state['input']
     # query_summary = f"""
     # You are suppose to determine if the <Question> is explicitly asking for a summary. When determining whether a question is asking for a summary, focus on whether the question is requesting a high-level overview of the data (summary), or if it’s asking for a specific value, action, or detail (non-summary). Always think before answering.
@@ -156,7 +155,7 @@ def python_anomaly_agent(state: list):
     #out = pandasai_llm.chat(query) 
 
     # Need to handle sorting of dataframes
-    out = anomaly_skill(df[1])
+    out = anomaly_skill(df[0])
     print('PYTHON ANOMALY OUT: ', out)
     return {"agent_out": out}
 
