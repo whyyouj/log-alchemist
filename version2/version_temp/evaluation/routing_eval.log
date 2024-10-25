@@ -1,0 +1,30 @@
+2024-10-24 01:34:54,828 - INFO - ===================================================
+2024-10-24 01:35:06,141 - INFO - Query: What is error 404?
+2024-10-24 01:35:06,141 - INFO - Expected Answer: no
+2024-10-24 01:35:06,141 - INFO - Model Answer: no
+2024-10-24 01:35:06,141 - INFO - Current Correct Answers: 1 
+
+2024-10-24 01:35:18,447 - INFO - Query: How many rows of data are there in the dataframe?
+2024-10-24 01:35:18,447 - INFO - Expected Answer: yes
+2024-10-24 01:35:18,447 - INFO - Model Answer: yes
+2024-10-24 01:35:18,447 - INFO - Current Correct Answers: 2 
+
+2024-10-24 01:35:18,447 - INFO - Total Correct Answers: 2/2
+2024-10-24 01:35:18,447 - INFO - Time Taken: 23.42 seconds
+2024-10-24 01:35:18,447 - INFO - =================================================== 
+
+2024-10-24 01:35:22,940 - INFO - ===================================================
+2024-10-24 01:35:35,093 - INFO - Query: What is error 404?
+2024-10-24 01:35:35,093 - INFO - Expected Answer: no
+2024-10-24 01:35:35,093 - INFO - Model Answer: no
+2024-10-24 01:35:35,093 - INFO - Current Correct Answers: 1 
+
+2024-10-24 01:35:48,569 - INFO - Query: How many rows of data are there in the dataframe?
+2024-10-24 01:35:48,569 - INFO - Expected Answer: yes
+2024-10-24 01:35:48,569 - INFO - Model Answer: yes
+2024-10-24 01:35:48,569 - INFO - Current Correct Answers: 2 
+
+2024-10-24 01:35:48,569 - INFO - Total Correct Answers: 2/2
+2024-10-24 01:35:48,569 - INFO - Time Taken: 25.44 seconds
+2024-10-24 01:35:48,569 - INFO - =================================================== 
+

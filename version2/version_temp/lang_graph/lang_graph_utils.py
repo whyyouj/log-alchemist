@@ -171,7 +171,7 @@ def multiple_question_parser(state:list):
         return {"input": "", "remaining_qns":[], "all_answer":all_answer}
     
 def router_multiple_question(state:list):
-    print(graph_stage_prefix, "Multiple Qestion Router")
+    print(graph_stage_prefix, "Multiple Question Router")
     if state["input"]:
         return "router_agent"
     else:
