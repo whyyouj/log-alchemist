@@ -240,7 +240,8 @@ class QueryParser:
             "limit": limit
         }
         
-        return pformat(prompt_template, indent=2)
+        # return pformat(prompt_template, indent=2)
+        return prompt_template
     
     def identify_intent(self, doc):
         intents = {
