@@ -30,8 +30,31 @@ class LangchainLLM(LLM):
         prompt = self.prepend_system_prompt(prompt, memory)
         self.last_prompt = prompt
         prompt = prompt + """
-        
         """
+        ##### if nuos_llm add this part to the prompt #############################################
+        #Here is how the final code should be formatted and only output the code
+        # """
+        # ```python
+        # import pandas as pd
+        # df = dfs[0]
+        # # TODO: import the required dependencies
+
+
+        # # Write code here
+
+
+        # # Declare result var: 
+        # result = {"type": ..., "value" : ans } 
+        # ```
+
+        # Example of result:
+        # possible "type": "string" or "number" or "dataframe" or "plot"
+        # if type(ans) = dataframe then result = { "type": "dataframe", "value": pd.DataFrame({...}) }
+        # if type(ans) = string then reuslt = { "type": "string", "value": f"..." }
+        # if type(ans) = plot then result = { "type": "plot", "value": "....png"
+        # if type(ans) = number result = { "type": "number", "value": ... }                                          
+        # """
+        ###############################################################################################
         
         res = self.langchain_llm.invoke(prompt)
         res = res.replace("</|im_end|>", "")
