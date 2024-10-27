@@ -218,4 +218,9 @@ def router_multiple_question(state:list):
     else:
         return "__end__"
     
+""" 
+def queryparser(state:):
+
+
+"""
     
