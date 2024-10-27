@@ -21,6 +21,8 @@ logging.basicConfig(level=logging.INFO)
 
 # Constants
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
+PANDAS_LLM = 'jiayuan1/llm2'
+GENERAL_LLM = "jiayuan1/nous_llm"
 
 st.set_page_config(
     page_title="Vantage Assistant",
@@ -370,7 +372,7 @@ def output(message):
                 st.write(dict['qns'])
             out = dict['ans']
             if str(out).endswith(".html"):
-                st.write("### Here is a summary of the data!")
+                st.write("Here is a summary of the data!")
                 print("[APP]", out)
                 pattern = r"([A-Z]:(?:\\\\|\\)(?:[^\\/:*?\"<>|\r\n]+(?:\\\\|\\))*[^\\/:*?\"<>|\r\n]+\.[a-zA-Z0-9]+|(?:\/[^\/\s]+)+\/[^\/\s]+\.[a-zA-Z0-9]+)"
                 html_files = re.findall(pattern, out)
@@ -385,9 +387,8 @@ def output(message):
                 
                         # Deleting temporary file after outputing
                         os.remove(path)
-                return
                     
-            elif "exports/charts/" in str(out) or 'tabulated_anomalies.png' in str(out):
+            elif "exports/charts/" in str(out) or 'tabulated_anomalies.png' in str(out) or '.png' in str(out):
                 img_base64 = img_to_base64(out)
                 if img_base64:
                     st.markdown(
@@ -441,12 +442,12 @@ def run_async_task(chat_input):
 def initialize_conversation():
     assistant_message = "Hello! I am Vantage AI. How can I assist you today?"
     conversation_history = [
-        {"role":"assistant", "content":[{"qns":"Begin", "ans": assistant_message}]}
+        {"role":"assistant", "content":[ {"qns":"Begin", "ans": assistant_message} ]}
     ]
     return conversation_history
 
 def initialize_langgraph():
-    graph = Agent_Ai()
+    graph = Agent_Ai(model= GENERAL_LLM)
     print('LangGraph Initialized')
     return graph
 
@@ -486,8 +487,8 @@ def update_langgraph():
         date_formatted_df = combine_datetime_columns(df)
         df_list.append(date_formatted_df)
 
-    llm = Python_Ai(model = 'llama3.1', df = df_list)
-    pandas_llm = llm.pandas_legend()#.pandas_legend_with_summary_skill()
+    llm = Python_Ai(model = PANDAS_LLM, df = df_list)
+    pandas_llm = llm.pandas_legend_with_skill()#.pandas_legend()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     print("LangGraph Updated")
@@ -505,8 +506,8 @@ def update_selected_log(df_option):
         date_formatted_df = combine_datetime_columns(df)
         df_list.append(date_formatted_df)
 
-    llm = Python_Ai(df = df_list)
-    pandas_llm = llm.pandas_legend()
+    llm = Python_Ai(model = PANDAS_LLM, df = df_list)
+    pandas_llm = llm.pandas_legend_with_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     st.session_state.selected_df = df_option

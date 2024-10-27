@@ -60,7 +60,8 @@ def router_agent_decision(state: list):
     # out = router_out[router_out.rfind("answer") + 5:]
     out = state['agent_out']
     if 'yes' in out.lower():
-        return 'router_summary_agent'
+        return 'python_pandas_ai' #'router_summary_agent'
+        
     else:
         return 'final_agent'
 
@@ -115,7 +116,7 @@ def python_summary_agent(state: list):
     df = state['df']
     query = state['input']
     llm = Python_Ai(model = "llama3.1", df = df)
-    pandasai_llm  = llm.pandas_legend_with_summary_skill()
+    pandasai_llm  = llm.pandas_legend_with_skill()
     prompt = f"""
     The following is the query from the user:
     {query}

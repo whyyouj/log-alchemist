@@ -25,4 +25,4 @@ class Agent_Ai:
         return self.llm.invoke(query)
     
     def run(self, query):
-        return self.llm.invoke(query)
+        return [{"qns":query, "ans" : self.llm.invoke(query)}]
