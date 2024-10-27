@@ -34,11 +34,11 @@ class Graph:
         graph.add_node("multiple_question_agent", multiple_question_agent) # Breakdown if question is about multiple questions
         graph.add_node('router_agent', router_agent) # Determining if question is related to dataset
 
-        graph.add_node('router_summary_agent', router_summary_agent) # Determining if question is asking for summary
+        ##graph.add_node('router_summary_agent', router_summary_agent) # Determining if question is asking for summary
 
         graph.add_node("python_pandas_ai", python_pandas_ai) # Answering specific dataset related questions
-        graph.add_node("python_summary_agent", python_summary_agent) # Answering summary related questions by outputting sweetviz framework
-        graph.add_node("python_anomaly_agent", python_anomaly_agent) # Answering anomaly related questions 
+        ##graph.add_node("python_summary_agent", python_summary_agent) # Answering summary related questions by outputting sweetviz framework
+        ##graph.add_node("python_anomaly_agent", python_anomaly_agent) # Answering anomaly related questions 
 
         graph.add_node('final_agent', final_agent) 
         graph.add_node("multiple_question_parser", multiple_question_parser)
@@ -50,19 +50,20 @@ class Graph:
             "router_agent",
             router_agent_decision,
             {
-                "router_summary_agent":"router_summary_agent",
+                #"router_summary_agent":"router_summary_agent",
+                "python_pandas_ai":"python_pandas_ai",
                 "final_agent":"final_agent"
             }
         )
-        graph.add_conditional_edges(
-            "router_summary_agent",
-            router_summary_agent_decision,
-            {
-                "python_summary_agent":"python_summary_agent",
-                "python_pandas_ai":"python_pandas_ai",
-                "python_anomaly_agent":"python_anomaly_agent"
-            }
-        )
+        ##graph.add_conditional_edges(
+        ##    "router_summary_agent",
+        ##    router_summary_agent_decision,
+        ##    {
+        ##        "python_summary_agent":"python_summary_agent",
+        ##        "python_pandas_ai":"python_pandas_ai",
+        ##        "python_anomaly_agent":"python_anomaly_agent"
+        ##    }
+        ##)
         graph.add_conditional_edges(
             "python_pandas_ai",
             router_python_output,
@@ -71,23 +72,23 @@ class Graph:
                 "multiple_question_parser":"multiple_question_parser"
             }
         )      
-        graph.add_conditional_edges(
-            "python_summary_agent",
-            router_python_output,
-            {
-                "final_agent":"final_agent",
-                "multiple_question_parser":"multiple_question_parser"
-            }
-        )
+        # graph.add_conditional_edges(
+        #     "python_summary_agent",
+        #     router_python_output,
+        #     {
+        #         "final_agent":"final_agent",
+        #         "multiple_question_parser":"multiple_question_parser"
+        #     }
+        # )
 
-        graph.add_conditional_edges(
-            "python_anomaly_agent",
-            router_python_output,
-            {
-                "final_agent":"final_agent",
-                "multiple_question_parser":"multiple_question_parser"
-            }
-        )
+        # graph.add_conditional_edges(
+        #     "python_anomaly_agent",
+        #     router_python_output,
+        #     {
+        #         "final_agent":"final_agent",
+        #         "multiple_question_parser":"multiple_question_parser"
+        #     }
+        # )
 
         # graph.add_conditional_edges(
         #     "python_anomaly_agent",

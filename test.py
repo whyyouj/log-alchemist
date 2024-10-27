@@ -24,7 +24,7 @@ questions = [
     "What is the meaning of life?"
 ]
 
-df = pd.read_csv("./logs/Sales Transaction v.4a.csv")
+df = pd.read_csv("./data/Mac_2k.log_structured.csv")
 # questions2 =["how many rows are there"]
 # df = pd.read_csv('train2.csv')
 
@@ -44,6 +44,32 @@ df = pd.read_csv("./logs/Sales Transaction v.4a.csv")
 # print(correct)
 # print(total)
 
+"""))"""
+llm = Python_Ai(model = 'jiayuan1/nous_llm', df = df, temperature=0)
+print(llm.pandas_legend_with_skill().chat("""perform a anomaly ananlysis on the whole data.
 
-llm = Python_Ai(model = 'jiayuan1/nous_llm', df = df)
-print(llm.pandas_legend_with_summary_skill().chat("filter for greece and count the number of occurance"))
+                                          
+Here is how the final code should be formatted and only output the code
+
+```python
+import pandas as pd
+df = dfs[0]
+# TODO: import the required dependencies
+
+
+# Write code here
+
+
+# Declare result var: 
+result = {"type": ..., "value" : ans } 
+```
+
+Example of result:
+possible "type": "string" or "number" or "dataframe" or "plot"
+if type(ans) = dataframe then result = { "type": "dataframe", "value": pd.DataFrame({...}) }
+if type(ans) = string then reuslt = { "type": "string", "value": f"..." }
+if type(ans) = plot then result = { "type": "plot", "value": "....png"
+if type(ans) = number result = { "type": "number", "value": ... }                                          
+"""
+))
+
