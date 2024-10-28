@@ -660,7 +660,7 @@ def update_langgraph():
         df_list.append(date_formatted_df)
 
     llm = Python_Ai(model = PANDAS_LLM, df = df_list)
-    pandas_llm = llm.pandas_legend_with_skill()#.pandas_legend()
+    pandas_llm = llm.pandas_legend_with_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     print("LangGraph Updated")
