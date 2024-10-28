@@ -546,16 +546,24 @@ class Python_Ai:
         pandas_ai = Agent(
             self.df, 
             description = """
-            You are a data analyst that has been tasked with the goal of providing a summary of the data using your skill when required. Everytime I ask you a question about summary, you should use your summary skill.
+                You are a highly skilled data analysis agent, responsible for handling and answering various data-related queries. 
+                For each query I provide, your task is to carefully analyze the data and return the most accurate and optimized solution.
+                
+                Your response should include:
+                1. The Python code necessary to derive the answer from the data.
+                
+                Always take your time to think through the query before responding, and ensure the code is optimized for both readability and performance.
+                
+                Typical questions you will handle include requests like "How many rows are there in the dataset?" or "What are the top 5 events that occurred?" so ensure your answers are tailored to these types of queries.
             """,
             config={
                 "llm":llm,
                 "open_charts":False,
                 "enable_cache" : False,
                 "save_charts": True,
-                "max_retries":10,
+                "max_retries": 3,
                 "response_parser": StreamlitResponse,
-                "custom_whitelisted_dependencies": ["sweetviz","collections", "pytz"]
+                "custom_whitelisted_dependencies": ["sweetviz", "collections", "pytz"]
             }
         )
         pandas_ai.add_skills(overall_summary)
