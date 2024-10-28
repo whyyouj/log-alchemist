@@ -447,9 +447,9 @@ def initialize_conversation():
     return conversation_history
 
 def initialize_langgraph():
-    graph = Agent_Ai(model= GENERAL_LLM)
+    agent = Agent_Ai(model= GENERAL_LLM)
     print('LangGraph Initialized')
-    return graph
+    return agent
 
 def initialize_session_state():
     """Initialize session state variables."""

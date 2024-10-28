@@ -97,18 +97,18 @@ def python_pandas_ai(state:list):
     print(graph_stage_prefix, 'Pandas AI agent')
     llm = state['pandas']
     query = state['input']
-    # prompt = f"""
-    # The following is the query from the user:
-    # {query}
+    prompt = f"""
+    The following is the query from the user:
+    {query}
 
-    # You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+    You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
 
-    # You are to following the instructions below strictly:
-    # - Any query related to Date or Time, refer to the 'Datetime' column.
-    # - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
-    # """
-    # out = llm.chat(prompt)
-    out = llm.chat(query)
+    You are to following the instructions below strictly:
+    - Any query related to Date or Time, refer to the 'Datetime' column.
+    - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    """
+    out = llm.chat(prompt)
+    # out = llm.chat(query)
     return {"agent_out": out}
 
 def python_summary_agent(state: list):
@@ -184,11 +184,6 @@ def final_agent(state:list):
 
     """
     out = llm.query_agent(query=prompt)
-    # Try your best to answer the query. Take your time. If the query relates to any dataframe, assist accordingly to answer the query.
-    # """
-    # out = llm.query_agent(query=prompt)
-
-    out = llm.query_agent(query)
     return {"agent_out":out}
 
 def multiple_question_parser(state:list):
