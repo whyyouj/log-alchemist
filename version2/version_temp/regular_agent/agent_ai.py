@@ -8,6 +8,11 @@ class Agent_Ai:
     
     #An llm that answer with a prompt. If the prompt is not given it will use the default prompt
     def prompt_agent(self, query, prompt=""):
+        
+        '''
+        This function is used to invoke a prompt formatted with LangChain PromptTemplate as input
+        '''
+        
         if len(self.df) == 0:
             return 'Error: No dataframe found'
         
@@ -22,7 +27,17 @@ class Agent_Ai:
     
     #An llm that simply answer the question
     def query_agent(self, query):
+        
+        '''
+        This function is used to invoke a prompt that is of type str as input
+        '''
+        
         return self.llm.invoke(query)
     
     def run(self, query):
-        return [{"qns":query, "ans" : self.llm.invoke(query)}]
+        
+        '''
+        This funtion format the output in a dictionary type that will be necessary for the app
+        '''
+        
+        return [{"qns":query, "ans" : self.query_agent(query= query)}]
