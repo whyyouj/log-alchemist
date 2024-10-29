@@ -29,33 +29,8 @@ class LangchainLLM(LLM):
         memory = context.memory if context else None
         prompt = self.prepend_system_prompt(prompt, memory)
         self.last_prompt = prompt
-        prompt = prompt 
-        ##### if nuos_llm add this part to the prompt #############################################
-        # Here is how the final code should be formatted and only output the code
-
-        # """
-        # ```python
-        # import pandas as pd
-        # df = dfs[0]
-        # # TODO: import the required dependencies
-
-
-        # # Write code here
-
-
-        # # Declare result var: 
-        # result = {"type": ..., "value" : ans } 
-        # ```
-
-        # Example of result:
-        # possible "type": "string" or "number" or "dataframe" or "plot"
-        # if type(ans) = dataframe then result = { "type": "dataframe", "value": pd.DataFrame({...}) }
-        # if type(ans) = string then reuslt = { "type": "string", "value": f"..." }
-        # if type(ans) = plot then result = { "type": "plot", "value": "....png"
-        # if type(ans) = number result = { "type": "number", "value": ... }                                          
-        # """
-
-        ###############################################################################################
+        prompt = prompt + """
+        """
         
         res = self.langchain_llm.invoke(prompt)
         res = res.replace("</|im_end|>", "")
@@ -82,12 +57,6 @@ def overall_summary(df):
         df pd.DataFrame: A pandas dataframe 
     """
     import sweetviz as sv
-    # if type(df) != list:
-    #     dfs = [df]
-    # else:
-    #     dfs = df
-    # tempfile_paths = []
-    # for i, d in enumerate(dfs):
 
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as f:
         tempfile_path = f.name
@@ -99,7 +68,6 @@ def overall_summary(df):
             except Exception as e:
                 raise(Exception)
         report.show_html(filepath=tempfile_path, layout='vertical', open_browser=False)
-        # tempfile_paths.append(tempfile_path)
     result = {'type': 'Python_AI_Summary' , 'path': {tempfile_path}}
 
     return tempfile_path
@@ -303,16 +271,10 @@ def overall_anomaly(df):
     ax.axis('off')  
     plt.text(0.5, 0.5, anomaly_table, family='monospace', ha='center', va='center', fontsize=12)
 
-
-    # png_path = "tabulated_anomalies.png"
-    # plt.savefig(png_path, bbox_inches='tight', dpi=300)
-
-    # result = {'type': 'Python_AI_Anomaly' , 'value': {png_path}}
     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
         tempfile_path = f.name
         plt.savefig(tempfile_path, bbox_inches='tight', dpi=300)
-        # tempfile_paths.append(tempfile_path)
-
+        
     return tempfile_path
 
 

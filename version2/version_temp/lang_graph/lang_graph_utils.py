@@ -9,7 +9,7 @@ import re
 import ast
 
 graph_stage_prefix = '[STAGE]'
-
+FINAL_LLM = "jiayuan1/nous_llm"
 
 def multiple_question_agent(state: list):
     '''
@@ -141,7 +141,7 @@ def final_agent(state:list):
     print(graph_stage_prefix, "Final Agent")
         
     # Initialize the LLM agent with the specified model
-    llm = Agent_Ai(model = "jiayuan1/nous_llm")
+    llm = Agent_Ai(model = FINAL_LLM)
     
     # Retrieve the user's query and all previous answers from the state
     query = state['input']
