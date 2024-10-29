@@ -140,6 +140,11 @@ def apply_css():
     )
 
 def img_to_base64(image_path):
+    
+    '''
+    This function format images to base64 so that it can be shown in the app
+    '''
+    
     try:
         with open(image_path, 'rb') as file:
             return base64.b64encode(file.read()).decode()
@@ -528,6 +533,15 @@ def clear_files():
     # update_langgraph()
 
 def output(message):
+    
+    '''
+    This function formats the output after invoking the language processing graph.
+    It ensures images are encoded in base64 format and that HTML content is rendered using `components.html`.
+    The `user` message format is a string: `message['content'] = str`
+    The `assistant` message format is a list of dictionaries: `message['content'] = [{"qns": ..., "ans": ...}]`
+    This function processes the input to correctly recognize user and assistant messages and renders them appropriately.
+    '''
+    
     role = message["role"]
     avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
     

@@ -44,11 +44,9 @@ df = pd.read_csv("./data/Mac_2k.log_structured.csv")
 # print(correct)
 # print(total)
 
-"""))"""
-llm = Python_Ai(model = 'jiayuan1/nous_llm', df = df, temperature=0)
-print(llm.pandas_legend_with_skill().chat("""perform a anomaly ananlysis on the whole data.
 
-                                          
+llm = Python_Ai(model = 'jiayuan1/llm2', df = df, temperature=0)
+print(llm.pandas_legend_with_skill().chat("""plot a time series of the data with interval of 1 minute.
 Here is how the final code should be formatted and only output the code
 
 ```python
@@ -65,11 +63,14 @@ result = {"type": ..., "value" : ans }
 ```
 
 Example of result:
-possible "type": "string" or "number" or "dataframe" or "plot"
+Use only these possible "type": "string" or "number" or "dataframe" or "plot"
 if type(ans) = dataframe then result = { "type": "dataframe", "value": pd.DataFrame({...}) }
 if type(ans) = string then reuslt = { "type": "string", "value": f"..." }
 if type(ans) = plot then result = { "type": "plot", "value": "....png"
-if type(ans) = number result = { "type": "number", "value": ... }                                          
+if type(ans) = number result = { "type": "number", "value": ... }    
+"""))
 """
-))
+                                          
+                                      
+))"""
 
