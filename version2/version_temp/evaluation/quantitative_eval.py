@@ -138,10 +138,17 @@ def main():
         "How many times did the event with component kernel occur?",
         "What is the most frequent eventid that occurred?",
         "What is the total number of errors and warnings are recorded in this log?",
+<<<<<<< HEAD
         "Who is the top user?",
         "How many missing values are there in Address?",
         "How many times did the event with component kernel occur?",
         "How many authorMacBook-Pro user are there?",
+=======
+        "What is the most frequent user?",
+        "How many missing values are there in Address?",
+        "How many times did the event with component kernel occur?",
+        "How many times did the event with the user authorMacBook-Pro occur?",
+>>>>>>> a1d8938b (Added more evaluation questions to test)
 
         # "How many times did the event with eventid E120 occur?",
         # "How many times did the event with eventid E203 occur?",
