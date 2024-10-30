@@ -562,7 +562,7 @@ def output(message):
                         components.html(html_content, height=800, scrolling=True)
                 
                         # Deleting temporary file after outputing
-                        os.remove(path)
+                        # os.remove(path)
                     
             elif "exports/charts/" in str(out) or 'tabulated_anomalies.png' in str(out) or '.png' in str(out):
                 img_base64 = img_to_base64(out)

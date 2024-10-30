@@ -18,7 +18,8 @@ class LanguageModelEvaluator:
         
 
     def generate_response(self, prompt: str) -> str:
-        pandas_ai = Python_Ai(df=self.df).pandas_legend()
+        PANDAS_LLM = 'jiayuan1/llm2'
+        pandas_ai = Python_Ai(PANDAS_LLM, df=self.df).pandas_legend_with_skill()
         # graph = Graph(pandas_ai, self.df)
         query = f"""
         The following is the query from the user:
