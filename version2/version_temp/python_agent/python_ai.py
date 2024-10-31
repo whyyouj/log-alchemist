@@ -21,7 +21,17 @@ class LangchainLLM(LLM):
 
     def __init__(self, langchain_llm: BaseLanguageModel):
         self.langchain_llm = langchain_llm
+        
+    def code_formatter(self, code):
+        MODEL3='jiayuan1/nous_llm'
+        llm = Agent_Ai(model=MODEL3)
+        query = """Your role is to extract the code portion and format it with:
+```python
 
+```
+Ensure result = {"type": ... , "value": ...} includes only "type" values: "string", "number", "dataframe", or "plot"."""
+        res = llm.query_agent(query= code + "\n" + query)
+        return res
     def call(
         self, instruction: BasePrompt, context: PipelineContext = None, suffix: str = ""
     ) -> str:
@@ -40,9 +50,11 @@ class LangchainLLM(LLM):
             res = f"""```python 
             {res}
             ``` """
-        print("[START_PROMPT]", prompt, '[END_PROMPT]')
+        # res = self.code_formatter(res)
+        #print("[START_PROMPT]", prompt, '[END_PROMPT]')
         print('[OUT]', res, '[END_OUT]')
-        return res.content if isinstance(self.langchain_llm, BaseChatModel) else res
+        return res #res.content if isinstance(self.langchain_llm, BaseChatModel) else res
+
 
     @property
     def type(self) -> str:
@@ -350,7 +362,7 @@ class Python_Ai:
                 "open_charts":False,
                 "enable_cache" : False,
                 "save_charts": True,
-                "max_retries":3,
+                "max_retries":5,
                 "response_parser": StreamlitResponse,
                 "custom_whitelisted_dependencies": ["sweetviz","collections", "pytz"]
             }
