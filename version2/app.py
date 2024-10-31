@@ -400,7 +400,7 @@ def output(message):
                         components.html(html_content, height=800, scrolling=True)
                 
                         # Deleting temporary file after outputing
-                        os.remove(path)
+                        # os.remove(path)
                     
             elif "exports/charts/" in str(out) or 'tabulated_anomalies.png' in str(out) or '.png' in str(out):
                 img_base64 = img_to_base64(out)
@@ -502,7 +502,7 @@ def update_langgraph():
         df_list.append(date_formatted_df)
 
     llm = Python_Ai(model = PANDAS_LLM, df = df_list)
-    pandas_llm = llm.pandas_legend_with_skill()#.pandas_legend()
+    pandas_llm = llm.pandas_legend_with_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     print("LangGraph Updated")

@@ -292,7 +292,7 @@ def overall_anomaly(df):
 
 
 class Python_Ai:
-    def __init__(self, model = "codellama:7b", df=[], temperature=0.1):
+    def __init__(self, model, df=[], temperature=0.1):
         self.model = model
         self.temperature = temperature
         self.df = df
@@ -364,7 +364,7 @@ class Python_Ai:
                 "save_charts": True,
                 "max_retries":5,
                 "response_parser": StreamlitResponse,
-                "custom_whitelisted_dependencies": ["sweetviz","collections", "pytz"]
+                "custom_whitelisted_dependencies": ["sweetviz", "collections", "pytz"]
             }
         )
         pandas_ai.add_skills(overall_summary)
