@@ -46,11 +46,11 @@ df = pd.read_csv("./data/Mac_2k.log_structured.csv")
 
 MODEL1='jiayuan1/llm2'
 MODEL2='llm5'
-MODEL3='jiayuan1/nous_llm'
+MODEL3='llm5.1'
 
 llm = Python_Ai(model = MODEL2, df = df, temperature=0)
 
-# print(llm.pandas_legend_with_skill().chat("""how many rows are there"""))
+print(llm.pandas_legend_with_skill().chat("""how many rows are there"""))
 # print(llm.pandas_legend_with_skill().chat("""How many times did the event with the user authorMacBook-Pro occur?"""))
 # print(llm.pandas_legend_with_skill().chat("""What is the most frequent user?"""))
 # print(llm.pandas_legend_with_skill().chat("""What is the most frequent eventid that occurred?"""))
