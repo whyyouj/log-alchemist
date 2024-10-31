@@ -44,8 +44,8 @@ logging.info("===================================================")
 
 # Load the Excel file with queries and answers
 # If you have a different set of queries to test, change the path here!
-excel_file_path = 'router_testing.xlsx'  
-df = pd.read_excel(excel_file_path)
+excel_file_path = 'router_testing.csv'  
+df = pd.read_csv(excel_file_path)
 
 # Tracking correct answers and the total number of queries
 correct_answers = 0
