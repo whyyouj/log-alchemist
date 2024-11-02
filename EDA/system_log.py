@@ -76,7 +76,7 @@ def component_freq():
     Input: None
     
     Output:
-    - fig: A plotly figure object containing the bar chart (plotly.graph_objs._figure.Figure)
+    - fig: A plotly figure object containing the bar chart.
     """
     
     component_freq = structured_system_log_df['Component'].value_counts()
@@ -105,7 +105,7 @@ def user_freq():
     Input: None
     
     Output:
-    - fig: A plotly figure object containing the bar chart (plotly.graph_objs._figure.Figure)
+    - fig: A plotly figure object containing the bar chart.
     """
     
     user_freq = structured_system_log_df['User'].value_counts()
@@ -134,7 +134,7 @@ def top_spikes():
     Input: None
     
     Output:
-    - fig: A plotly figure object containing the line chart and table (plotly.graph_objs._figure.Figure)
+    - fig: A plotly figure object containing the line chart and table.
     """
     structured_system_log_df['Datetime'] = pd.to_datetime(structured_system_log_df['Time'], format = '%H:%M:%S')
     time_series = structured_system_log_df.groupby(['Month', 'Date']).apply(
@@ -198,7 +198,7 @@ def top_spikes_analysis():
     Input: None
     
     Output:
-    - fig: A plotly figure object containing the table (plotly.graph_objs._figure.Figure)
+    - fig: A plotly figure object containing the table.
     """
     fouth_of_july_df = structured_system_log_df[(structured_system_log_df['Month']=='Jul') & (structured_system_log_df['Date']== 4)]
     spike_df = fouth_of_july_df[(fouth_of_july_df["Time"] >= "23:22:00") & (fouth_of_july_df["Time"] < "23:23:00")]
@@ -242,7 +242,7 @@ def inactivity():
     Input: None
     
     Output:
-    - fig: A plotly figure object containing the table (plotly.graph_objs._figure.Figure)
+    - fig: A plotly figure object containing the table.
     """
     date_time_structured_system_log_df = structured_system_log_df
     date_time_structured_system_log_df['DateTime'] = pd.to_datetime('2024 ' + date_time_structured_system_log_df['Month'] + " " + date_time_structured_system_log_df['Date'].astype(str) + " " + date_time_structured_system_log_df['Time'])
@@ -290,7 +290,7 @@ def potential_shut_down():
     Input: None
     
     Output:
-    - fig: A plotly figure object containing the table (plotly.graph_objs._figure.Figure)
+    - fig: A plotly figure object containing the table.
     """
     shutdown_keywords = ['shutdown', 'halt', 'poweroff', 'reboot']
     shutdown_logs = structured_system_log_df[structured_system_log_df['Content'].str.contains('|'.join(shutdown_keywords), case=False, na=False)]
@@ -327,7 +327,7 @@ def error_analysis():
     Input: None
     
     Output:
-    - fig: A plotly figure object containing the table (plotly.graph_objs._figure.Figure)
+    - fig: A plotly figure object containing the table.
     """
     error_keywords = ['error']
     error_logs = structured_system_log_df[structured_system_log_df['Content'].str.contains('|'.join(error_keywords), case=False, na=False)]
@@ -368,7 +368,7 @@ def correlation_analysis():
     Input: None
     
     Output:
-    - fig: A plotly figure object containing the heatmap and table (plotly.graph_objs._figure.Figure)
+    - fig: A plotly figure object containing the heatmap and table.
     """
     encode_data = pd.get_dummies(structured_system_log_df[['Component', 'User', 'EventId']], drop_first=True)
     correlation_df = encode_data.corr()
