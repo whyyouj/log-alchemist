@@ -21,6 +21,8 @@ logging.basicConfig(level=logging.INFO)
 
 # Constants
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
+PANDAS_LLM = 'jiayuan1/llm2'
+GENERAL_LLM = "jiayuan1/nous_llm"
 
 st.set_page_config(
     page_title="Vantage Assistant",
@@ -108,6 +110,11 @@ def apply_css():
     )
 
 def img_to_base64(image_path):
+    
+    '''
+    This function format images to base64 so that it can be shown in the app
+    '''
+    
     try:
         with open(image_path, 'rb') as file:
             return base64.b64encode(file.read()).decode()
@@ -352,6 +359,15 @@ def clear_files():
 
 
 def output(message):
+    
+    '''
+    This function formats the output after invoking the language processing graph.
+    It ensures images are encoded in base64 format and that HTML content is rendered using `components.html`.
+    The `user` message format is a string: `message['content'] = str`
+    The `assistant` message format is a list of dictionaries: `message['content'] = [{"qns": ..., "ans": ...}]`
+    This function processes the input to correctly recognize user and assistant messages and renders them appropriately.
+    '''
+    
     role = message["role"]
     avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
     
@@ -370,7 +386,7 @@ def output(message):
                 st.write(dict['qns'])
             out = dict['ans']
             if str(out).endswith(".html"):
-                st.write("### Here is a summary of the data!")
+                st.write("Here is a summary of the data!")
                 print("[APP]", out)
                 pattern = r"([A-Z]:(?:\\\\|\\)(?:[^\\/:*?\"<>|\r\n]+(?:\\\\|\\))*[^\\/:*?\"<>|\r\n]+\.[a-zA-Z0-9]+|(?:\/[^\/\s]+)+\/[^\/\s]+\.[a-zA-Z0-9]+)"
                 html_files = re.findall(pattern, out)
@@ -384,10 +400,9 @@ def output(message):
                         components.html(html_content, height=800, scrolling=True)
                 
                         # Deleting temporary file after outputing
-                        os.remove(path)
-                return
+                        # os.remove(path)
                     
-            elif "exports/charts/" in str(out) or 'tabulated_anomalies.png' in str(out):
+            elif "exports/charts/" in str(out) or 'tabulated_anomalies.png' in str(out) or '.png' in str(out):
                 img_base64 = img_to_base64(out)
                 if img_base64:
                     st.markdown(
@@ -441,14 +456,14 @@ def run_async_task(chat_input):
 def initialize_conversation():
     assistant_message = "Hello! I am Vantage AI. How can I assist you today?"
     conversation_history = [
-        {"role":"assistant", "content":[{"qns":"Begin", "ans": assistant_message}]}
+        {"role":"assistant", "content":[ {"qns":"Begin", "ans": assistant_message} ]}
     ]
     return conversation_history
 
 def initialize_langgraph():
-    graph = Agent_Ai()
+    agent = Agent_Ai(model= GENERAL_LLM)
     print('LangGraph Initialized')
-    return graph
+    return agent
 
 def initialize_session_state():
     """Initialize session state variables."""
@@ -486,8 +501,8 @@ def update_langgraph():
         date_formatted_df = combine_datetime_columns(df)
         df_list.append(date_formatted_df)
 
-    llm = Python_Ai(model = 'llama3.1', df = df_list)
-    pandas_llm = llm.pandas_legend()#.pandas_legend_with_summary_skill()
+    llm = Python_Ai(model = PANDAS_LLM, df = df_list)
+    pandas_llm = llm.pandas_legend_with_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     print("LangGraph Updated")
@@ -505,8 +520,8 @@ def update_selected_log(df_option):
         date_formatted_df = combine_datetime_columns(df)
         df_list.append(date_formatted_df)
 
-    llm = Python_Ai(df = df_list)
-    pandas_llm = llm.pandas_legend()
+    llm = Python_Ai(model = PANDAS_LLM, df = df_list)
+    pandas_llm = llm.pandas_legend_with_skill()
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     st.session_state.selected_df = df_option

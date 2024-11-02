@@ -1,0 +1,121 @@
+{
+  "evaluation_time": "2024-11-01T10:42:53.982392",
+  "results": {
+    "Question 1": {
+      "prompt": "How many rows are there in the dataset?",
+      "model_responses": [
+        "2000"
+      ],
+      "ground_truth_value": 2000,
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 10.664539337158203
+    },
+    "Question 2": {
+      "prompt": "How many times did the event with eventid E189 occur?",
+      "model_responses": [
+        "166"
+      ],
+      "ground_truth_value": 166,
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 7.316064834594727
+    },
+    "Question 3": {
+      "prompt": "How many times did the event E189 occur?",
+      "model_responses": [
+        "Unfortunately, I was not able to answer your question, because of the following error:\n\nNo code found in the response\n"
+      ],
+      "ground_truth_value": 166,
+      "correct_predictions": 0,
+      "total_runs": 1,
+      "accuracy": 0.0,
+      "total_time": 10.989571809768677
+    },
+    "Question 4": {
+      "prompt": "How many times did the event with component kernel occur?",
+      "model_responses": [
+        "0"
+      ],
+      "ground_truth_value": 775,
+      "correct_predictions": 0,
+      "total_runs": 1,
+      "accuracy": 0.0,
+      "total_time": 5.9887473583221436
+    },
+    "Question 5": {
+      "prompt": "What is the most frequent eventid that occurred?",
+      "model_responses": [
+        "The most frequent eventid is E189."
+      ],
+      "ground_truth_value": "E189",
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 6.456484079360962
+    },
+    "Question 6": {
+      "prompt": "What is the total number of errors and warnings are recorded in this log?",
+      "model_responses": [
+        "The total number of errors is 5 and the total number of warnings is 0."
+      ],
+      "ground_truth_value": 191,
+      "correct_predictions": 0,
+      "total_runs": 1,
+      "accuracy": 0.0,
+      "total_time": 7.5377197265625
+    },
+    "Question 7": {
+      "prompt": "Who is the top user?",
+      "model_responses": [
+        "The top user is authorMacBook-Pro."
+      ],
+      "ground_truth_value": "authorMacBook-Pro",
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 4.937518835067749
+    },
+    "Question 8": {
+      "prompt": "How many missing values are there in Address?",
+      "model_responses": [
+        "Unfortunately, I was not able to answer your question, because of the following error:\n\nNo code found in the response\n"
+      ],
+      "ground_truth_value": 1946,
+      "correct_predictions": 0,
+      "total_runs": 1,
+      "accuracy": 0.0,
+      "total_time": 14.6836998462677
+    },
+    "Question 9": {
+      "prompt": "How many times did the event with component kernel occur?",
+      "model_responses": [
+        "775"
+      ],
+      "ground_truth_value": 775,
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 5.755112409591675
+    },
+    "Question 10": {
+      "prompt": "How many authorMacBook-Pro user are there?",
+      "model_responses": [
+        "554"
+      ],
+      "ground_truth_value": 554,
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 5.54846453666687
+    },
+    "overall": {
+      "correct_predictions": 6,
+      "total_runs": 10,
+      "accuracy": 60.0,
+      "total_time": 79.8779227733612
+    }
+  }
+}
