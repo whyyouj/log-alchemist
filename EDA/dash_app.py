@@ -52,7 +52,6 @@ class App:
         
     def setup_app_layout(self):
         """
-        Set up the layout of the Dash app.
 
         Description:
         This function sets the layout of the Dash app, including the location component, sidebar, and content area.
@@ -69,7 +68,6 @@ class App:
     
     def setup_callbacks(self):
         """
-        Set up the callbacks for the Dash app.
         
         Description:
         This function sets up the callbacks for the Dash app, including the callback to update the page content based on the URL.
@@ -85,7 +83,6 @@ class App:
         
         def render_page_content(pathname):
             """
-            Render the page content based on the URL pathname.
             
             Description:
             This function returns the content to be displayed based on the URL pathname.
@@ -130,7 +127,6 @@ class App:
     
     def run(self, debug = False):
         """
-        Run the Dash app server.
         
         Description:
         This function runs the Dash app server.

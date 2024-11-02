@@ -21,6 +21,16 @@ class ColumnGetter:
 
     
     def _generate_prompt_template_default(self, log_row):
+        """        
+        Description:
+        This function generates a default prompt template to infer column names from log data.
+        
+        Input:
+        - log_row: A string containing rows of log data (str)
+        
+        Output:
+        - log_query_template: A formatted PromptTemplate object (PromptTemplate)
+        """
         log_query_template = PromptTemplate.from_template(
             """
             You are an expert in log analytics, and I need your help to prepare only the relevant column names when given a few rows of the same log data. I will use these columns in a LogParser. You simply have to read the rows of log data and tell me what are the possible column names. 
@@ -53,6 +63,17 @@ class ColumnGetter:
         return log_query_template
     
     def _generate_prompt_template_fewshot(self, log_row):
+        """
+        
+        Description:
+        This function generates a few-shot prompt template to infer column names from log data using example prompts.
+        
+        Input:
+        - log_row: A string containing rows of log data (str)
+        
+        Output:
+        - log_query_template: A formatted FewShotPromptTemplate object (FewShotPromptTemplate)
+        """
         example_prompt = PromptTemplate(
             input_variables = ['log_data', 'response'],
             template = "Question: {log_data}\n{response}"
@@ -96,6 +117,19 @@ class ColumnGetter:
         return log_query_template
 
     def get_column(self, model, log_data, prompt_method = 'default'):
+        """
+        
+        Description:
+        This function generates the column names for the given log data using the specified prompt method and model.
+        
+        Input:
+        - model: The model to be used for generating column names (str)
+        - log_data: The log data for which column names need to be generated (str)
+        - prompt_method: The prompt method to be used ('default' or 'fewshot') (str)
+        
+        Output:
+        - output: The generated column names (list)
+        """
         print(f"[INFO] Generating Columns, Model: {model}, Prompt Method: {prompt_method}")
         # Calling Llama 3.1 model to llm variable
         llm = OllamaLLM(model = model)
