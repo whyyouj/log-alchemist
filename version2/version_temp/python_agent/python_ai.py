@@ -41,6 +41,7 @@ class LangchainLLM(LLM):
 Ensure result = {"type": ... , "value": ...} includes only "type" values: "string", "number", "dataframe", or "plot"."""
         res = llm.query_agent(query= code + "\n" + query)
         return res
+    
     def call(
         self, instruction: BasePrompt, context: PipelineContext = None, suffix: str = ""
     ) -> str:
@@ -192,7 +193,7 @@ def overall_anomaly(df):
             # Select the top 3 most extreme outliers for the column
             top_3_outliers = outliers_sorted.head(3)
             
-            # 11. Append the top 3 outliers for this column to the list (row number, column, value, distance)
+            # Append the top 3 outliers for this column to the list (row number, column, value, distance)
             for index, row in top_3_outliers.iterrows():
                 outliers_data.append({
                     'numeric_column': column,
