@@ -41,38 +41,38 @@ class Graph:
         graph = StateGraph(AgentState)
 
         # LangGraph Nodes
-        graph.add_node("multiple_question_agent", multiple_question_agent) # Breakdown if question is about multiple questions
-        graph.add_node('question_type_router', router_agent) # Determining if question is related to dataset
-        graph.add_node("python_pandas_ai", python_pandas_ai) # Answering specific dataset related questions
-        graph.add_node('final_agent', final_agent) 
-        graph.add_node("question_remaining_router", multiple_question_parser)
+        graph.add_node("Multiple_Question_Agent", multiple_question_agent) # Breakdown if question is about multiple questions
+        graph.add_node('Question_Type_Router', router_agent) # Determining if question is related to dataset
+        graph.add_node("PandasAI_Agent", python_pandas_ai) # Answering specific dataset related questions
+        graph.add_node('Final_Agent', final_agent) 
+        graph.add_node("Question_Remaining_Router", multiple_question_parser)
 
         # LangGraph Edges
-        graph.add_edge(START, 'multiple_question_agent') # Initialising LangGraph
-        graph.add_edge("multiple_question_agent", 'question_type_router')
+        graph.add_edge(START, 'Multiple_Question_Agent') # Initialising LangGraph
+        graph.add_edge("Multiple_Question_Agent", 'Question_Type_Router')
         graph.add_conditional_edges( 
-            'question_type_router',
+            'Question_Type_Router',
             router_agent_decision,
             {
-                "python_pandas_ai":"python_pandas_ai",
-                "final_agent":"final_agent"
+                "PandasAI_Agent":"PandasAI_Agent",
+                "Final_Agent":"Final_Agent"
             }
         )
         graph.add_conditional_edges(
-            "python_pandas_ai",
+            "PandasAI_Agent",
             router_python_output,
             {
-                "final_agent":"final_agent",
-                "question_remaining_router":"question_remaining_router"
+                "Final_Agent":"Final_Agent",
+                "Question_Remaining_Router":"Question_Remaining_Router"
             }
         )      
-        graph.add_edge("final_agent", "question_remaining_router")
+        graph.add_edge("Final_Agent", "Question_Remaining_Router")
         
         graph.add_conditional_edges(
-            "question_remaining_router",
+            "Question_Remaining_Router",
             router_multiple_question,
             {
-                'question_type_router':'question_type_router',
+                'Question_Type_Router':'Question_Type_Router',
                 "__end__":"__end__"
             }
         )

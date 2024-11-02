@@ -95,10 +95,10 @@ def router_agent_decision(state: list):
 
     out = state['agent_out']
     if 'yes' in out.lower():
-        return 'python_pandas_ai' 
+        return 'PandasAI_Agent' 
         
     else:
-        return 'final_agent'
+        return 'Final_Agent'
 
     
 def python_pandas_ai(state:list):
@@ -124,9 +124,9 @@ def router_python_output(state:list):
     
     router_out = state["agent_out"]
     if "Unfortunately, I was not able to answer your question, because of the following error:" in str(router_out):
-        return "final_agent"
+        return "Final_Agent"
     else:
-        return "question_remaining_router"
+        return "Question_Remaining_Router"
     
     
 def final_agent(state:list):
@@ -235,7 +235,7 @@ def router_multiple_question(state:list):
     
     print(graph_stage_prefix, "Multiple Question Router")
     if state["input"]:
-        return "question_type_router"
+        return "Question_Type_Router"
     else:
         return "__end__"
     
