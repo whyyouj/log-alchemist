@@ -7,10 +7,30 @@ class MaxRetriesError(Exception):
 
 class LogParser:
     def __init__(self, model, prompt_method):
+        """
+        Description:
+        This function initializes the LogParser class with the given model and prompt method.
+        
+        Input:
+        - model: The model to be used for generating column names (str)
+        - prompt_method: The prompt method to be used ('default' or 'fewshot') (str)
+        
+        Output: None
+        """
         self.model = model
         self.prompt_method = prompt_method
 
     def read_file(self, path):
+        """
+        Description:
+        This function reads the log file from the given path and returns its content as a string.
+        
+        Input:
+        - path: The path to the log file (str)
+        
+        Output:
+        - log: The content of the log file (str)
+        """
         log = ''
         with open(path, mode='r') as f:
             for line in f:
@@ -18,6 +38,23 @@ class LogParser:
         return log
     
     def get_columns(self, path, max_retries=5, max_length=20, max_cols = 10):
+        """
+        
+        Description:
+        This function generates column names for the log data using the specified model and prompt method. It retries up to max_retries times if the generated columns do not meet the quality checks.
+        
+        Input:
+        - path: The path to the log file (str)
+        - max_retries: The maximum number of retries for generating column names (int, default=5)
+        - max_length: The maximum length of a column name (int, default=20)
+        - max_cols: The maximum number of columns (int, default=10)
+        
+        Output:
+        - formatted_columns: The formatted column names (str)
+        
+        Raises:
+        - MaxRetriesError: If no valid column names are generated after max_retries attempts
+        """
         column_getter = ColumnGetter()
         log_str = self.read_file(path)
 
@@ -53,6 +90,17 @@ class LogParser:
         raise MaxRetriesError(f'[ERROR] No matches for columns found after {max_retries} attempts')
     
     def parse_log(self, input_dir, output_dir, log_file):
+        """        
+        Description:
+        This function parses the log file using the Drain log parser and generates structured output in the specified output directory.
+        
+        Input:
+        - input_dir: The directory containing the input log file (str)
+        - output_dir: The directory to save the parsed output (str)
+        - log_file: The name of the log file to be parsed (str)
+        
+        Output: None
+        """
         file_path_full = input_dir + log_file
         columns = self.get_columns(file_path_full)
         regex = [
