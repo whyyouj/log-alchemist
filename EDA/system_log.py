@@ -14,7 +14,6 @@ template_system_log_df = pd.read_csv(template_system_log)
 # EventID
 def event_freq():
     """
-    Generate a plot of the top 5 event frequencies.
     
     Description:
     This function calculates the top 5 most frequent events and generates a plotly figure with a table and bar chart.
@@ -68,7 +67,6 @@ def event_freq():
 
 def component_freq():
     """
-    Generate a plot of the top 5 component frequencies.
     
     Description:
     This function calculates the top 5 most frequent components and generates a plotly bar chart.
@@ -97,7 +95,6 @@ def component_freq():
     
 def user_freq():
     """
-    Generate a plot of the top 5 user frequencies.
     
     Description:
     This function calculates the top 5 most frequent users and generates a plotly bar chart.
@@ -126,7 +123,6 @@ def user_freq():
 
 def top_spikes():
     """
-    Generate a plot of the top 5 usage spikes.
     
     Description:
     This function calculates the top 5 usage spikes and generates a plotly figure with a line chart and table.
@@ -190,7 +186,6 @@ def top_spikes():
 
 def top_spikes_analysis():
     """
-    Generate a table of events that occurred during the highest spike.
     
     Description:
     This function identifies the events that occurred during the highest spike and generates a plotly table.
@@ -234,7 +229,6 @@ def top_spikes_analysis():
 
 def inactivity():
     """
-    Generate a table of the top 3 periods of inactivity.
     
     Description:
     This function calculates the top 3 periods of inactivity and generates a plotly table.
@@ -282,7 +276,6 @@ def inactivity():
 
 def potential_shut_down():
     """
-    Generate a table of potential shutdown events.
     
     Description:
     This function identifies potential shutdown events and generates a plotly table.
@@ -319,7 +312,6 @@ def potential_shut_down():
 
 def error_analysis():
     """
-    Generate a table of the top 5 events with potential errors.
     
     Description:
     This function identifies the top 5 events with potential errors and generates a plotly table.
@@ -360,7 +352,6 @@ def error_analysis():
 
 def correlation_analysis():
     """
-    Generate a correlation analysis plot.
     
     Description:
     This function calculates the correlations between different components, users, and event IDs, and generates a plotly figure with a heatmap and table.
