@@ -42,16 +42,16 @@ class Graph:
 
         # LangGraph Nodes
         graph.add_node("multiple_question_agent", multiple_question_agent) # Breakdown if question is about multiple questions
-        graph.add_node('router_agent', router_agent) # Determining if question is related to dataset
+        graph.add_node('question_type_router', router_agent) # Determining if question is related to dataset
         graph.add_node("python_pandas_ai", python_pandas_ai) # Answering specific dataset related questions
         graph.add_node('final_agent', final_agent) 
-        graph.add_node("multiple_question_parser", multiple_question_parser)
+        graph.add_node("question_remaining_router", multiple_question_parser)
 
         # LangGraph Edges
         graph.add_edge(START, 'multiple_question_agent') # Initialising LangGraph
-        graph.add_edge("multiple_question_agent", "router_agent")
+        graph.add_edge("multiple_question_agent", 'question_type_router')
         graph.add_conditional_edges( 
-            "router_agent",
+            'question_type_router',
             router_agent_decision,
             {
                 "python_pandas_ai":"python_pandas_ai",
@@ -63,16 +63,16 @@ class Graph:
             router_python_output,
             {
                 "final_agent":"final_agent",
-                "multiple_question_parser":"multiple_question_parser"
+                "question_remaining_router":"question_remaining_router"
             }
         )      
-        graph.add_edge("final_agent", "multiple_question_parser")
+        graph.add_edge("final_agent", "question_remaining_router")
         
         graph.add_conditional_edges(
-            "multiple_question_parser",
+            "question_remaining_router",
             router_multiple_question,
             {
-                "router_agent":"router_agent",
+                'question_type_router':'question_type_router',
                 "__end__":"__end__"
             }
         )
@@ -102,8 +102,9 @@ class Graph:
         from PIL import Image as PILImage
         import io
         import os
+        from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
         runnable = self.graph
-        png_data = runnable.get_graph().draw_png()
+        png_data = runnable.get_graph().draw_mermaid_png(node_colors=NodeStyles(first = "#00008b", last = "#add8e6", default = "#00008b"))
         image = PILImage.open(io.BytesIO(png_data))
         os.makedirs("./image", exist_ok=True)
         image.save("./image/lang_chain_graph_pandas_new2.png")

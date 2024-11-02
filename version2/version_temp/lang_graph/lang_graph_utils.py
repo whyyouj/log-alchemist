@@ -126,7 +126,7 @@ def router_python_output(state:list):
     if "Unfortunately, I was not able to answer your question, because of the following error:" in str(router_out):
         return "final_agent"
     else:
-        return "multiple_question_parser"
+        return "question_remaining_router"
     
     
 def final_agent(state:list):
@@ -184,7 +184,7 @@ def final_agent(state:list):
     {query}
 
     """
-    
+    print(prompt)
     # Query the LLM agent with the constructed prompt
     out = llm.query_agent(query=prompt)
 
@@ -235,7 +235,7 @@ def router_multiple_question(state:list):
     
     print(graph_stage_prefix, "Multiple Question Router")
     if state["input"]:
-        return "router_agent"
+        return "question_type_router"
     else:
         return "__end__"
     

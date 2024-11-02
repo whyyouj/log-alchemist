@@ -364,7 +364,7 @@ class Python_Ai:
                 "save_charts": True,
                 "max_retries":5,
                 "response_parser": StreamlitResponse,
-                "custom_whitelisted_dependencies": ["sweetviz", "collections", "pytz"]
+                "custom_whitelisted_dependencies": ["sweetviz", "collections", "pytz", "seaborn", "scipy"]
             }
         )
         pandas_ai.add_skills(overall_summary)

@@ -46,42 +46,71 @@ df = pd.read_csv("./data/Mac_2k.log_structured.csv")
 
 MODEL1='jiayuan1/llm2'
 MODEL2='llm5'
-MODEL3='llm5.1'
+MODEL3='jiayuan1/llm5'
 
-llm = Python_Ai(model = MODEL2, df = df, temperature=0)
+llm = Python_Ai(model = MODEL3, df = df, temperature=0)
 
-print(llm.pandas_legend_with_skill().chat("""how many rows are there"""))
+# print(llm.pandas_legend_with_skill().chat("""how many rows are there"""))
 # print(llm.pandas_legend_with_skill().chat("""How many times did the event with the user authorMacBook-Pro occur?"""))
 # print(llm.pandas_legend_with_skill().chat("""What is the most frequent user?"""))
 # print(llm.pandas_legend_with_skill().chat("""What is the most frequent eventid that occurred?"""))
-# print(llm.pandas_legend_with_skill().chat("""Identify outliers in the number of occurrences of each User (using Z-score)"""))
-"""    
-Here is how the final code should be formatted and only output the code
+# print(llm.pandas_legend_with_skill().chat("""give me a summary of the dataset
+# Here is how the final code should be formatted and only output the code
 
-```python
-import pandas as pd
-df = dfs[0]
-# TODO: import the required dependencies
-
-
-# Write code here
+# ```python
+# import pandas as pd
+# df = dfs[0]
+# # TODO: import the required dependencies
 
 
-# Declare result var: 
-result = {"type": ..., "value" : ans } 
-```
+# # Write code here
 
-Example of result:
-Use only these possible "type": "string" or "number" or "dataframe" or "plot"
-if type(ans) = dataframe then result = { "type": "dataframe", "value": pd.DataFrame({...}) }
-if type(ans) = string then reuslt = { "type": "string", "value": f"..." }
-if type(ans) = plot then result = { "type": "plot", "value": "....png"
-if type(ans) = number result = { "type": "number", "value": ... }
-                                     
+
+# # Declare result var: 
+# result = {"type": ..., "value" : ans } 
+# ```
+
+# Example of result:
+# Use only these possible "type": "string" or "number" or "dataframe" or "plot"
+# if type(ans) = dataframe then result = { "type": "dataframe", "value": pd.DataFrame({...}) }
+# if type(ans) = string then reuslt = { "type": "string", "value": f"..." }
+# if type(ans) = plot then result = { "type": "plot", "value": "....png"
+# if type(ans) = number result = { "type": "number", "value": ... }
+# """))
+# """                                         
                                       
-))"""
+# ))"""
 
-# llm = Agent_Ai(model= "jiayuan1/nous_llm")
-# print(llm.query_agent('what is 1+1'))
+llm = Agent_Ai(model= "llama3.1")
+print(llm.query_agent('''
+### Instruction:
+Please extract all individual actions from the following input and categorize them into one of three categories: 
+Pandas (for dataframe-related actions), Explain (for explanation requests), or General (for non-dataframe related questions).
+- Group dependent actions into the same sentence. 
+- Split explanations into separate entries.
+- General questions (non-dataframe related) should also be in separate entries.
+
+Return each categorized action in a list format, where each entry is a dictionary containing the category and the associated action.
+What is the Ouput for ###Input
+Input:
+
+“How do I calculate the mean of a column in a dataframe? Also, can you explain why the mean might be different if I drop NaN values? 
+Output:
+[
+    {"Pandas": "Calculate the mean of a column in a dataframe."},
+    {"Explain": "Explain why the mean might be different if NaN values are dropped."},
+]
+
+Input:
+“Could you show me how to add a new column based on existing columns in a dataframe? I also need help understanding how this impacts the memory usage of the dataframe.
+Output:
+[
+    {"Pandas": "Add a new column based on existing columns in a dataframe."},
+    {"Explain": "Explain how adding a new column impacts the memory usage of the dataframe."},
+]
+
+###Input
+How many rows are there. Explain the meaning of a 404 error'''
+))
 # print(llm.query_agent('what is the previous question'))
 
