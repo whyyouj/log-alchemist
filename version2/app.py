@@ -24,6 +24,7 @@ NUMBER_OF_MESSAGES_TO_DISPLAY = 20
 PANDAS_LLM = 'jiayuan1/llm2'
 GENERAL_LLM = "jiayuan1/nous_llm"
 
+# Setting up the Streamlit page configuration
 st.set_page_config(
     page_title="Vantage Assistant",
     page_icon="imgs/vantage_logo.png",
@@ -42,7 +43,13 @@ st.set_page_config(
 )
 
 def apply_css():
-    # Insert custom CSS for glowing effect
+    '''
+    Description: Insert custom CSS for glowing effect and sidebar styling.
+    
+    Input: None
+    
+    Output: None
+    '''
     st.markdown(
         """
         <style>
@@ -110,9 +117,14 @@ def apply_css():
     )
 
 def img_to_base64(image_path):
-    
     '''
-    This function format images to base64 so that it can be shown in the app
+    Description: Convert images to base64 format for display in the app.
+    
+    Input:
+    - image_path: str
+    
+    Output:
+    - base64 string of the image: str
     '''
     
     try:
@@ -123,6 +135,13 @@ def img_to_base64(image_path):
         return None
 
 def st_title():
+    '''
+    Description: Display the title and logo of the app.
+    
+    Input: None
+    
+    Output: None
+    '''
     img_path = "imgs/vantage_logo.png"
     img_base64 = img_to_base64(img_path)
 
@@ -134,6 +153,13 @@ def st_title():
         ''', unsafe_allow_html=True)
 
 def st_sidebar():
+    '''
+    Description: Display the sidebar with buttons and logo.
+    
+    Input: None
+    
+    Output: None
+    '''
     img_path = "imgs/chatbot_logo.webp"
     img_base64 = img_to_base64(img_path)
     if img_base64:
@@ -248,6 +274,13 @@ def st_sidebar():
         )
 
 def st_fileuploader():
+    '''
+    Description: Display the file uploader interface.
+    
+    Input: None
+    
+    Output: None
+    '''
     col1, col2 = st.columns(2)
     with col1:
         st.subheader('Uploaded Files')
@@ -263,6 +296,13 @@ def st_fileuploader():
         display_file_uploader()
 
 def display_file_uploader():
+    '''
+    Description: Display the file uploader form.
+    
+    Input: None
+    
+    Output: None
+    '''
     with st.form(key = "fileupload_form"):
         #desired file types: type=['pdf', 'txt', 'log', 'docx', 'csv']
         uploaded_files = st.file_uploader("Upload your log files", type=['csv'], 
@@ -288,6 +328,14 @@ def display_file_uploader():
         st.rerun()
         
 def on_file_submit(uploaded_files):
+    '''
+    Description: Handle file upload submission.
+    
+    Input:
+    - uploaded_files: list of uploaded files
+    
+    Output: None
+    '''
     filepaths = st.session_state.filepaths.copy()
     csv_filepaths = st.session_state.csv_filepaths.copy()
 
@@ -311,6 +359,14 @@ def on_file_submit(uploaded_files):
         # update_langgraph()
 
 def on_folder_submit(abs_folderpath):
+    '''
+    Description: Handle folder upload submission.
+    
+    Input:
+    - abs_folderpath: str
+    
+    Output: None
+    '''
     abs_folderpath = abs_folderpath.strip()
     if len(abs_folderpath) == 0:
         return
@@ -349,6 +405,13 @@ def on_folder_submit(abs_folderpath):
             # update_langgraph()
 
 def clear_files():
+    '''
+    Description: Clear all uploaded files.
+    
+    Input: None
+    
+    Output: None
+    '''
     for file in list(st.session_state.filepaths.values()) + list(st.session_state.csv_filepaths.values()):
         if isinstance(file, tempfile._TemporaryFileWrapper):
             os.remove(file.name)
@@ -361,11 +424,16 @@ def clear_files():
 def output(message):
     
     '''
-    This function formats the output after invoking the language processing graph.
+    This function formats and displays the output after invoking the language processing graph.
     It ensures images are encoded in base64 format and that HTML content is rendered using `components.html`.
     The `user` message format is a string: `message['content'] = str`
     The `assistant` message format is a list of dictionaries: `message['content'] = [{"qns": ..., "ans": ...}]`
     This function processes the input to correctly recognize user and assistant messages and renders them appropriately.
+    
+    Input:
+    - message: dict
+    
+    Output: None
     '''
     
     role = message["role"]
@@ -420,7 +488,7 @@ def output(message):
 
 async def on_chat_submit(chat_input):
     """
-    Handle chat input submissions and interact with the llm.
+    Handle chat input submissions and interact with the LLM.
 
     Parameters:
     - chat_input (str): The chat input from the user.
@@ -446,6 +514,14 @@ async def on_chat_submit(chat_input):
         error_message.empty()
 
 def run_async_task(chat_input):
+    '''
+    Description: Run the async function within an event loop and display a spinner while processing.
+    
+    Input:
+    - chat_input: str
+    
+    Output: None
+    '''
     with st.spinner("Thinking..."):
         # Run the async function within an event loop
         loop = asyncio.new_event_loop()
@@ -454,6 +530,14 @@ def run_async_task(chat_input):
         output(st.session_state.history[-1])
 
 def initialize_conversation():
+    '''
+    Description: Initialize the conversation history with a welcome message from the assistant.
+    
+    Input: None
+    
+    Output:
+    - conversation_history: list of dict
+    '''
     assistant_message = "Hello! I am Vantage AI. How can I assist you today?"
     conversation_history = [
         {"role":"assistant", "content":[ {"qns":"Begin", "ans": assistant_message} ]}
@@ -461,12 +545,26 @@ def initialize_conversation():
     return conversation_history
 
 def initialize_langgraph():
+    '''
+    Description: Initialize the LangGraph with a general LLM model.
+    
+    Input: None
+    
+    Output:
+    - agent: Agent_Ai object
+    '''
     agent = Agent_Ai(model= GENERAL_LLM)
     print('LangGraph Initialized')
     return agent
 
 def initialize_session_state():
-    """Initialize session state variables."""
+    '''
+    Description: Initialize session state variables.
+    
+    Input: None
+    
+    Output: None
+    '''
     if "history" not in st.session_state:
         st.session_state.history = initialize_conversation()
     if "mode" not in st.session_state:
@@ -486,11 +584,25 @@ def initialize_session_state():
         st.session_state.selected_df = None
 
 def reset_session_state():
+    '''
+    Description: Reset session state variables to their initial values.
+    
+    Input: None
+    
+    Output: None
+    '''
     st.session_state.history = initialize_conversation()
     st.session_state.mode = "Chat with VantageAI"
     st.session_state.selected_df = None
 
 def update_langgraph():
+    '''
+    Description: Update the LangGraph with the uploaded CSV files.
+    
+    Input: None
+    
+    Output: None
+    '''
     df_list = []
     for file in st.session_state.csv_filepaths.values():
         file_path = file
@@ -508,6 +620,14 @@ def update_langgraph():
     print("LangGraph Updated")
 
 def update_selected_log(df_option):
+    '''
+    Description: Update the LangGraph with the selected log file.
+    
+    Input:
+    - df_option: str
+    
+    Output: None
+    '''
     df_list = []
 
     if df_option is not None:
@@ -528,10 +648,13 @@ def update_selected_log(df_option):
     print("LangGraph updated with selected log:", df_option)
 
 def main():
+    '''
+    Description: Main function to display the chat interface and handle user interactions :D
     
-    """
-    Display the chat interface :).
-    """
+    Input: None
+    
+    Output: None
+    '''
     
     initialize_session_state()
 
