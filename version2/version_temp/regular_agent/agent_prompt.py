@@ -1,5 +1,6 @@
 from langchain_core.prompts import PromptTemplate
 
+# Define the prefix and suffix for the prompt template
 PREFIX = """
     You are working with one or more pandas dataframe(s) in Python.
     The following shows the first 3 rows of each of the dataframe(s):
@@ -29,12 +30,28 @@ class Agent_Prompt:
     '''
     
     def __init__(self, df):
+        '''
+        Description: Initializes the Agent_Prompt object with a dataframe.
+        
+        Input:
+        - df: list of pd.DataFrame
+        
+        Output: None
+        '''
         self.df = df
         self.prefix = PREFIX
         self.suffix = SUFFIX
         
     @property
     def value(self):
+        '''
+        Description: Generates the prompt template by combining the prefix, dataframe head, and suffix.
+        
+        Input: None
+        
+        Output:
+        - template: PromptTemplate object
+        '''
         for d in self.df:
             head = str(d.head(3).to_markdown()) + '\n\n'
             self.prefix += head
