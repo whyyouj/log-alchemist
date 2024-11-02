@@ -155,4 +155,4 @@ if __name__ == '__main__':
     file_name = "auditrecords.csv"
     df = pd.read_csv(f"../logs/{file_name}")
     path = f"../logs/Test/{file_name}"
-    combine_datetime_columns(df, 2024).to_csv(path, index = False)
+    combine_datetime_columns(df).to_csv(path, index = False)
