@@ -309,14 +309,15 @@ class Python_Ai:
             df=self.df
         )
     
-    def pandas_legend(self):
+    def pandas_legend_with_skill(self):
         
         '''
-        This function is to call the pandas ai agent. 
-        The agent here does not have any skill
+        This function is to call the pandas ai agent.
+        This agent has both summary and anomaly skill.
         '''
         
-        llm  = self.get_llm().llm
+        llm  = LangchainLLM(self.get_llm().llm)
+
         pandas_ai = Agent(
             self.df, 
             description = """
@@ -335,42 +336,7 @@ class Python_Ai:
                 "open_charts":False,
                 "enable_cache" : False,
                 "save_charts": True,
-                "max_retries":5,
-                "verbose": True,
-                "response_parser": StreamlitResponse,
-                "custom_whitelisted_dependencies": ["sweetviz", "numpy", "scipy", "pandas", "tabulate", "matplotlib", "datetime"]
-            }
-        )
-        return pandas_ai
-    
-    def pandas_legend_with_skill(self):
-        
-        '''
-        This function is to call the pandas ai agent.
-        This agent has both summary and anomaly skill.
-        '''
-        
-        llm  = LangchainLLM(self.get_llm().llm)
-
-        pandas_ai = Agent(
-            self.df, 
-            # description = """
-            #     You are a highly skilled data analysis agent, responsible for handling and answering various data-related queries. 
-            #     For each query I provide, your task is to carefully analyze the data and return the most accurate and optimized solution.
-                
-            #     Your response should include:
-            #     1. The Python code necessary to derive the answer from the data.
-                
-            #     Always take your time to think through the query before responding, and ensure the code is optimized for both readability and performance.
-                
-            #     Typical questions you will handle include requests like "How many rows are there in the dataset?" or "What are the top 5 events that occurred?" so ensure your answers are tailored to these types of queries.
-            # """,
-            config={
-                "llm":llm,
-                "open_charts":False,
-                "enable_cache" : False,
-                "save_charts": True,
-                "max_retries":5,
+                "max_retries":3,
                 "response_parser": StreamlitResponse,
                 "custom_whitelisted_dependencies": ["sweetviz", "collections", "pytz"]
             }
@@ -378,10 +344,3 @@ class Python_Ai:
         pandas_ai.add_skills(overall_summary)
         pandas_ai.add_skills(overall_anomaly)
         return pandas_ai
-
-
-if __name__=="__main__":
-    import pandas as pd
-    df = pd.read_csv("../../../EDA/data/mac/Mac_2k.log_structured.csv")
-    ai = Python_Ai(df=df).pandas_ai_agent('how many users are there and who are the different users')
-    print(ai[0].explain(), ai[1])

@@ -47,7 +47,7 @@ class LanguageModelEvaluator:
             raise ValueError(f"No numeric value found in the text: {text}")
 
     def evaluate(self, log_file: str, ground_truth_file: str, prompts: List[str], metric_names: List[str], n: int) -> Dict[str, Dict]:
-        df = pd.read_csv(log_file)
+        self.df = pd.read_csv(log_file)
 
         with open(ground_truth_file, 'r') as f:
             ground_truth = json.load(f)
@@ -128,7 +128,7 @@ class LanguageModelEvaluator:
         print(f"Results saved to {output_file}")
         return output_file
 
-def main():
+def run_train_evaluation():
     log_file = "Mac_2k.log_structured.csv"
     ground_truth_file = "mac_ground_truth.json"
     prompts = [
@@ -155,15 +155,48 @@ def main():
     metric_names = ["total_rows", 'E189', "E189", "kernel", "most_frequent_eventid",
                      "errors_warnings", "most_freq_user", 'missing_val_address', 'kernel', 'authorMacBook-Pro']
                     # , 'E120', 'E203', 'E323', 'kernel', 'com.apple.cts', 'corecaptured', 'QQ', 'Microsoft Word', 'authorMacBook-Pro']
-
+    
     n = int(input("Enter the number of times to run each evaluation: "))
 
     evaluator = LanguageModelEvaluator()
     results = evaluator.evaluate(log_file, ground_truth_file, prompts, metric_names, n)
 
     evaluator.save_results(results)
-
     return results
+
+def run_test_evaluation():
+    log_file = "Windows_2k.log_structured.csv"
+    ground_truth_file = "windows_ground_truth.json"
+    prompts = [
+        "How many rows are there in the dataset?", 
+        "How many times did the event with eventid E29 occur?",
+        "How many times did the event E29 occur?",
+        "How many times did the event with component CBS occur?",
+        "What is the most frequent eventid that occurred?",
+        "What is the number of errors recorded?",
+        "What is the number of warnings recorded?",
+        "Who is the top EventTemplate?",
+        "How many missing values are there in Content?",
+        "How many 'Warning: Unrecognized packageExtended attribute.' are there?",
+        "What is the total number of times that eventid E29 and E36 occur?"
+    ]
+    metric_names = ["total_rows", 'E29', "E29", "CBS", "most_freqent_eventid",
+                     "errors", "warnings", "top_event_template", 'missing_val_content', 'warning_unrecog', "e29_e36_total"]
+    
+    n = int(input("Enter the number of times to run each evaluation: "))
+
+    evaluator = LanguageModelEvaluator()
+    results = evaluator.evaluate(log_file, ground_truth_file, prompts, metric_names, n)
+
+    evaluator.save_results(results)
+    return results
+
+
+def main():
+    # res = run_train_evaluation()
+    res = run_test_evaluation()
+
+    return res
 
 if __name__ == "__main__":
     evaluation_results = main()

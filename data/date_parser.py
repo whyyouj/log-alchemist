@@ -152,7 +152,7 @@ def combine_datetime_columns(df, default_year=2024):
     return df_orig
 
 if __name__ == '__main__':
-    file_name = "auditrecords.csv"
-    df = pd.read_csv(f"../logs/{file_name}")
+    file_name = "Windows_2k.log_structured.csv"
+    df = pd.read_csv(f"../logs/Windows/{file_name}")
     path = f"../logs/Test/{file_name}"
     combine_datetime_columns(df, 2024).to_csv(path, index = False)

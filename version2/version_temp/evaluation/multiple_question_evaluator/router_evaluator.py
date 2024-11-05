@@ -70,7 +70,7 @@ test_inputs_df["Output"] = test_outputs
 
 # Function to generate LLM responses
 def generate_response(query):
-    llm = Agent_Ai("jiayuan1/router_llm", temperature = 0)
+    llm = Agent_Ai("jiayuan1/router_50", temperature = 0)
     output = llm.query_agent(query)
     return output
 
@@ -120,5 +120,5 @@ def evaluate(data):
     print(f"Accuracy: {accuracy:.3f}")
             
 if __name__ == "__main__":
-    # evaluate(train_data)
-    evaluate(test_inputs_df)
+    evaluate(train_data)
+    # evaluate(test_inputs_df)
