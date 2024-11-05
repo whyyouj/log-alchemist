@@ -30,11 +30,11 @@ st.set_page_config(
     menu_items={
         "About": """
             ## Vantage AI
-            ### Powered using Llama 3.1
+            #### The AI Assistant that performs log analysis
 
-            **Vantage Point Security**:https://vantagepoint.sg
+            **Contact Vantage Point Security:**  
+            **https://vantagepoint.sg**
 
-            The AI Assistant that performs log analysis.
         """
     }
 )
@@ -398,6 +398,18 @@ def st_aboutpage():
                 **:arrow_forward: The response time of Vantage AI varies according to the complexity of the query and the size of the selected log.**
 
                 **:arrow_forward: Try to provide more context in your queries to allow Vantage AI to generate better responses.**
+                </div>
+                """, unsafe_allow_html=True)
+    
+    st.markdown("""
+                <div class='aboutheader'>
+                <b>Contact Us</b>
+                </div>
+                """, unsafe_allow_html=True)
+    st.markdown("""
+                <div class='aboutcontent'>
+
+                **Website: https://vantagepoint.sg**
                 </div>
                 """, unsafe_allow_html=True)
 
