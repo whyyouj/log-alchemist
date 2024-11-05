@@ -518,10 +518,12 @@ def output(message):
     avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
     
     with st.chat_message(role, avatar=avatar_image):
-        if role == 'user':
+        #if the message from user or assistant is just a string, output it without formatting
+        if isinstance(message['content'], str):
             st.write(message['content'])
             return 
-        #Determine whether a not to break the question down
+
+        #if assistant message is a list of dict, determine whether a not to break the question down
         format = True
         if len(message['content']) == 1:
             format = False
