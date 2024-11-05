@@ -23,13 +23,13 @@ logging.basicConfig(level=logging.INFO)
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
 
 st.set_page_config(
-    page_title="Vantage Assistant",
+    page_title="Vantage AI",
     page_icon="imgs/vantage_logo.png",
     layout="wide",
     initial_sidebar_state="auto",
     menu_items={
         "About": """
-            ## Vantage AI Assistant
+            ## Vantage AI
             ### Powered using Llama 3.1
 
             **Vantage Point Security**:https://vantagepoint.sg
