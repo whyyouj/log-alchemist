@@ -23,6 +23,15 @@ class LangchainLLM(LLM):
         self.langchain_llm = langchain_llm
         
     def code_formatter(self, code):
+        '''
+        Description: Formats the code using a specific model.
+        
+        Input:
+        - code: str
+        
+        Output:
+        - res: formatted code as str
+        '''
         MODEL3='jiayuan1/nous_llm'
         llm = Agent_Ai(model=MODEL3)
         query = """Your role is to extract the code portion and format it with:
@@ -32,9 +41,21 @@ class LangchainLLM(LLM):
 Ensure result = {"type": ... , "value": ...} includes only "type" values: "string", "number", "dataframe", or "plot"."""
         res = llm.query_agent(query= code + "\n" + query)
         return res
+    
     def call(
         self, instruction: BasePrompt, context: PipelineContext = None, suffix: str = ""
     ) -> str:
+        '''
+        Description: Calls the Langchain LLM with a given instruction and context.
+        
+        Input:
+        - instruction: BasePrompt
+        - context: PipelineContext (optional)
+        - suffix: str (optional)
+        
+        Output:
+        - res: str
+        '''
         prompt = instruction.to_string() + suffix
         memory = context.memory if context else None
         prompt = self.prepend_system_prompt(prompt, memory)
@@ -58,6 +79,14 @@ Ensure result = {"type": ... , "value": ...} includes only "type" values: "strin
 
     @property
     def type(self) -> str:
+        '''
+        Description: Returns the type of the Langchain LLM.
+        
+        Input: None
+        
+        Output:
+        - str: type of the Langchain LLM
+        '''
         return f"langchain_{self.langchain_llm._llm_type}"
 
 @skill
@@ -67,6 +96,9 @@ def overall_summary(df):
     The output type will be a string
     Args:
         df pd.DataFrame: A pandas dataframe 
+    
+    Output:
+        - tempfile_path: str
     """
     import sweetviz as sv
 
@@ -92,6 +124,8 @@ def overall_anomaly(df):
     The output type will be a string
     Args:
         df pd.DataFrame: A pandas dataframe 
+    Output:
+        - tempfile_path: str
     """
     print('[INFO] Anomaly Skill called')
     import numpy as np
@@ -159,7 +193,7 @@ def overall_anomaly(df):
             # Select the top 3 most extreme outliers for the column
             top_3_outliers = outliers_sorted.head(3)
             
-            # 11. Append the top 3 outliers for this column to the list (row number, column, value, distance)
+            # Append the top 3 outliers for this column to the list (row number, column, value, distance)
             for index, row in top_3_outliers.iterrows():
                 outliers_data.append({
                     'numeric_column': column,
@@ -187,6 +221,20 @@ def overall_anomaly(df):
             continue
 
     def timing_resampler(df, interval, column):
+        '''
+        Description: Resamples the dataframe based on a given interval and column.
+        
+        Input:
+        - df: pd.DataFrame
+        - interval: str
+        - column: str
+        
+        Output:
+        - interval_df: pd.DataFrame
+        - skew: float
+        - kurt: float
+        - total: float
+        '''
         interval_counts = df.resample(interval, on=column).size()
         interval_df = pd.DataFrame(interval_counts).reset_index()
         interval_df.columns = [f'Interval_{interval}', 'Count']
@@ -195,6 +243,15 @@ def overall_anomaly(df):
         return (interval_df, skew, kurt, skew+ np.abs(kurt-3))
 
     def timing_outliers(interval_df):
+        '''
+        Description: Identifies outliers in the resampled dataframe.
+        
+        Input:
+        - interval_df: pd.DataFrame
+        
+        Output:
+        - filtered_df: pd.DataFrame
+        '''
         q1 = interval_df['Count'].quantile(0.25)
         q3 = interval_df['Count'].quantile(0.75)
         iqr = q3-q1
@@ -204,6 +261,17 @@ def overall_anomaly(df):
         return filtered_df
 
     def best_timing(df, ts_col):
+        '''
+        Description: Determines the best interval for resampling and identifies outliers.
+        
+        Input:
+        - df: pd.DataFrame
+        - ts_col: str
+        
+        Output:
+        - best_interval: str
+        - best_df: pd.DataFrame
+        '''
         intervals = ['1min', '5min', '10min', '30min', '1H', '2H', '3H', '6H', '12H', '1D']
         res = []
         for i in intervals:
@@ -293,14 +361,28 @@ def overall_anomaly(df):
 
 class Python_Ai:
     def __init__(self, model, df=[], temperature=0.1):
+        ''' 
+        Description: Initializes the Python_Ai object with a model, dataframe, and temperature.
+        
+        Input:
+        - model: str
+        - df: list (optional)
+        - temperature: float (optional)
+
+        Output: None
+        '''
         self.model = model
         self.temperature = temperature
         self.df = df
         
     def get_llm(self):
-        
         '''
-        This function is to initialise the OLLAMA model
+        Description: Initializes the Ollama model.
+        
+        Input: None
+        
+        Output:
+        - Agent_Ai: initialized Agent_Ai object
         '''
         
         return Agent_Ai(
@@ -309,11 +391,14 @@ class Python_Ai:
             df=self.df
         )
     
-    def pandas_legend_with_skill(self):
-        
+    def pandas_legend(self):
         '''
-        This function is to call the pandas ai agent.
-        This agent has both summary and anomaly skill.
+        Description: Calls the pandas AI agent without any skill.
+        
+        Input: None
+        
+        Output:
+        - pandas_ai: Agent object
         '''
         
         llm  = LangchainLLM(self.get_llm().llm)
@@ -336,7 +421,44 @@ class Python_Ai:
                 "open_charts":False,
                 "enable_cache" : False,
                 "save_charts": True,
-                "max_retries":3,
+                "max_retries":5,
+                "verbose": True,
+                "response_parser": StreamlitResponse,
+                "custom_whitelisted_dependencies": ["sweetviz", "numpy", "scipy", "pandas", "tabulate", "matplotlib", "datetime"]
+            }
+        )
+        return pandas_ai
+    
+    def pandas_legend_with_skill(self):
+        '''
+        Description: Calls the pandas AI agent with both summary and anomaly skills.
+        
+        Input: None
+        
+        Output:
+        - pandas_ai: Agent object
+        '''
+        llm  = LangchainLLM(self.get_llm().llm)
+
+        pandas_ai = Agent(
+            self.df, 
+            # description = """
+            #     You are a highly skilled data analysis agent, responsible for handling and answering various data-related queries. 
+            #     For each query I provide, your task is to carefully analyze the data and return the most accurate and optimized solution.
+                
+            #     Your response should include:
+            #     1. The Python code necessary to derive the answer from the data.
+                
+            #     Always take your time to think through the query before responding, and ensure the code is optimized for both readability and performance.
+                
+            #     Typical questions you will handle include requests like "How many rows are there in the dataset?" or "What are the top 5 events that occurred?" so ensure your answers are tailored to these types of queries.
+            # """,
+            config={
+                "llm":llm,
+                "open_charts":False,
+                "enable_cache" : False,
+                "save_charts": True,
+                "max_retries":5,
                 "response_parser": StreamlitResponse,
                 "custom_whitelisted_dependencies": ["sweetviz", "collections", "pytz"]
             }
