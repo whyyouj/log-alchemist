@@ -9,6 +9,10 @@ from langchain_core.prompts import PromptTemplate
 import re 
 import ast
 from parser.QueryParser.query_parser import QueryParser
+from typing import TypedDict,  Union, Annotated, Any, Optional, Dict
+import operator
+from langchain_core.agents import AgentAction, AgentFinish
+from .types import AgentState
 
 graph_stage_prefix = '[STAGE]'
 
@@ -92,7 +96,7 @@ def router_summary_agent_decision(state: list):
         return 'python_anomaly_agent'
     else:
         print('[INFO] Routed to General agent')
-        return 'python_pandas_ai'
+        return 'query_parser_agent'
     
 def python_pandas_ai(state:list):
     print(graph_stage_prefix, 'Pandas AI agent')
@@ -218,9 +222,31 @@ def router_multiple_question(state:list):
     else:
         return "__end__"
     
-""" 
-def queryparser(state:):
-
-
-"""
+def query_parser_agent(state: dict) -> dict:
+    """Agent function to parse natural language queries into structured format"""
+    print(f"{graph_stage_prefix} Query Parser Agent")
+    print(f"{graph_stage_prefix} Input Query: {state['input']}")
     
+
+    df = state["df"]
+    if isinstance(df, list):
+        df = df[0]  
+        
+    query_parser = QueryParser(df)
+    print('This is the state: \n', state)
+    parsed_query = query_parser.parse_query(state["input"])
+    
+    # Add logging
+    print(f"{graph_stage_prefix} Parsed Query Structure:")
+    print(f"  - Intent: {parsed_query.get('intent')}")
+    print(f"  - Target Columns: {parsed_query.get('target_columns')}")
+    print(f"  - Filters: {parsed_query.get('filters')}")
+    print(f"  - Group By: {parsed_query.get('group_by')}")
+    print(f"  - Aggregation: {parsed_query.get('aggregation')}")
+    print(f"  - Sort: {parsed_query.get('sort')}")
+    print(f"  - Limit: {parsed_query.get('limit')}")
+    
+    state["input"] = parsed_query
+    state["df"] = df  
+    
+    return state
