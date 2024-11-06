@@ -35,10 +35,10 @@ class LangchainLLM(LLM):
         MODEL3='jiayuan1/nous_llm'
         llm = Agent_Ai(model=MODEL3)
         query = """Your role is to extract the code portion and format it with:
-```python
+            ```python
 
-```
-Ensure result = {"type": ... , "value": ...} includes only "type" values: "string", "number", "dataframe", or "plot"."""
+            ```
+            Ensure result = {"type": ... , "value": ...} includes only "type" values: "string", "number", "dataframe", or "plot"."""
         res = llm.query_agent(query= code + "\n" + query)
         return res
     
@@ -75,7 +75,6 @@ Ensure result = {"type": ... , "value": ...} includes only "type" values: "strin
         #print("[START_PROMPT]", prompt, '[END_PROMPT]')
         print('[OUT]', res, '[END_OUT]')
         return res #res.content if isinstance(self.langchain_llm, BaseChatModel) else res
-
 
     @property
     def type(self) -> str:
