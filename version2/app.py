@@ -114,16 +114,15 @@ def apply_css():
         }
 
         #backtotop {
-            background-color: #155a8a; /* Darker blue on hover */
+            background-color: #74a7cc; /* Darker blue on hover */
             color: white; /* Text color */
             border: none; /* No border */
-            border-radius: 50px; /* Rounded corners */
-            padding: 10px 20px; /* Vertical and horizontal padding */
-            font-size: 15px; /* Font size */
+            border-radius: 30px; /* Rounded corners */
+            font-size: 3px; /* Font size */
             cursor: pointer; /* Pointer cursor */
             transition: background-color 0.3s ease; /* Smooth transition */
-            width: 15%; /* Full width */
-        } 
+            display: inline-block;
+        }
 
         .aboutheader {
             background-color: #2a7bb5; /* Darker blue on hover */
@@ -141,6 +140,7 @@ def apply_css():
 
         .aboutcontent {
             padding: 2px 20px;
+            text-align: justify;
         }
         </style>""",
         unsafe_allow_html=True,
@@ -319,8 +319,8 @@ def st_chatpage():
     with main_col1:
         df_option = st.selectbox(
             "Select a log to query",
-            st.session_state.csv_filepaths.keys(),
-            index=None,
+            options=st.session_state.csv_filepaths.keys(),
+            index=list(st.session_state.csv_filepaths.keys()).index(st.session_state.selected_df) if st.session_state.selected_df is not None else None,
             placeholder="Select a log to query",
             label_visibility='collapsed'
         ) 
@@ -345,6 +345,7 @@ def st_chatpage():
 
     if chat_input := st.chat_input("Ask a question"):
 
+        st.session_state.response_out = False
         st.session_state.history.append({"role": "user", "content": chat_input})
         output(message=st.session_state.history[-1])
 
@@ -354,23 +355,23 @@ def st_chatpage():
             print(e)
             st.write("Please rephrase your question or restart the chat.")
 
-    st.markdown(
-        """ 
-        <a target="_self" href="#topsection">
-            <button id="backtotop">
-                Back to Top
-            </button>
-        </a>
-        """, 
-        unsafe_allow_html=True
-    ) 
+    if st.session_state.response_out:
+        st.markdown(
+            """ 
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,200,0,0&icon_names=arrow_upward" />
+            <a target="_self" href="#topsection">
+                <button id="backtotop">
+                    <span id="topicon" class="material-symbols-outlined" title="Back to top">
+                        arrow_upward
+                    </span>
+                </button>
+            </a>
+            """, 
+            unsafe_allow_html=True
+        ) 
 
 def st_aboutpage():
-    st.markdown("""
-                <div class='aboutheader'>
-                <b>What is Vantage AI?</b>
-                </div>
-                """, unsafe_allow_html=True)
+    st.subheader('What is Vantage AI?')
     st.markdown("""
                 <div class='aboutcontent'>
 
@@ -382,63 +383,35 @@ def st_aboutpage():
                 </div>
                 """, unsafe_allow_html=True)
 
-    st.markdown("""
-                <div class='aboutheader'>
-                <b>Navigating around Vantage AI</b>
-                </div>
-                """, unsafe_allow_html=True)
+    st.subheader('How to use Vantage AI')
     st.markdown("""
                 <div class='aboutcontent'>
 
-                **:arrow_forward: Click on **:blue[My Chat]** in the sidebar to chat with Vantage AI.**  
+                - **Upload your logs by selecting them from your files or inputting an absolute folder path.**
 
-                **:arrow_forward: Click on **:blue[Upload File]** in the sidebar to upload and manage your log files.**  
+                - **Using the provided dropdown at the top of the chat, select the log you wish to query and analyse.**
 
-                **:arrow_forward: Click on **:red[Restart Chat]** in the sidebar to restart chat with Vantage AI.**  
-                </div>
-                """, unsafe_allow_html=True)
+                - **Query the log you selected! Vantage AI is able to answer questions on the selected log, provide summaries, analyse for anomalies, and even plot graphs for data visualisation!**
 
-    st.markdown("""
-                <div class='aboutheader'>
-                <b>How to use Vantage AI</b>
-                </div>
-                """, unsafe_allow_html=True)
-    st.markdown("""
-                <div class='aboutcontent'>
-
-                **:arrow_forward: Upload your logs by selecting them from your files or inputting an absolute folder path.**
-
-                **:arrow_forward: Using the provided dropdown at the top of the chat, select the log you wish to query and analyse.**
-
-                **:arrow_forward: :rainbow[Query the log you selected!] Vantage AI is able to answer questions on the selected log, provide summaries, analyse for anomalies, and even plot graphs for data visualisation!**
-
-                **:arrow_forward: :rainbow[You may also input generic queries unrelated to your logs!] Vantage AI will respond to them like a regular chatbot!**
+                - **You may also input generic queries unrelated to your logs! Vantage AI will respond to them like a regular chatbot!**
                 </div>
                 """, unsafe_allow_html=True)
     
-    st.markdown("""
-                <div class='aboutheader'>
-                <b>Remarks</b>
-                </div>
-                """, unsafe_allow_html=True)
+    st.subheader('Remarks')
     st.markdown("""
                 <div class='aboutcontent'>
 
-                **:arrow_forward: Vantage AI processes suitable datetime columns, so there might be changes in the datetime columns of your logs.**
+                - **Vantage AI processes suitable datetime columns, so there might be changes in the datetime columns of your logs.**
 
-                **:arrow_forward: The size limit per log file is 50MB. Log files which exceed the size limit are not accepted.**
+                - **The size limit per log file is 50MB. Log files which exceed the size limit are not accepted.**
 
-                **:arrow_forward: The response time of Vantage AI varies according to the complexity of the query and the size of the selected log.**
+                - **The response time of Vantage AI varies according to the complexity of the query and the size of the selected log.**
 
-                **:arrow_forward: Try to provide more context in your queries to allow Vantage AI to generate better responses.**
+                - **Try to provide more context in your queries to allow Vantage AI to generate better responses.**
                 </div>
                 """, unsafe_allow_html=True)
     
-    st.markdown("""
-                <div class='aboutheader'>
-                <b>Contact Us</b>
-                </div>
-                """, unsafe_allow_html=True)
+    st.subheader('Contact Us')
     st.markdown("""
                 <div class='aboutcontent'>
 
@@ -700,6 +673,7 @@ def run_async_task(chat_input):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(on_chat_submit(chat_input))
         output(st.session_state.history[-1])
+        st.session_state.response_out = True
 
 def initialize_conversation():
     '''
@@ -754,6 +728,8 @@ def initialize_session_state():
         st.session_state.graph = initialize_langgraph()
     if "selected_df" not in st.session_state:
         st.session_state.selected_df = None
+    if "response_out" not in st.session_state:
+        st.session_state.response_out = False
 
 def reset_session_state():
     '''
@@ -765,7 +741,7 @@ def reset_session_state():
     '''
     st.session_state.history = initialize_conversation()
     st.session_state.mode = "Chat with VantageAI"
-    st.session_state.selected_df = None
+    st.session_state.response_out = False
 
 def update_langgraph():
     '''
