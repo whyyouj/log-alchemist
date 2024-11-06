@@ -24,7 +24,7 @@ questions = [
     "What is the meaning of life?"
 ]
 
-df = pd.read_csv("./logs/Sales Transaction v.4a.csv")
+df = pd.read_csv("./data/Mac_2k.log_structured.csv")
 # questions2 =["how many rows are there"]
 # df = pd.read_csv('train2.csv')
 
@@ -44,6 +44,44 @@ df = pd.read_csv("./logs/Sales Transaction v.4a.csv")
 # print(correct)
 # print(total)
 
+MODEL1='jiayuan1/llm2'
+MODEL2='llm5'
+MODEL3='jiayuan1/nous_llm'
 
-llm = Python_Ai(model = 'jiayuan1/nous_llm', df = df)
-print(llm.pandas_legend_with_summary_skill().chat("filter for greece and count the number of occurance"))
+llm = Python_Ai(model = MODEL2, df = df, temperature=0)
+
+# print(llm.pandas_legend_with_skill().chat("""how many rows are there"""))
+# print(llm.pandas_legend_with_skill().chat("""How many times did the event with the user authorMacBook-Pro occur?"""))
+# print(llm.pandas_legend_with_skill().chat("""What is the most frequent user?"""))
+# print(llm.pandas_legend_with_skill().chat("""What is the most frequent eventid that occurred?"""))
+# print(llm.pandas_legend_with_skill().chat("""Identify outliers in the number of occurrences of each User (using Z-score)"""))
+"""    
+Here is how the final code should be formatted and only output the code
+
+```python
+import pandas as pd
+df = dfs[0]
+# TODO: import the required dependencies
+
+
+# Write code here
+
+
+# Declare result var: 
+result = {"type": ..., "value" : ans } 
+```
+
+Example of result:
+Use only these possible "type": "string" or "number" or "dataframe" or "plot"
+if type(ans) = dataframe then result = { "type": "dataframe", "value": pd.DataFrame({...}) }
+if type(ans) = string then reuslt = { "type": "string", "value": f"..." }
+if type(ans) = plot then result = { "type": "plot", "value": "....png"
+if type(ans) = number result = { "type": "number", "value": ... }
+                                     
+                                      
+))"""
+
+# llm = Agent_Ai(model= "jiayuan1/nous_llm")
+# print(llm.query_agent('what is 1+1'))
+# print(llm.query_agent('what is the previous question'))
+

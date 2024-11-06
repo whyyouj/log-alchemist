@@ -8,8 +8,22 @@ sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
-from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, router_python_output, python_summary_agent, multiple_question_agent, multiple_question_parser, router_multiple_question, python_anomaly_agent, query_parser_agent
-from .types import AgentState
+from lang_graph.lang_graph_utils import multiple_question_agent, router_agent,router_agent_decision, python_pandas_ai, router_python_output, final_agent, multiple_question_parser, router_multiple_question
+
+class AgentState(TypedDict):
+    
+    '''
+    The variables that will be present in the state of the Lang Graph
+    '''
+    
+    input: str
+    agent_out: Union[AgentAction, AgentFinish, None]
+    intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+    pandas: Python_Ai
+    df: pd.DataFrame
+    remaining_qns: list
+    all_answer: list
+    parsed_query: Optional[Dict]
     
 class Graph:
     def __init__(self, pandas_llm, df):
@@ -20,6 +34,11 @@ class Graph:
     
     @staticmethod
     def get_graph():
+        
+        '''
+        The function that builds the graph
+        '''
+        
         graph = StateGraph(AgentState)
 
         # Add nodes
@@ -33,12 +52,10 @@ class Graph:
         graph.add_node('final_agent', final_agent)
         graph.add_node("multiple_question_parser", multiple_question_parser)
 
-        # Define the initial flow
-        graph.add_edge(START, 'multiple_question_agent')
+        # LangGraph Edges
+        graph.add_edge(START, 'multiple_question_agent') # Initialising LangGraph
         graph.add_edge("multiple_question_agent", "router_agent")
-
-        # Router agent decisions
-        graph.add_conditional_edges(
+        graph.add_conditional_edges( 
             "router_agent",
             router_agent_decision,
             {
@@ -104,57 +121,29 @@ class Graph:
                 "__end__": "__end__"
             }
         )
+        
+        # compile the graph
+        runnable = graph.compile()
 
-        return graph.compile()
+        return runnable
     
     def run(self, query):
-        # llm = Agent_Ai(model='mistral', temperature=0)
-        # prompt = f"""The user has asked: '{query}'.
-        # Determine if this question is asking to "try again", "retry", or something with a similar meaning related to repeating an action.
-        # If the question is about retrying, respond with 'Yes'.
-        # If the question is not about retrying, respond with 'No'.
-        # Only answer 'Yes' or 'No'"""
-        # ans = llm.query_agent(prompt)
-        # print(f'[STAGE] Try again agent:{ans}')
-        # if 'yes' in ans.lower():
-        #     if self.qns != '':
-        #         query = self.qns
-        #     else:
-        #         option = ['😀','🥳','😊','🥳','🤩','😎','😄','🤭']
-        #         import numpy as np
-        #         num = np.random.randint(0,len(option)-1)
-        #         return f"Hi! Please ask a question {option[num]}"
-        # else:
-        #     self.qns = query
-
-        self.qns = query
-        # llm = Agent_Ai(model='mistral', temperature=0)
-        # prompt = f"""The user has asked: '{query}'.
-        # Determine if this question is asking to "try again", "retry", or something with a similar meaning related to repeating an action.
-        # If the question is about retrying, respond with 'Yes'.
-        # If the question is not about retrying, respond with 'No'.
-        # Only answer 'Yes' or 'No'"""
-        # ans = llm.query_agent(prompt)
-        # print(f'[STAGE] Try again agent:{ans}')
-        # if 'yes' in ans.lower():
-        #     if self.qns != '':
-        #         query = self.qns
-        #     else:
-        #         option = ['😀','🥳','😊','🥳','🤩','😎','😄','🤭']
-        #         import numpy as np
-        #         num = np.random.randint(0,len(option)-1)
-        #         return f"Hi! Please ask a question {option[num]}"
-        # else:
-        #     self.qns = query
-        if self.qns == '':
-            self.qns = 'No previous question'
-            
+        
+        '''
+        The function that will run a user query using the Lang Graph
+        '''
+        
         runnable = self.graph
         out = runnable.invoke({"input":f"{query}", "pandas":self.pandas, "df":self.df, "remaining_qns":[], "all_answer":[]})
         self.qns = query
         return out['all_answer']
     
     def show(self):
+        
+        '''
+        Plot the Lang Graph to have a visualisation of a plot of how the graph will look
+        '''
+        
         from PIL import Image as PILImage
         import io
         import os
@@ -171,6 +160,38 @@ class Graph:
         pandas_ai = Python_Ai(model='llama3.1',df=df).pandas_legend()
         global_graph = Graph(pandas_llm=pandas_ai, df=df)
         return global_graph
+    
+#=================#
+#== Legacy Code ==#
+#=================#
+
+### Try again agent ###
+# llm = Agent_Ai(model='mistral', temperature=0)
+# prompt = f"""The user has asked: '{query}'.
+# Determine if this question is asking to "try again", "retry", or something with a similar meaning related to repeating an action.
+# If the question is about retrying, respond with 'Yes'.
+# If the question is not about retrying, respond with 'No'.
+# Only answer 'Yes' or 'No'"""
+# ans = llm.query_agent(prompt)
+# print(f'[STAGE] Try again agent:{ans}')
+# if 'yes' in ans.lower():
+#     if self.qns != '':
+#         query = self.qns
+#     else:
+#         option = ['😀','🥳','😊','🥳','🤩','😎','😄','🤭']
+#         import numpy as np
+#         num = np.random.randint(0,len(option)-1)
+#         return f"Hi! Please ask a question {option[num]}"
+# else:
+#     self.qns = query
+
+### create_graph() ###
+# def create_graph():
+#     global global_graph
+#     df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
+#     pandas_ai = Python_Ai(model='llama3.1',df=df).pandas_legend()
+#     global_graph = Graph(pandas_llm=pandas_ai, df=df)
+#     return global_graph
     
 if __name__ == "__main__":
     df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
