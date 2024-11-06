@@ -97,7 +97,7 @@ def router_agent_decision(state: list):
 
     out = state['agent_out']
     if 'yes' in out.lower():
-        return 'query_parser_agent' 
+        return 'python_pandas_ai' 
         
     else:
         return 'final_agent'
@@ -108,11 +108,32 @@ def python_pandas_ai(state:list):
     '''
     This is where the pandas ai agent will invoke the query
     '''
+    df = state["df"]
+    if isinstance(df, list):
+        df = df[0]  
+    query_parser = QueryParser(df.head())
+    parsed_query = query_parser.parse_query(str(state["input"]))
     
     print(graph_stage_prefix, 'Pandas AI agent')
     llm = state['pandas']
     query = state['input']
-    out = llm.chat(query)
+    prompt = f"""
+        The following is the query from the user:
+        {query}
+        
+        The parsed query structure is:
+        {parsed_query}
+
+        You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
+
+        You are to following the instructions below strictly:
+        - Any query related to Date or Time, refer to the 'Datetime' column.
+        - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
+    """
+    
+    
+    out = llm.chat(prompt)
+    # out = llm.chat(query + str(parsed_query))
     return {"agent_out": out}
 
 
@@ -241,31 +262,3 @@ def router_multiple_question(state:list):
     else:
         return "__end__"
     
-def query_parser_agent(state: dict) -> dict:
-    """Agent function to parse natural language queries into structured format"""
-    print(f"{graph_stage_prefix} Query Parser Agent")
-    print(f"{graph_stage_prefix} Input Query: {state['input']}")
-    
-    df = state["df"]
-    if isinstance(df, list):
-        df = df[0]  
-        
-    query_parser = QueryParser(df.head())
-    parsed_query = query_parser.parse_query(str(state["input"]))
-    # print("This is the parsed query: \n", parsed_query)
-    # Add logging
-    print(f"{graph_stage_prefix} Parsed Query Structure:")
-    print(f"  - Intent: {parsed_query.get('intent')}")
-    print(f"  - Target Columns: {parsed_query.get('target_columns')}")
-    print(f"  - Filters: {parsed_query.get('filters')}")
-    print(f"  - Group By: {parsed_query.get('group_by')}")
-    print(f"  - Aggregation: {parsed_query.get('aggregation')}")
-    print(f"  - Sort: {parsed_query.get('sort')}")
-    print(f"  - Limit: {parsed_query.get('limit')}")
-    
- 
-    state["input"] = str(parsed_query)
-    # state["df"] = df 
-    # print("This is the state: \n", state) 
-    
-    return state
