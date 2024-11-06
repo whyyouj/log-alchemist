@@ -86,11 +86,11 @@ def router_agent(state: list):
 
      # Get the input query from the state
     query = state['input']
+    qns_type = '' # Initialize question type
+    qns = '' # Initialize question content
     try:
         # Attempt to evaluate the query as a dictionary
         parse_dict = eval(query)
-        qns_type = '' # Initialize question type
-        qns = '' # Initialize question content
         
         # Iterate through the keys of the dictionary to extract question type and content
         for i in parse_dict.keys():
@@ -106,11 +106,14 @@ def router_agent(state: list):
         
     except:
         # If parsing fails, set default values
-        out = 'yes'
+        if "pandas" in query.lower():
+            out = "yes"
+        else:
+            out = 'no'
         input = query
         
     # Print the final output of the router agent   
-    print('ROUTER AGENT OUTPUT: ', out, 'TYPE', qns_type,'INPUT:', input)
+    print('ROUTER AGENT OUTPUT: ', out, 'TYPE', qns_type, 'INPUT:', input)
     
     # Return the output and the processed input
     return {"agent_out": out, "input": input}
