@@ -1,4 +1,4 @@
-from typing import TypedDict, Annotated, List, Union
+from typing import TypedDict, Annotated, List, Union, Optional, Dict
 from langchain_core.agents import AgentAction, AgentFinish
 import operator
 from langgraph.graph import StateGraph, END, START
@@ -8,7 +8,7 @@ sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
-from lang_graph.lang_graph_utils import multiple_question_agent, router_agent,router_agent_decision, python_pandas_ai, router_python_output, final_agent, multiple_question_parser, router_multiple_question
+from lang_graph.lang_graph_utils import multiple_question_agent, router_agent,router_agent_decision, python_pandas_ai, router_python_output, final_agent, multiple_question_parser, router_multiple_question, query_parser_agent
 
 class AgentState(TypedDict):
     
@@ -23,6 +23,7 @@ class AgentState(TypedDict):
     df: pd.DataFrame
     remaining_qns: list
     all_answer: list
+    parsed_query: Optional[Dict]
     
 class Graph:
     def __init__(self, pandas_llm, df):
@@ -44,6 +45,7 @@ class Graph:
         graph.add_node("multiple_question_agent", multiple_question_agent) # Breakdown if question is about multiple questions
         graph.add_node('router_agent', router_agent) # Determining if question is related to dataset
         graph.add_node("python_pandas_ai", python_pandas_ai) # Answering specific dataset related questions
+        graph.add_node('query_parser_agent', query_parser_agent)
         graph.add_node('final_agent', final_agent) 
         graph.add_node("multiple_question_parser", multiple_question_parser)
 
@@ -54,10 +56,12 @@ class Graph:
             "router_agent",
             router_agent_decision,
             {
-                "python_pandas_ai":"python_pandas_ai",
+                "query_parser_agent": "query_parser_agent",
                 "final_agent":"final_agent"
             }
         )
+        graph.add_edge("query_parser_agent", "python_pandas_ai")
+        
         graph.add_conditional_edges(
             "python_pandas_ai",
             router_python_output,

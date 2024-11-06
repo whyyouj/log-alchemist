@@ -1,12 +1,14 @@
 import pandas as pd
 import os, sys
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from regular_agent.agent_ai import Agent_Ai
 from python_agent.python_ai import Python_Ai, overall_anomaly
 from langchain_core.prompts import PromptTemplate
 import re 
 import ast
+from parser.QueryParser.query_parser import QueryParser
 
 graph_stage_prefix = '[STAGE]'
 FINAL_LLM = "jiayuan1/nous_llm"
@@ -95,7 +97,7 @@ def router_agent_decision(state: list):
 
     out = state['agent_out']
     if 'yes' in out.lower():
-        return 'python_pandas_ai' 
+        return 'query_parser_agent' 
         
     else:
         return 'final_agent'
@@ -239,4 +241,31 @@ def router_multiple_question(state:list):
     else:
         return "__end__"
     
+def query_parser_agent(state: dict) -> dict:
+    """Agent function to parse natural language queries into structured format"""
+    print(f"{graph_stage_prefix} Query Parser Agent")
+    print(f"{graph_stage_prefix} Input Query: {state['input']}")
     
+    df = state["df"]
+    if isinstance(df, list):
+        df = df[0]  
+        
+    query_parser = QueryParser(df.head())
+    parsed_query = query_parser.parse_query(str(state["input"]))
+    # print("This is the parsed query: \n", parsed_query)
+    # Add logging
+    print(f"{graph_stage_prefix} Parsed Query Structure:")
+    print(f"  - Intent: {parsed_query.get('intent')}")
+    print(f"  - Target Columns: {parsed_query.get('target_columns')}")
+    print(f"  - Filters: {parsed_query.get('filters')}")
+    print(f"  - Group By: {parsed_query.get('group_by')}")
+    print(f"  - Aggregation: {parsed_query.get('aggregation')}")
+    print(f"  - Sort: {parsed_query.get('sort')}")
+    print(f"  - Limit: {parsed_query.get('limit')}")
+    
+ 
+    state["input"] = str(parsed_query)
+    # state["df"] = df 
+    # print("This is the state: \n", state) 
+    
+    return state
