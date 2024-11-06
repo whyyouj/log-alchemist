@@ -22,25 +22,56 @@ class LangchainLLM(LLM):
     def __init__(self, langchain_llm: BaseLanguageModel):
         self.langchain_llm = langchain_llm
         
-    def code_formatter(self, code):
-        '''
-        Description: Formats the code using a specific model.
+    # def code_formatter(self, code):
+    #     '''
+    #     Description: Formats the code using a specific model.
         
-        Input:
-        - code: str
+    #     Input:
+    #     - code: str
         
-        Output:
-        - res: formatted code as str
-        '''
-        MODEL3='jiayuan1/nous_llm'
-        llm = Agent_Ai(model=MODEL3)
-        query = """Your role is to extract the code portion and format it with:
-            ```python
+    #     Output:
+    #     - res: formatted code as str
+    #     '''
+    #     MODEL3='jiayuan1/nous_llm'
+    #     llm = Agent_Ai(model=MODEL3)
+    #     query = """Your role is to extract the code portion and format it with:
+    #         ```python
 
-            ```
-            Ensure result = {"type": ... , "value": ...} includes only "type" values: "string", "number", "dataframe", or "plot"."""
-        res = llm.query_agent(query= code + "\n" + query)
-        return res
+    #         ```
+    #         Ensure result = {"type": ... , "value": ...} includes only "type" values: "string", "number", "dataframe", or "plot"."""
+    #     res = llm.query_agent(query= code + "\n" + query)
+    #     return res
+
+    def code_formatter(self, code):
+        import re
+        pattern = r"(import.*?result\s*=\s*\{.*?\})" #r"(import.*?result\s*=\s*\{.*?\})"
+
+        # Search for the pattern in the text
+        match = re.search(pattern, code, re.DOTALL)
+
+        # Extract the matched code if found
+        if match:
+            extracted_code = match.group(1)
+            
+            pattern_2 = r"(result\s*=\s*\{.*?\})"
+            match = re.search(pattern_2, extracted_code, re.DOTALL)
+            if match:
+                rs = match.group(1)
+                count = 0 
+                for i in rs:
+                    if i =="{":
+                        count += 1
+                    elif i == "}":
+                        count -=1
+                if count != 0:
+                    extracted_code+= "\"}"
+            
+            print("[AI]", extracted_code)
+            
+            return f"```python \n {extracted_code}\n```"
+            
+        else:
+            return code
     
     def call(
         self, instruction: BasePrompt, context: PipelineContext = None, suffix: str = ""
@@ -67,13 +98,14 @@ class LangchainLLM(LLM):
         res = res.replace("</|im_end|>", "")
         res = res.replace("</s>", "")
         res = res.replace("</|im_start|>", "")
-        if "```python" not in res:
-            res = f"""```python 
-            {res}
-            ``` """
+        # if "```python" not in res:
+        #     res = f"""```python 
+        #     {res}
+        #     ``` """
         # res = self.code_formatter(res)
         #print("[START_PROMPT]", prompt, '[END_PROMPT]')
-        print('[OUT]', res, '[END_OUT]')
+        # print('[OUT]', res, '[END_OUT]')
+        res = self.code_formatter(res)
         return res #res.content if isinstance(self.langchain_llm, BaseChatModel) else res
 
     @property
