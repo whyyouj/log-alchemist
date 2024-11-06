@@ -309,7 +309,7 @@ def overall_anomaly(df):
         event_frequency_df.columns = ['Value', 'Count']
         event_frequency_df = event_frequency_df.sort_values('Count', ascending=True)
         rarest = event_frequency_df.head(3)
-        anomalies[f'Rare_values_in_{col}'] = tabulate(rarest, headers=rarest.columns, tablefmt='pretty', showindex=False)
+        anomalies[f'Rare_values_in_{col}*'] = tabulate(rarest, headers=rarest.columns, tablefmt='pretty', showindex=False)
     print('[INFO] Anomaly Skill: categorical columns checked')
 
     #################################
@@ -336,6 +336,11 @@ def overall_anomaly(df):
     if len(error_results) > 0:
         error_results_df = tabulate(error_results, headers=['Column', 'Error Counts'], tablefmt='grid')
         anomalies['Error Checks'] = error_results_df
+
+    ##################
+    ### Disclaimer ###
+    ##################
+    anomalies['*DISCLAIMER'] = "For a detailed overview on the rare categories in each column, please query for a summary of the data and refer to the SweetVIZ summary."
 
     ########################
     ### add in timestamp ###
@@ -391,43 +396,43 @@ class Python_Ai:
             df=self.df
         )
     
-    def pandas_legend(self):
-        '''
-        Description: Calls the pandas AI agent without any skill.
+    # def pandas_legend(self):
+    #     '''
+    #     Description: Calls the pandas AI agent without any skill.
         
-        Input: None
+    #     Input: None
         
-        Output:
-        - pandas_ai: Agent object
-        '''
+    #     Output:
+    #     - pandas_ai: Agent object
+    #     '''
         
-        llm  = LangchainLLM(self.get_llm().llm)
+    #     llm  = LangchainLLM(self.get_llm().llm)
 
-        pandas_ai = Agent(
-            self.df, 
-            description = """
-                You are a highly skilled data analysis agent, responsible for handling and answering various data-related queries. 
-                For each query I provide, your task is to carefully analyze the data and return the most accurate and optimized solution.
+    #     pandas_ai = Agent(
+    #         self.df, 
+    #         description = """
+    #             You are a highly skilled data analysis agent, responsible for handling and answering various data-related queries. 
+    #             For each query I provide, your task is to carefully analyze the data and return the most accurate and optimized solution.
                 
-                Your response should include:
-                1. The Python code necessary to derive the answer from the data.
+    #             Your response should include:
+    #             1. The Python code necessary to derive the answer from the data.
                 
-                Always take your time to think through the query before responding, and ensure the code is optimized for both readability and performance.
+    #             Always take your time to think through the query before responding, and ensure the code is optimized for both readability and performance.
                 
-                Typical questions you will handle include requests like "How many rows are there in the dataset?" or "What are the top 5 events that occurred?" so ensure your answers are tailored to these types of queries.
-            """,
-            config={
-                "llm":llm,
-                "open_charts":False,
-                "enable_cache" : False,
-                "save_charts": True,
-                "max_retries":5,
-                "verbose": True,
-                "response_parser": StreamlitResponse,
-                "custom_whitelisted_dependencies": ["sweetviz", "numpy", "scipy", "pandas", "tabulate", "matplotlib", "datetime"]
-            }
-        )
-        return pandas_ai
+    #             Typical questions you will handle include requests like "How many rows are there in the dataset?" or "What are the top 5 events that occurred?" so ensure your answers are tailored to these types of queries.
+    #         """,
+    #         config={
+    #             "llm":llm,
+    #             "open_charts":False,
+    #             "enable_cache" : False,
+    #             "save_charts": True,
+    #             "max_retries":5,
+    #             "verbose": True,
+    #             "response_parser": StreamlitResponse,
+    #             "custom_whitelisted_dependencies": ["sweetviz", "numpy", "scipy", "pandas", "tabulate", "matplotlib", "datetime"]
+    #         }
+    #     )
+    #     return pandas_ai
     
     def pandas_legend_with_skill(self):
         '''
@@ -458,7 +463,7 @@ class Python_Ai:
                 "open_charts":False,
                 "enable_cache" : False,
                 "save_charts": True,
-                "max_retries":5,
+                "max_retries": 3,
                 "response_parser": StreamlitResponse,
                 "custom_whitelisted_dependencies": ["sweetviz", "collections", "pytz"]
             }
