@@ -24,45 +24,31 @@ graph_stage_prefix = '[STAGE]'
 FINAL_LLM = "jiayuan1/nous_llm"
 
 def multiple_question_agent(state: list):
-    '''
-    Description:
-    This function contains an LLM that breaks down multiple response question into a list of dictionaries
-    that contains the type of question and the values with the parsed questions.
-    
+    """
+    Breaks down multi-part questions into separate components.
+
+    Function Description:
+    Uses an LLM to parse complex questions into individual components and categorizes them
+    based on whether they require pandas operations or explanation.
+
     Input:
-    - state: Dictionary containing:
+    - state (dict): Contains:
         - df: pandas DataFrame with the data
-        - input: User's input question(s)
-    
+        - input: User's multi-part question
+
     Output:
-    - Dictionary containing:
-        - input: First parsed question (str)
+    - dict: Contains:
+        - input: First parsed question
         - remaining_qns: List of remaining questions
+
+    Note:
+    - Returns original question as single item if parsing fails
+    - Requires router_160 model to be available
         
     Example:
     Input: "How many rows are there and explain the dataset"
     Output: [{"Pandas": "How many rows are there"}, {"Explain": "Explain the dataset"}]
-    '''
-    # Print the stage prefix for "Multiple Question Parser"
-    '''
-    Description:
-    This function contains an LLM that breaks down multiple response question into a list of dictionaries
-    that contains the type of question and the values with the parsed questions.
-    
-    Input:
-    - state: Dictionary containing:
-        - df: pandas DataFrame with the data
-        - input: User's input question(s)
-    
-    Output:
-    - Dictionary containing:
-        - input: First parsed question (str)
-        - remaining_qns: List of remaining questions
-        
-    Example:
-    Input: "How many rows are there and explain the dataset"
-    Output: [{"Pandas": "How many rows are there"}, {"Explain": "Explain the dataset"}]
-    '''
+    """
     # Print the stage prefix for "Multiple Question Parser"
     print(graph_stage_prefix, "Multiple Question Parser")
 
@@ -78,17 +64,14 @@ def multiple_question_agent(state: list):
     # Define a pattern to find any text within square brackets
     pattern = r'\[[^\]]+\]'
     try:
-        # Use regex to find the first instance of text within square brackets in the output
+
         # Use regex to find the first instance of text within square brackets in the output
         parse_qns = re.findall(pattern, out)[0]
 
         # Replace special quotation marks with standard quotes
-
-        # Replace special quotation marks with standard quotes
-        parse_qns = parse_qns.replace("“", """\"""")
         parse_qns = parse_qns.replace("”", """\"""")
 
-        # Evaluate the formatted string to convert it into a list of questions
+
 
         # Evaluate the formatted string to convert it into a list of questions
         parse_qns_list = eval(f"""{parse_qns}""")
@@ -103,41 +86,35 @@ def multiple_question_agent(state: list):
     # Print the parsed question list
     print(parse_qns_list)
 
-    # Return the first question as "input" and remaining questions as "remaining_qns"
 
     # Return the first question as "input" and remaining questions as "remaining_qns"
     return {"input": str(parse_qns_list[0]), "remaining_qns": parse_qns_list[1:]}
 
 def router_agent(state: list):
-    '''
-    
-    Description:
-    This function routes the input from the previous node to either the pandas agent (for pandas-related questions) or the final agent (for explanation or general questions).
-    
+    """
+    Routes questions to appropriate processing agents.
+
+    Function Description:
+    Analyzes questions to determine whether they require pandas operations
+    or general explanation, routing them to the appropriate agent.
+
     Input:
-    - state: Dictionary containing input query and other state information (dict)
-    
-    Output: 
-    - Dictionary containing routing decision ('agent_out') and processed input ('input')
-    '''
-    
-    # Print the stage prefix for "Router Agent"
-    '''
-    
-    Description:
-    This function routes the input from the previous node to either the pandas agent (for pandas-related questions) or the final agent (for explanation or general questions).
-    
-    Input:
-    - state: Dictionary containing input query and other state information (dict)
-    
-    Output: 
-    - Dictionary containing routing decision ('agent_out') and processed input ('input')
-    '''
+    - state (dict): Contains input query and DataFrame
+
+    Output:
+    - dict: Contains:
+        - agent_out: 'yes' for pandas queries, 'no' for others
+        - input: Processed query string
+
+    Note:
+    - Defaults to 'no' if question type cannot be determined
+    - Strips any dictionary formatting from input
+    """
     
     # Print the stage prefix for "Router Agent"
     print(graph_stage_prefix, 'Router Agent')
 
-     # Get the input query from the state
+
 
      # Get the input query from the state
     query = state['input']
@@ -145,16 +122,12 @@ def router_agent(state: list):
     qns = '' # Initialize question content
     try:
         # Attempt to evaluate the query as a dictionary
-        # Attempt to evaluate the query as a dictionary
         parse_dict = eval(query)
         
-        # Iterate through the keys of the dictionary to extract question type and content
         # Iterate through the keys of the dictionary to extract question type and content
         for i in parse_dict.keys():
             qns_type = i
             qns = parse_dict[qns_type]
-            
-        # Determine output based on the question type    
             
         # Determine output based on the question type    
         if "pandas" in qns_type.lower():
@@ -180,29 +153,22 @@ def router_agent(state: list):
 
 def router_agent_decision(state: list):
     """
-    Make routing decision based on router agent output.
-    
-    Description:
-    Determines whether to route to pandas_ai or final_agent based on router output.
-    
-    Input:
-    - state: Dictionary containing router agent output (dict)
-    
-    Output:
-    - String indicating next agent ('python_pandas_ai' or 'final_agent')
-    """
+    Makes routing decision based on router agent output.
 
-    """
-    Make routing decision based on router agent output.
-    
-    Description:
-    Determines whether to route to pandas_ai or final_agent based on router output.
-    
+    Function Description:
+    Examines the router agent's output to determine the appropriate processing path,
+    directing queries either to pandas operations or general explanation handling.
+
     Input:
-    - state: Dictionary containing router agent output (dict)
-    
+    - state (dict): Contains:
+        - agent_out (str): Router agent's decision ('yes' or 'no')
+
     Output:
-    - String indicating next agent ('python_pandas_ai' or 'final_agent')
+    - str: Name of next agent to handle query ('python_pandas_ai' or 'final_agent')
+
+    Note:
+    - Returns 'final_agent' if output cannot be parsed
+    - Case-insensitive matching for 'yes' determination
     """
 
     out = state['agent_out']
@@ -215,29 +181,25 @@ def router_agent_decision(state: list):
     
 def python_pandas_ai(state:list):
     """
-    Invoke the pandas AI agent to process the query.
-    
-    Description:
-    This function invokes the pandas AI agent to process the query and return the result.
-    
+    Processes pandas-related queries using AI.
+
+    Function Description:
+    Executes pandas operations based on natural language queries,
+    handling data analysis and manipulation requests.
+
     Input:
-    - state: Dictionary containing the pandas AI agent and input query (dict)
-    
+    - state (dict): Contains:
+        - pandas: PandasAI instance
+        - input: Query string
+        - df: DataFrame to analyze
+
     Output:
-    - Dictionary containing the agent's output ('agent_out')
-    """
-    
-    """
-    Invoke the pandas AI agent to process the query.
-    
-    Description:
-    This function invokes the pandas AI agent to process the query and return the result.
-    
-    Input:
-    - state: Dictionary containing the pandas AI agent and input query (dict)
-    
-    Output:
-    - Dictionary containing the agent's output ('agent_out')
+    - dict: Contains:
+        - agent_out: Generated pandas code or error message
+
+    Note:
+    - Returns error message if query cannot be processed
+    - Code output excludes function definitions and return statements
     """
     
     print(graph_stage_prefix, 'Pandas AI agent')
@@ -259,17 +221,22 @@ def python_pandas_ai(state:list):
 
 def router_python_output(state:list):
     """
-    Route based on pandas AI agent output success.
-    
-    Description:
-    Checks if pandas AI agent successfully answered query. Routes to final agent on failure,
-    multiple question parser on success.
-    
+    Routes based on pandas AI agent execution success.
+
+    Function Description:
+    Analyzes the output from pandas AI agent to determine if the query was 
+    successfully processed, routing to appropriate next step based on result.
+
     Input:
-    - state: Dictionary containing pandas AI agent output (dict)
-    
+    - state (dict): Contains:
+        - agent_out (str): Output from pandas AI agent execution
+
     Output:
-    - String indicating next stage ('final_agent' or 'multiple_question_parser')
+    - str: Next processing stage ('final_agent' or 'multiple_question_parser')
+
+    Note:
+    - Routes to final_agent on error messages
+    - Continues to question parser on successful execution
     """
     
     router_out = state["agent_out"]
@@ -281,36 +248,26 @@ def router_python_output(state:list):
     
     
 def final_agent(state:list):
-    '''
-    Handle non-Pandas related questions using an LLM.
-    
-    Description:
-    This function handles non-Pandas related questions by using an LLM.
-    It maintains a "knowledge base" from previous questions and answers, 
-    which acts as memory to assist in responding to follow-up questions.
-    
+    """
+    Handles general explanation queries using LLM.
+
+    Function Description:
+    Processes non-pandas queries by maintaining context from previous
+    Q&A pairs and generating natural language responses.
+
     Input:
-    - state: Dictionary containing input query and all previous answers (dict)
-    
+    - state (dict): Contains:
+        - input: Current query
+        - all_answer: List of previous Q&A pairs
+
     Output:
-    - Dictionary containing the agent's output ('agent_out')
-    '''
-    
-    # Print the stage prefix for "Final Agent"
-    '''
-    Handle non-Pandas related questions using an LLM.
-    
-    Description:
-    This function handles non-Pandas related questions by using an LLM.
-    It maintains a "knowledge base" from previous questions and answers, 
-    which acts as memory to assist in responding to follow-up questions.
-    
-    Input:
-    - state: Dictionary containing input query and all previous answers (dict)
-    
-    Output:
-    - Dictionary containing the agent's output ('agent_out')
-    '''
+    - dict: Contains:
+        - agent_out: LLM generated response
+
+    Note:
+    - Returns direct answer if no relevant context found
+    - Truncates DataFrame outputs to 10 rows in context
+    """
     
     # Print the stage prefix for "Final Agent"
     print(graph_stage_prefix, "Final Agent")
@@ -327,12 +284,10 @@ def final_agent(state:list):
     query = state['input']
     previous_ans = state['all_answer']
     
-    # Initialize a string to format previous answers as a knowledge base
     
     # Initialize a string to format previous answers as a knowledge base
     previous_ans_format = "Here is you knowledge base:\n"
     
-    # If there are previous answers, format each as Q&A pairs to add to the knowledge base
     
     # If there are previous answers, format each as Q&A pairs to add to the knowledge base
     if previous_ans:
@@ -340,7 +295,6 @@ def final_agent(state:list):
             qns = i['qns']
             ans = i['ans']
             
-            # If the answer is a DataFrame, convert to JSON (limited to the first 10 rows for brevity)
             
             # If the answer is a DataFrame, convert to JSON (limited to the first 10 rows for brevity)
             if isinstance(ans, pd.DataFrame):
@@ -351,19 +305,11 @@ def final_agent(state:list):
                     # If conversion fails, keep the answer as it is
                     ans = ans
             
-            # Add question and answer to the knowledge base format
-                try:
-                    ans = ans.head(10)
-                    ans= ans.to_json()
-                except:
-                    # If conversion fails, keep the answer as it is
-                    ans = ans
             
             # Add question and answer to the knowledge base format
             previous_ans_format += qns + '\n'
             previous_ans_format += f"Answer: {ans}" + "\n\n"
             
-        # Add instructions for using the knowledge base to answer the question    
             
         # Add instructions for using the knowledge base to answer the question    
         previous_ans_format += "You should use the information above to answer the following question directly and concisely. If the user's question is not related to the knowledge base, answer it directly without using the knowledge base."
@@ -371,10 +317,8 @@ def final_agent(state:list):
     
     else:
         # If no previous answers, set knowledge base format to empty
-        # If no previous answers, set knowledge base format to empty
         previous_ans_format = ""
     
-    # Construct the final prompt with knowledge base and user's question
     
     # Construct the final prompt with knowledge base and user's question
     prompt = f"""
@@ -393,22 +337,33 @@ def final_agent(state:list):
 
 
 def multiple_question_parser(state:list):
-    '''
-    Format the output from the previous stage and update the state.
-    
-    Description:
-    This function formats the output from the previous stage as a dictionary 
-    with keys "qns" (question) and "ans" (answer). 
-    It updates the state to save each answer in a list along with previous answers. 
-    It also determines the next question and prepares it as input for the next stage of the graph.
-    
+    """
+    Processes and manages multi-part question responses.
+
+    Function Description:
+    Handles the state management for multi-part questions by:
+    1. Formatting current Q&A pair
+    2. Updating answer history
+    3. Managing question queue
+    4. Preparing next question for processing
+
     Input:
-    - state: Dictionary containing input query, agent's output, and all previous answers (dict)
-    
+    - state (dict): Contains:
+        - input (str): Current question
+        - agent_out: Answer to current question
+        - all_answer (list): Previous Q&A history
+        - remaining_qns (list): Queue of remaining questions
+
     Output:
-    - Dictionary containing the next input query, remaining questions, and all answers (dict)
-    '''
-    
+    - dict: Updated state containing:
+        - input: Next question or empty string
+        - remaining_qns: Updated question queue
+        - all_answer: Updated Q&A history
+
+    Note:
+    - Returns empty input when all questions processed
+    - Maintains numerical ordering of questions in history
+    """
     # Print the stage prefix for "Multiple Question Parser"
     print(graph_stage_prefix, "Multiple Question Parser")
     
@@ -435,19 +390,25 @@ def multiple_question_parser(state:list):
         return {"input": "", "remaining_qns":[], "all_answer":all_answer}
     
 def router_multiple_question(state:list):
-    '''
-    Route based on remaining questions.
-    
-    Description:
-    This function is simply a router that routes the graph back to the router agent if there is remaining question else
-    the graph will end.
-    
+    """
+    Controls flow for multi-question processing.
+
+    Function Description:
+    Determines whether to continue processing questions or end the session
+    based on presence of remaining input in the state.
+
     Input:
-    - state: Dictionary containing input query and remaining questions (dict)
-    
+    - state (dict): Contains:
+        - input (str): Next question to process or empty string
+        - remaining_qns (list): Any remaining questions
+
     Output:
-    - String indicating next stage ('router_agent' or '__end__')
-    '''
+    - str: Next processing stage ('router_agent' or '__end__')
+
+    Note:
+    - Returns '__end__' when no more questions to process
+    - Maintains processing loop while questions remain
+    """
     
     print(graph_stage_prefix, "Multiple Question Router")
     if state["input"]:
