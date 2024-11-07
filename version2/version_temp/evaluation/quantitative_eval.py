@@ -13,11 +13,30 @@ from lang_graph.lang_graph import Graph
 from python_agent.python_ai import Python_Ai
 
 class LanguageModelEvaluator:
+    """
+    A class for evaluating language model responses against ground truth for log analysis tasks.
+    """
     def __init__(self):
         self.df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
         
 
     def generate_response(self, prompt: str) -> str:
+        """
+        Generates a response using a language model for a given prompt about log analysis.
+
+        Function Description:
+        Uses a specialized pandas-aware language model to interpret and answer queries about log data.
+        The model is instructed to return executable code without function definitions.
+
+        Input:
+        - prompt (str): The user query about log data analysis
+
+        Output:
+        - str: The model's response, decoded if in bytes format
+
+        Note:
+        - Returns empty string if the model fails to generate a response
+        """
         PANDAS_LLM = 'jiayuan1/llm2'
         pandas_ai = Python_Ai(PANDAS_LLM, df=self.df).pandas_legend_with_skill()
         # graph = Graph(pandas_ai, self.df)
@@ -38,6 +57,21 @@ class LanguageModelEvaluator:
         return str(response)
 
     def extract_numeric_value(self, text: str) -> float:
+        """
+        Extracts the last numeric value from a text string.
+
+        Function Description:
+        Uses regex to find all numbers (including decimals) in the text and returns the last one found.
+
+        Input:
+        - text (str): Text containing numeric values
+
+        Output:
+        - float: The last numeric value found in the text
+
+        Note:
+        - Raises ValueError if no numeric value is found
+        """
         if isinstance(text, bytes):
             text = text.decode('utf-8')
         matches = re.findall(r'\d+(?:\.\d+)?', text)
@@ -47,6 +81,26 @@ class LanguageModelEvaluator:
             raise ValueError(f"No numeric value found in the text: {text}")
 
     def evaluate(self, log_file: str, ground_truth_file: str, prompts: List[str], metric_names: List[str], n: int) -> Dict[str, Dict]:
+        """
+        Evaluates model performance by comparing responses against ground truth values.
+
+        Function Description:
+        Runs multiple evaluations for each prompt, comparing model responses with expected values.
+        Tracks accuracy, timing, and stores all responses for analysis.
+
+        Input:
+        - log_file (str): Path to the structured log CSV file
+        - ground_truth_file (str): Path to JSON file containing correct answers
+        - prompts (List[str]): List of questions to ask the model
+        - metric_names (List[str]): Corresponding metric names for ground truth lookup
+        - n (int): Number of times to run each evaluation
+
+        Output:
+        - Dict[str, Dict]: Detailed results including accuracy, timing, and responses
+
+        Note:
+        - Returns empty dictionary if evaluation fails
+        """
         self.df = pd.read_csv(log_file)
 
         with open(ground_truth_file, 'r') as f:
@@ -111,6 +165,23 @@ class LanguageModelEvaluator:
         return results
 
     def save_results(self, results: Dict[str, Dict], output_file: str = None):
+        """
+        Saves evaluation results to a JSON file.
+
+        Function Description:
+        Creates a timestamped JSON file containing evaluation results and metadata.
+
+        Input:
+        - results (Dict[str, Dict]): Evaluation results to save
+        - output_file (str, optional): Custom output file path
+
+        Output:
+        - str: Path to the saved results file
+
+        Note:
+        - Creates default filename with timestamp if output_file is None
+        """
+
         if output_file is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             output_file = f"./results/quantitative_evaluation_results_{timestamp}.json"
@@ -129,6 +200,23 @@ class LanguageModelEvaluator:
         return output_file
 
 def run_train_evaluation():
+    """
+    Runs evaluation on Mac log dataset with predefined prompts.
+
+    Function Description:
+    Executes evaluation using Mac-specific log data and corresponding ground truth values.
+    Uses a set of predefined prompts focused on Mac log analysis.
+
+    Input:
+    None
+
+    Output:
+    - Dict[str, Dict]: Evaluation results
+
+    Note:
+    - Prompts user for number of evaluation runs
+    - Returns None if evaluation fails
+    """
     log_file = "Mac_2k.log_structured.csv"
     ground_truth_file = "mac_ground_truth.json"
     prompts = [
@@ -165,6 +253,23 @@ def run_train_evaluation():
     return results
 
 def run_test_evaluation():
+    """
+    Runs evaluation on Windows log dataset with predefined prompts.
+
+    Function Description:
+    Executes evaluation using Windows-specific log data and corresponding ground truth values.
+    Uses a set of predefined prompts focused on Windows log analysis.
+
+    Input:
+    None
+
+    Output:
+    - Dict[str, Dict]: Evaluation results
+
+    Note:
+    - Prompts user for number of evaluation runs
+    - Returns None if evaluation fails
+    """
     log_file = "Windows_2k.log_structured.csv"
     ground_truth_file = "windows_ground_truth.json"
     prompts = [
