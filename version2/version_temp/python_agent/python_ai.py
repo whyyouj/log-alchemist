@@ -21,28 +21,17 @@ class LangchainLLM(LLM):
 
     def __init__(self, langchain_llm: BaseLanguageModel):
         self.langchain_llm = langchain_llm
-        
-    # def code_formatter(self, code):
-    #     '''
-    #     Description: Formats the code using a specific model.
-        
-    #     Input:
-    #     - code: str
-        
-    #     Output:
-    #     - res: formatted code as str
-    #     '''
-    #     MODEL3='jiayuan1/nous_llm'
-    #     llm = Agent_Ai(model=MODEL3)
-    #     query = """Your role is to extract the code portion and format it with:
-    #         ```python
-
-    #         ```
-    #         Ensure result = {"type": ... , "value": ...} includes only "type" values: "string", "number", "dataframe", or "plot"."""
-    #     res = llm.query_agent(query= code + "\n" + query)
-    #     return res
 
     def code_formatter(self, code):
+        '''
+        Description: Formats the code using REGEX.
+        
+        Input:
+        - code: str
+        
+        Output:
+        - res: formatted code as str
+        '''
         import re
         pattern = r"(import.*?result\s*=\s*\{.*?\})" #r"(import.*?result\s*=\s*\{.*?\})"
 
@@ -66,9 +55,9 @@ class LangchainLLM(LLM):
                 if count != 0:
                     extracted_code+= "\"}"
             
-            print("[AI]", extracted_code)
+            # print("[AI]", extracted_code)
             
-            return f"```python \n {extracted_code}\n```"
+            return f"```python\n{extracted_code}\n```"
             
         else:
             return code
@@ -102,8 +91,6 @@ class LangchainLLM(LLM):
         memory = context.memory if context else None
         prompt = self.prepend_system_prompt(prompt, memory)
         self.last_prompt = prompt
-        prompt = prompt + """
-        """
         prompt = prompt + """
         """
         
@@ -518,6 +505,7 @@ class Python_Ai:
                 "open_charts":False,
                 "enable_cache" : False,
                 "save_charts": True,
+                # "verbose": True,
                 "max_retries": 3,
                 "response_parser": StreamlitResponse,
                 "custom_whitelisted_dependencies": ["sweetviz", "collections", "pytz"]

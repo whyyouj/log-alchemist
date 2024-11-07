@@ -4,12 +4,8 @@ import pandas as pd
 import os, sys
 
 # Add the parent directory to system path for module imports
-
-# Add the parent directory to system path for module imports
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# Import custom AI agent modules
 
 # Import custom AI agent modules
 from regular_agent.agent_ai import Agent_Ai
@@ -19,31 +15,10 @@ import re
 import ast
 
 # Define constants
-# Define constants
 graph_stage_prefix = '[STAGE]'
 FINAL_LLM = "jiayuan1/nous_llm"
 
 def multiple_question_agent(state: list):
-    '''
-    Description:
-    This function contains an LLM that breaks down multiple response question into a list of dictionaries
-    that contains the type of question and the values with the parsed questions.
-    
-    Input:
-    - state: Dictionary containing:
-        - df: pandas DataFrame with the data
-        - input: User's input question(s)
-    
-    Output:
-    - Dictionary containing:
-        - input: First parsed question (str)
-        - remaining_qns: List of remaining questions
-        
-    Example:
-    Input: "How many rows are there and explain the dataset"
-    Output: [{"Pandas": "How many rows are there"}, {"Explain": "Explain the dataset"}]
-    '''
-    # Print the stage prefix for "Multiple Question Parser"
     '''
     Description:
     This function contains an LLM that breaks down multiple response question into a list of dictionaries
@@ -75,20 +50,12 @@ def multiple_question_agent(state: list):
     # Define a pattern to find any text within square brackets
     pattern = r'\[[^\]]+\]'
 
-    # Define a pattern to find any text within square brackets
-    pattern = r'\[[^\]]+\]'
     try:
-        # Use regex to find the first instance of text within square brackets in the output
         # Use regex to find the first instance of text within square brackets in the output
         parse_qns = re.findall(pattern, out)[0]
 
         # Replace special quotation marks with standard quotes
-
-        # Replace special quotation marks with standard quotes
         parse_qns = parse_qns.replace("“", """\"""")
-        parse_qns = parse_qns.replace("”", """\"""")
-
-        # Evaluate the formatted string to convert it into a list of questions
 
         # Evaluate the formatted string to convert it into a list of questions
         parse_qns_list = eval(f"""{parse_qns}""")
@@ -97,13 +64,7 @@ def multiple_question_agent(state: list):
         parse_qns_list = [state['input']]
 
     # Print the parsed question list
-        # If an error occurs, set the question list to include only the input
-        parse_qns_list = [state['input']]
-
-    # Print the parsed question list
     print(parse_qns_list)
-
-    # Return the first question as "input" and remaining questions as "remaining_qns"
 
     # Return the first question as "input" and remaining questions as "remaining_qns"
     return {"input": str(parse_qns_list[0]), "remaining_qns": parse_qns_list[1:]}
@@ -122,22 +83,7 @@ def router_agent(state: list):
     '''
     
     # Print the stage prefix for "Router Agent"
-    '''
-    
-    Description:
-    This function routes the input from the previous node to either the pandas agent (for pandas-related questions) or the final agent (for explanation or general questions).
-    
-    Input:
-    - state: Dictionary containing input query and other state information (dict)
-    
-    Output: 
-    - Dictionary containing routing decision ('agent_out') and processed input ('input')
-    '''
-    
-    # Print the stage prefix for "Router Agent"
     print(graph_stage_prefix, 'Router Agent')
-
-     # Get the input query from the state
 
      # Get the input query from the state
     query = state['input']
@@ -145,16 +91,12 @@ def router_agent(state: list):
     qns = '' # Initialize question content
     try:
         # Attempt to evaluate the query as a dictionary
-        # Attempt to evaluate the query as a dictionary
         parse_dict = eval(query)
         
-        # Iterate through the keys of the dictionary to extract question type and content
         # Iterate through the keys of the dictionary to extract question type and content
         for i in parse_dict.keys():
             qns_type = i
             qns = parse_dict[qns_type]
-            
-        # Determine output based on the question type    
             
         # Determine output based on the question type    
         if "pandas" in qns_type.lower():
@@ -166,10 +108,10 @@ def router_agent(state: list):
         
     except:
         # If parsing fails, set default values
-        if "pandas" in query.lower():
-            out = "yes"
-        else:
-            out = 'no'
+        # if "pandas" in query.lower():
+        #     out = "yes"
+        # else:
+        out = 'yes'
         input = query
         
     # Print the final output of the router agent   
@@ -191,20 +133,6 @@ def router_agent_decision(state: list):
     Output:
     - String indicating next agent ('python_pandas_ai' or 'final_agent')
     """
-
-    """
-    Make routing decision based on router agent output.
-    
-    Description:
-    Determines whether to route to pandas_ai or final_agent based on router output.
-    
-    Input:
-    - state: Dictionary containing router agent output (dict)
-    
-    Output:
-    - String indicating next agent ('python_pandas_ai' or 'final_agent')
-    """
-
     out = state['agent_out']
     if 'yes' in out.lower():
         return 'python_pandas_ai' 
@@ -214,19 +142,6 @@ def router_agent_decision(state: list):
 
     
 def python_pandas_ai(state:list):
-    """
-    Invoke the pandas AI agent to process the query.
-    
-    Description:
-    This function invokes the pandas AI agent to process the query and return the result.
-    
-    Input:
-    - state: Dictionary containing the pandas AI agent and input query (dict)
-    
-    Output:
-    - Dictionary containing the agent's output ('agent_out')
-    """
-    
     """
     Invoke the pandas AI agent to process the query.
     
@@ -297,28 +212,7 @@ def final_agent(state:list):
     '''
     
     # Print the stage prefix for "Final Agent"
-    '''
-    Handle non-Pandas related questions using an LLM.
-    
-    Description:
-    This function handles non-Pandas related questions by using an LLM.
-    It maintains a "knowledge base" from previous questions and answers, 
-    which acts as memory to assist in responding to follow-up questions.
-    
-    Input:
-    - state: Dictionary containing input query and all previous answers (dict)
-    
-    Output:
-    - Dictionary containing the agent's output ('agent_out')
-    '''
-    
-    # Print the stage prefix for "Final Agent"
     print(graph_stage_prefix, "Final Agent")
-        
-    # Initialize the LLM agent with the specified model
-    llm = Agent_Ai(model = FINAL_LLM)
-    
-    # Retrieve the user's query and all previous answers from the state
         
     # Initialize the LLM agent with the specified model
     llm = Agent_Ai(model = FINAL_LLM)
@@ -328,20 +222,13 @@ def final_agent(state:list):
     previous_ans = state['all_answer']
     
     # Initialize a string to format previous answers as a knowledge base
-    
-    # Initialize a string to format previous answers as a knowledge base
     previous_ans_format = "Here is you knowledge base:\n"
-    
-    # If there are previous answers, format each as Q&A pairs to add to the knowledge base
     
     # If there are previous answers, format each as Q&A pairs to add to the knowledge base
     if previous_ans:
         for i in previous_ans:
             qns = i['qns']
             ans = i['ans']
-            
-            # If the answer is a DataFrame, convert to JSON (limited to the first 10 rows for brevity)
-            
             # If the answer is a DataFrame, convert to JSON (limited to the first 10 rows for brevity)
             if isinstance(ans, pd.DataFrame):
                 try:
@@ -364,17 +251,12 @@ def final_agent(state:list):
             previous_ans_format += f"Answer: {ans}" + "\n\n"
             
         # Add instructions for using the knowledge base to answer the question    
-            
-        # Add instructions for using the knowledge base to answer the question    
         previous_ans_format += "You should use the information above to answer the following question directly and concisely. If the user's question is not related to the knowledge base, answer it directly without using the knowledge base."
     
     
     else:
         # If no previous answers, set knowledge base format to empty
-        # If no previous answers, set knowledge base format to empty
         previous_ans_format = ""
-    
-    # Construct the final prompt with knowledge base and user's question
     
     # Construct the final prompt with knowledge base and user's question
     prompt = f"""
