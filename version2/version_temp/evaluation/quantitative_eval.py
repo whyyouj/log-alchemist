@@ -192,13 +192,8 @@ def run_test_evaluation():
     return results
 
 
-def main():
-    # res = run_train_evaluation()
-    res = run_test_evaluation()
+# def main():
+#     res = run_train_evaluation()
+#     res = run_test_evaluation()
 
-    return res
-
-if __name__ == "__main__":
-    evaluation_results = main()
-    
-global_graph = None
+#     return res
