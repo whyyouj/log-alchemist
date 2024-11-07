@@ -221,14 +221,23 @@ def top_spikes():
 
 def top_spikes_analysis():
     """
-    
-    Description:
-    This function identifies the events that occurred during the highest spike and generates a plotly table.
-    
-    Input: None
-    
+    Analyzes the highest activity spike in the system logs.
+
+    Function Description:
+    Creates a detailed breakdown of events that occurred
+    during this spike period, including their EventIDs and templates, to help
+    understand what caused the spike in system activity.
+
+    Input:
+    - None (uses global structured_system_log_df and template_system_log_df)
+
     Output:
-    - fig: A plotly figure object containing the table.
+    - fig (plotly.graph_objects.Figure): A table showing events during the spike period,
+      with columns for EventID/Type and Count
+
+    Note:
+    - Returns empty figure if no events found in the specified timeframe
+    - Requires both structured and template log DataFrames to be properly loaded
     """
     fouth_of_july_df = structured_system_log_df[(structured_system_log_df['Month']=='Jul') & (structured_system_log_df['Date']== 4)]
     spike_df = fouth_of_july_df[(fouth_of_july_df["Time"] >= "23:22:00") & (fouth_of_july_df["Time"] < "23:23:00")]
