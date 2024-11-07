@@ -1,19 +1,34 @@
-from typing import TypedDict, Annotated, List, Union, Optional, Dict
+# Import required libraries
+from typing import TypedDict, Annotated, List, Union
 from langchain_core.agents import AgentAction, AgentFinish
 import operator
 from langgraph.graph import StateGraph, END, START
 import pandas as pd
 import os, sys
+
+# Add the parent directory to the system path for module imports
 sys.path.insert(1, "/".join(os.path.realpath(__file__).split("/")[0:-2]))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Importing our custom AI modules
 from python_agent.python_ai import Python_Ai
 from regular_agent.agent_ai import Agent_Ai
 from lang_graph.lang_graph_utils import multiple_question_agent, router_agent,router_agent_decision, python_pandas_ai, router_python_output, final_agent, multiple_question_parser, router_multiple_question
 
 class AgentState(TypedDict):
-    
     '''
-    The variables that will be present in the state of the Lang Graph
+    Description: A TypedDict to define the state of an agent.
+    
+    Input: 
+    - input: str
+    - agent_out: Union[AgentAction, AgentFinish, None]
+    - intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+    - pandas: Python_Ai
+    - df: pd.DataFrame
+    - remaining_qns: list
+    - all_answer: list
+    
+    Output: None
     '''
     
     input: str
@@ -27,6 +42,15 @@ class AgentState(TypedDict):
     
 class Graph:
     def __init__(self, pandas_llm, df):
+        '''
+        Description: Initializes the Graph object with a pandas LLM and a DataFrame.
+        
+        Input:
+        - pandas_llm: Python_Ai
+        - df: pd.DataFrame
+        
+        Output: None
+        '''
         self.pandas = pandas_llm
         self.df = df
         self.qns = ''
@@ -34,9 +58,13 @@ class Graph:
     
     @staticmethod
     def get_graph():
-        
         '''
-        The function that builds the graph
+        Description: Builds and compiles the state graph.
+        
+        Input: None
+        
+        Output: 
+        - runnable: Compiled state graph
         '''
         
         graph = StateGraph(AgentState)
@@ -85,9 +113,14 @@ class Graph:
         return runnable
     
     def run(self, query):
-        
         '''
-        The function that will run a user query using the Lang Graph
+        Description: Runs a user query using the Lang Graph.
+        
+        Input:
+        - query: str
+        
+        Output:
+        - out['all_answer']: list
         '''
         
         runnable = self.graph
@@ -96,9 +129,13 @@ class Graph:
         return out['all_answer']
     
     def show(self):
-        
         '''
-        Plot the Lang Graph to have a visualisation of a plot of how the graph will look
+        Description: Plots the Lang Graph to visualize how the graph will look.
+        
+        Input: None
+        
+        Output:
+        - path to the saved image: str
         '''
         
         from PIL import Image as PILImage
@@ -112,6 +149,14 @@ class Graph:
         return "./image/lang_chain_graph_pandas_new2.png"
     
     def create_graph():
+        '''
+        Description: Creates a global graph object.
+        
+        Input: None
+        
+        Output:
+        - global_graph: Graph
+        '''
         global global_graph
         df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
         pandas_ai = Python_Ai(model='llama3.1',df=df).pandas_legend()
