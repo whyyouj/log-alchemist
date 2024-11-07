@@ -44,13 +44,22 @@ st.set_page_config(
 )
 
 def apply_css():
-    '''
-    Description: Insert custom CSS for glowing effect and sidebar styling.
-    
+    """
+    Applies custom CSS styling to the Streamlit application interface.
+
+    Function Description:
+    Injects custom CSS code to style various elements including the sidebar, chat input,
+    hover effects, glowing effects, and button styling. Enhances visual appearance and
+    user experience of the application.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Changes are applied directly to Streamlit's UI components through st.markdown
+    - If CSS fails to apply, UI will fall back to Streamlit's default styling
+    """
     st.markdown(
         """
         <style>
@@ -148,15 +157,23 @@ def apply_css():
     )
 
 def img_to_base64(image_path):
-    '''
-    Description: Convert images to base64 format for display in the app.
-    
+    """
+    Converts an image file to base64 encoded string format.
+
+    Function Description:
+    Reads an image file from the given path and converts it to a base64 encoded string,
+    making it suitable for embedding in HTML/CSS.
+
     Input:
-    - image_path: str
-    
+    - image_path (str): File path to the image to be converted
+
     Output:
-    - base64 string of the image: str
-    '''
+    - str: Base64 encoded string of the image, or None if conversion fails
+
+    Note:
+    - Returns None if file reading or conversion fails
+    - Logs error message if operation fails
+    """
     
     try:
         with open(image_path, 'rb') as file:
@@ -166,13 +183,21 @@ def img_to_base64(image_path):
         return None
 
 def st_title():
-    '''
-    Description: Display the title and logo of the app.
-    
+    """
+    Displays the application title and logo in the main interface.
+
+    Function Description:
+    Creates a header section containing the application logo and title "Vantage AI"
+    using HTML formatting for custom styling.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - If logo image fails to load, only title text will be displayed
+    - Uses HTML/CSS for custom formatting through st.markdown
+    """
     img_path = "imgs/vantage_logo.png"
     img_base64 = img_to_base64(img_path)
 
@@ -184,13 +209,21 @@ def st_title():
         ''', unsafe_allow_html=True)
 
 def st_sidebar():
-    '''
-    Description: Display the sidebar with buttons and logo.
-    
+    """
+    Displays and manages the application's sidebar interface.
+
+    Function Description:
+    Creates and renders the sidebar containing navigation buttons, logos, and styling.
+    Handles mode switching between chat, file upload, and about pages.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Updates st.session_state.mode based on button interactions
+    - If logos fail to load, sidebar will display without images
+    """
     img_path = "imgs/chatbot_logo.webp"
     img_base64 = img_to_base64(img_path)
     if img_base64:
@@ -316,6 +349,21 @@ def st_sidebar():
         )
 
 def st_chatpage():
+    """
+    Renders the main chat interface page.
+
+    Function Description:
+    Creates a two-column layout with log selection dropdown and chat history.
+    Manages chat input/output and displays message history with proper formatting.
+
+    Input: None
+
+    Output: None
+
+    Note:
+    - Updates chat history in session state
+    - Displays error message if chat processing fails
+    """
     main_col1, main_col2 = st.columns([1, 2])
     with main_col1:
         df_option = st.selectbox(
@@ -372,6 +420,21 @@ def st_chatpage():
         ) 
 
 def st_aboutpage():
+    """
+    Displays the About page with application information.
+
+    Function Description:
+    Renders formatted sections explaining Vantage AI's purpose, usage instructions,
+    limitations, and contact information.
+
+    Input: None
+
+    Output: None
+
+    Note:
+    - Uses HTML/CSS formatting for enhanced visual presentation
+    - Content is static and informational
+    """
     st.subheader('What is Vantage AI?')
     st.markdown("""
                 <div class='aboutcontent'>
@@ -421,13 +484,21 @@ def st_aboutpage():
                 """, unsafe_allow_html=True)
 
 def st_fileuploader():
-    '''
-    Description: Display the file uploader interface.
-    
+    """
+    Manages the file upload interface and functionality.
+
+    Function Description:
+    Creates a two-column layout showing uploaded files and upload controls.
+    Provides options for both individual file uploads and folder uploads.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Updates st.session_state.csv_filepaths with new uploads
+    - Displays success/error messages for upload operations
+    """
     col1, col2 = st.columns(2)
     with col1:
         st.subheader('Uploaded Files')
@@ -443,13 +514,21 @@ def st_fileuploader():
         display_file_uploader()
 
 def display_file_uploader():
-    '''
-    Description: Display the file uploader form.
-    
+    """
+    Renders the file upload form components.
+
+    Function Description:
+    Creates and displays two forms: one for individual file uploads
+    and another for folder path submission.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Supports only CSV file uploads
+    - Shows temporary success messages after successful uploads
+    """
     with st.form(key = "fileupload_form"):
         #desired file types: type=['pdf', 'txt', 'log', 'docx', 'csv']
         uploaded_files = st.file_uploader("Upload your log files", type=['csv'], 
@@ -475,14 +554,22 @@ def display_file_uploader():
         st.rerun()
         
 def on_file_submit(uploaded_files):
-    '''
-    Description: Handle file upload submission.
-    
+    """
+    Processes submitted files and updates application state.
+
+    Function Description:
+    Handles file upload submissions by creating temporary files and
+    updating the application's filepath dictionaries.
+
     Input:
-    - uploaded_files: list of uploaded files
-    
+    - uploaded_files (list): List of uploaded file objects from Streamlit
+
     Output: None
-    '''
+
+    Note:
+    - Updates st.session_state.filepaths and st.session_state.csv_filepaths
+    - Creates temporary files for uploaded content
+    """
     filepaths = st.session_state.filepaths.copy()
     csv_filepaths = st.session_state.csv_filepaths.copy()
 
@@ -506,14 +593,22 @@ def on_file_submit(uploaded_files):
         # update_langgraph()
 
 def on_folder_submit(abs_folderpath):
-    '''
-    Description: Handle folder upload submission.
-    
+    """
+    Processes folder path submission and validates contents.
+
+    Function Description:
+    Validates the submitted folder path and processes compatible files
+    within size limits, updating application state accordingly.
+
     Input:
-    - abs_folderpath: str
-    
+    - abs_folderpath (str): Absolute path to folder containing log files
+
     Output: None
-    '''
+
+    Note:
+    - Enforces 40MB file size limit
+    - Shows error messages for invalid paths
+    """
     abs_folderpath = abs_folderpath.strip()
     if len(abs_folderpath) == 0:
         return
@@ -554,13 +649,21 @@ def on_folder_submit(abs_folderpath):
             # update_langgraph()
 
 def clear_files():
-    '''
-    Description: Clear all uploaded files.
-    
+    """
+    Clears all uploaded files from the application state.
+
+    Function Description:
+    Removes temporary files from disk and clears file path dictionaries 
+    in the session state.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Deletes temporary files from system
+    - Resets file path dictionaries to empty
+    """
     for file in list(st.session_state.filepaths.values()) + list(st.session_state.csv_filepaths.values()):
         if isinstance(file, tempfile._TemporaryFileWrapper):
             os.remove(file.name)
@@ -572,6 +675,9 @@ def clear_files():
 def output(message):
     
     '''
+    
+    Formats and displays chat messages in the interface.
+
     This function formats and displays the output after invoking the language processing graph.
     It ensures images are encoded in base64 format and that HTML content is rendered using `components.html`.
     The `user` message format is a string: `message['content'] = str`
@@ -579,9 +685,13 @@ def output(message):
     This function processes the input to correctly recognize user and assistant messages and renders them appropriately.
     
     Input:
-    - message: dict
-    
+    - message (dict): Message object containing role and content
+
     Output: None
+
+    Note:
+    - Handles HTML, images, and text content differently
+    - Uses custom avatars for different message roles
     '''
     
     role = message["role"]
@@ -638,13 +748,20 @@ def output(message):
 
 async def on_chat_submit(chat_input):
     """
-    Handle chat input submissions and interact with the LLM.
+    Processes chat input asynchronously through the language model.
 
-    Parameters:
-    - chat_input (str): The chat input from the user.
+    Function Description:
+    Sends user input to the language model graph and updates conversation
+    history with the response asynchronously.
 
-    Returns:
-    - None: Updates the chat history in Streamlit's session state.
+    Input:
+    - chat_input (str): User's chat message
+
+    Output: None
+
+    Note:
+    - Handles errors with appropriate error messages
+    - Updates session state with model response
     """
 
     try:
@@ -660,14 +777,22 @@ async def on_chat_submit(chat_input):
         error_message.empty()
 
 def run_async_task(chat_input):
-    '''
-    Description: Run the async function within an event loop and display a spinner while processing.
-    
+    """
+    Executes chat processing in an asynchronous context.
+
+    Function Description:
+    Creates and manages an asyncio event loop for processing chat input,
+    displaying a loading spinner during execution.
+
     Input:
-    - chat_input: str
-    
+    - chat_input (str): User's chat message to process
+
     Output: None
-    '''
+
+    Note:
+    - Updates chat history with processed response
+    - Shows loading spinner during processing
+    """
     with st.spinner("Thinking..."):
         # Run the async function within an event loop
         loop = asyncio.new_event_loop()
@@ -677,14 +802,21 @@ def run_async_task(chat_input):
         st.session_state.response_out = True
 
 def initialize_conversation():
-    '''
-    Description: Initialize the conversation history with a welcome message from the assistant.
-    
+    """
+    Creates initial conversation state with welcome message.
+
+    Function Description:
+    Initializes the chat history with a welcome message from the assistant,
+    setting up the conversation structure.
+
     Input: None
-    
+
     Output:
-    - conversation_history: list of dict
-    '''
+    - list: Initial conversation history with welcome message
+
+    Note:
+    - Sets standard format for chat history structure
+    """
     assistant_message = "Hello! I am Vantage AI. How can I assist you today?"
     conversation_history = [
         {"role":"assistant", "content":[ {"qns":"Begin", "ans": assistant_message} ]}
@@ -692,26 +824,43 @@ def initialize_conversation():
     return conversation_history
 
 def initialize_langgraph():
-    '''
-    Description: Initialize the LangGraph with a general LLM model.
-    
+    """
+    Initializes the language model graph for chat processing.
+
+    Function Description:
+    Creates a new Agent_Ai instance with the specified general language model
+    for handling chat interactions.
+
     Input: None
-    
+
     Output:
-    - agent: Agent_Ai object
-    '''
+    - Agent_Ai: Initialized agent object for processing chat
+
+    Note:
+    - Uses GENERAL_LLM constant for model selection
+    - Prints confirmation message when initialized
+    """
     agent = Agent_Ai(model= GENERAL_LLM)
     print('LangGraph Initialized')
     return agent
 
 def initialize_session_state():
-    '''
-    Description: Initialize session state variables.
-    
+    """
+    Initializes all required session state variables for the application.
+
+    Function Description:
+    Sets up initial values for conversation history, application mode, button states,
+    file paths, and other necessary session variables. Also initializes the language
+    model graph and loads default log files if specified.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Creates new session state variables if they don't exist
+    - Loads default logs from '../logs/Test' if available
+    """
     if "history" not in st.session_state:
         st.session_state.history = initialize_conversation()
     if "mode" not in st.session_state:
@@ -733,25 +882,41 @@ def initialize_session_state():
         st.session_state.response_out = False
 
 def reset_session_state():
-    '''
-    Description: Reset session state variables to their initial values.
-    
+    """
+    Resets the application session state to initial values.
+
+    Function Description:
+    Resets conversation history, mode, and response flags to their
+    default values, effectively restarting the chat session.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Maintains file uploads and configurations
+    - Only resets conversation-related state
+    """
     st.session_state.history = initialize_conversation()
     st.session_state.mode = "Chat with VantageAI"
     st.session_state.response_out = False
 
 def update_langgraph():
-    '''
-    Description: Update the LangGraph with the uploaded CSV files.
-    
+    """
+    Updates the language model graph with current CSV files.
+
+    Function Description:
+    Refreshes the language model's context with currently uploaded
+    CSV files for improved processing accuracy.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Called when CSV files are added/removed
+    - Updates model's understanding of available data
+    """
     df_list = []
     for file in st.session_state.csv_filepaths.values():
         file_path = file
@@ -769,14 +934,22 @@ def update_langgraph():
     print("LangGraph Updated")
 
 def update_selected_log(df_option):
-    '''
-    Description: Update the LangGraph with the selected log file.
-    
+    """
+    Updates the LangGraph with the currently selected log file.
+
+    Function Description:
+    Loads the selected CSV file, processes datetime formatting, initializes a new Python_Ai 
+    instance with the processed data, and updates the graph in session state.
+
     Input:
-    - df_option: str
-    
+    - df_option (str): Name of the selected log file from dropdown
+
     Output: None
-    '''
+
+    Note:
+    - Updates st.session_state.graph and st.session_state.selected_df
+    - If file processing fails, graph will not be updated
+    """
     df_list = []
 
     if df_option is not None:
@@ -797,13 +970,21 @@ def update_selected_log(df_option):
     print("LangGraph updated with selected log:", df_option)
 
 def main():
-    '''
-    Description: Main function to display the chat interface and handle user interactions :D
-    
+    """
+    Application entry point and main execution flow.
+
+    Function Description:
+    Initializes application state, sets up UI components, and manages
+    mode switching between different application views.
+
     Input: None
-    
+
     Output: None
-    '''
+
+    Note:
+    - Controls overall application flow and state management
+    - Handles page reloading when necessary
+    """
     
     initialize_session_state()
 
