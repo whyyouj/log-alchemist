@@ -87,10 +87,23 @@ class LangchainLLM(LLM):
         Output:
         - res: str
         '''
+        '''
+        Description: Calls the Langchain LLM with a given instruction and context.
+        
+        Input:
+        - instruction: BasePrompt
+        - context: PipelineContext (optional)
+        - suffix: str (optional)
+        
+        Output:
+        - res: str
+        '''
         prompt = instruction.to_string() + suffix
         memory = context.memory if context else None
         prompt = self.prepend_system_prompt(prompt, memory)
         self.last_prompt = prompt
+        prompt = prompt + """
+        """
         prompt = prompt + """
         """
         
@@ -118,15 +131,27 @@ class LangchainLLM(LLM):
         Output:
         - str: type of the Langchain LLM
         '''
+        '''
+        Description: Returns the type of the Langchain LLM.
+        
+        Input: None
+        
+        Output:
+        - str: type of the Langchain LLM
+        '''
         return f"langchain_{self.langchain_llm._llm_type}"
 
 @skill
+def overall_summary(df):
 def overall_summary(df):
     """
     Use this for any question regarding an Overall Summary
     The output type will be a string
     Args:
         df pd.DataFrame: A pandas dataframe 
+    
+    Output:
+        - tempfile_path: str
     
     Output:
         - tempfile_path: str

@@ -3,8 +3,8 @@ import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
 # File paths for the structured and template system logs
-structured_system_log = './data/mac/Mac_2k.log_structured.csv'
-template_system_log = './data/mac/Mac_2k.log_templates.csv'
+structured_system_log = '../logs/Mac/Mac_2k.log_structured.csv'
+template_system_log = '../logs/Mac/Mac_2k.log_templates.csv'
 
 # Read the relevant CSV files into DataFrames
 structured_system_log_df = pd.read_csv(structured_system_log)

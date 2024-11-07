@@ -27,18 +27,18 @@ GENERAL_LLM = "jiayuan1/nous_llm"
 
 # Setting up the Streamlit page configuration
 st.set_page_config(
-    page_title="Vantage Assistant",
+    page_title="Vantage AI",
     page_icon="imgs/vantage_logo.png",
     layout="wide",
     initial_sidebar_state="auto",
     menu_items={
         "About": """
-            ## Vantage AI Assistant
-            ### Powered using Llama 3.1
+            ## Vantage AI
+            #### The AI Assistant that performs log analysis
 
-            **Vantage Point Security**:https://vantagepoint.sg
+            **Contact Vantage Point Security:**  
+            **https://vantagepoint.sg**
 
-            The AI Assistant that performs log analysis.
         """
     }
 )
@@ -113,6 +113,36 @@ def apply_css():
                 0 0 1.8em rgba(0, 170, 255, 1.2);
             transition: transform 0.3s ease, box-shadow 0.5s ease; /* Smooth transition for hover */
         }
+
+        #backtotop {
+            background-color: #74a7cc; /* Darker blue on hover */
+            color: white; /* Text color */
+            border: none; /* No border */
+            border-radius: 30px; /* Rounded corners */
+            font-size: 3px; /* Font size */
+            cursor: pointer; /* Pointer cursor */
+            transition: background-color 0.3s ease; /* Smooth transition */
+            display: inline-block;
+        }
+
+        .aboutheader {
+            background-color: #2a7bb5; /* Darker blue on hover */
+            color: white; /* Text color */
+            border-style: solid;
+            border-width: 3px;
+            border-radius: 30px; /* Rounded corners */
+            padding: 10px 20px; /* Vertical and horizontal padding */
+            font-size: 25px; /* Font size */
+            cursor: pointer; /* Pointer cursor */
+            transition: background-color 0.3s ease; /* Smooth transition */
+            display: inline-block;
+            margin: 10px 0px 10px 0px;
+        }
+
+        .aboutcontent {
+            padding: 2px 20px;
+            text-align: justify;
+        }
         </style>""",
         unsafe_allow_html=True,
     )
@@ -147,7 +177,7 @@ def st_title():
     img_base64 = img_to_base64(img_path)
 
     st.markdown(f'''
-        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <div id='topsection' style="display: flex; align-items: center; margin-bottom: 20px;">
             <img src="data:image/png;base64,{img_base64}" style="width:50px; height:50px; margin-right: 10px;"/>
             <h1 style="display: inline; color: #020024">Vantage AI</h1>
         </div>
@@ -239,18 +269,29 @@ def st_sidebar():
     # Sidebar buttons
 
     if st.session_state.mode == "Chat with VantageAI":
-        chat_var = "chat1"
-        chat_var2 = "chat"
+        chat_id = "chat1"
+        upload_id = "chat"
+        about_id = "chat"
+    elif st.session_state.mode == "Upload File":
+        chat_id = "chat"
+        upload_id = "chat1"
+        about_id = "chat"
     else:
-        chat_var = "chat"
-        chat_var2 = "chat1"
+        chat_id = "chat"
+        upload_id = "chat"
+        about_id = "chat1"
+
+    st.sidebar.markdown(f'<span id={about_id}></span>', unsafe_allow_html=True)
+    if st.sidebar.button("About"):
+        st.session_state.mode = "About"
+        st.session_state.button = True
     
-    st.sidebar.markdown(f'<span id={chat_var}></span>', unsafe_allow_html=True)
+    st.sidebar.markdown(f'<span id={chat_id}></span>', unsafe_allow_html=True)
     if st.sidebar.button("My Chat", key = "ai"):
         st.session_state.mode = "Chat with VantageAI"
         st.session_state.button = True
 
-    st.sidebar.markdown(f'<span id={chat_var2}></span>', unsafe_allow_html=True)
+    st.sidebar.markdown(f'<span id={upload_id}></span>', unsafe_allow_html=True)
     if st.sidebar.button("Upload File", key = "up"):
         st.session_state.mode = "Upload File"
         st.session_state.button = True
@@ -273,6 +314,111 @@ def st_sidebar():
             """,
             unsafe_allow_html=True
         )
+
+def st_chatpage():
+    main_col1, main_col2 = st.columns([1, 2])
+    with main_col1:
+        df_option = st.selectbox(
+            "Select a log to query",
+            options=st.session_state.csv_filepaths.keys(),
+            index=list(st.session_state.csv_filepaths.keys()).index(st.session_state.selected_df) if st.session_state.selected_df is not None else None,
+            placeholder="Select a log to query",
+            label_visibility='collapsed'
+        ) 
+
+        if df_option != st.session_state.selected_df:
+            update_selected_log(df_option)
+    
+    st.markdown(
+        """
+        <style>
+            .stChatMessage.st-emotion-cache-1c7y2kd.eeusbqq4 {
+                flex-direction: row-reverse; /* Align children to the right */
+                text-align: right; /* Align text to the right */
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    for message in st.session_state.history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
+        output(message=message)
+
+    if chat_input := st.chat_input("Ask a question"):
+
+        st.session_state.response_out = False
+        st.session_state.history.append({"role": "user", "content": chat_input})
+        output(message=st.session_state.history[-1])
+
+        try:
+            run_async_task(chat_input)
+        except Exception as e:
+            print(e)
+            st.write("Please rephrase your question or restart the chat.")
+
+    if st.session_state.response_out:
+        st.markdown(
+            """ 
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,200,0,0&icon_names=arrow_upward" />
+            <a target="_self" href="#topsection">
+                <button id="backtotop">
+                    <span id="topicon" class="material-symbols-outlined" title="Back to top">
+                        arrow_upward
+                    </span>
+                </button>
+            </a>
+            """, 
+            unsafe_allow_html=True
+        ) 
+
+def st_aboutpage():
+    st.subheader('What is Vantage AI?')
+    st.markdown("""
+                <div class='aboutcontent'>
+
+                **Vantage AI is a multifunctional chatbot with a focus on log analysis!**  
+                
+                **Timely insights from system, audit, and transaction logs are essential for maintaining system health, troubleshooting issues, and ensuring security and compliance. Audit logs capture critical system access events, transaction logs record specific application activities, and system logs monitor general performance and errors. Analysing these logs manually is time-consuming and complex, particularly as log data volumes grow.**
+
+                **Vantage AI enables users to upload their own audit, transaction, and system logs, and quickly query, analyse, and interpret them through natural language interaction. Hence, Vantage AI can streamline troubleshooting, enhance audit reporting, and allow even non-technical users to investigate issues independently, automatically identifying patterns, providing insights, and suggesting solutions.**
+                </div>
+                """, unsafe_allow_html=True)
+
+    st.subheader('How to use Vantage AI')
+    st.markdown("""
+                <div class='aboutcontent'>
+
+                - **Upload your logs by selecting them from your files or inputting an absolute folder path.**
+
+                - **Using the provided dropdown at the top of the chat, select the log you wish to query and analyse.**
+
+                - **Query the log you selected! Vantage AI is able to answer questions on the selected log, provide summaries, analyse for anomalies, and even plot graphs for data visualisation!**
+
+                - **You may also input generic queries unrelated to your logs! Vantage AI will respond to them like a regular chatbot!**
+                </div>
+                """, unsafe_allow_html=True)
+    
+    st.subheader('Remarks')
+    st.markdown("""
+                <div class='aboutcontent'>
+
+                - **Vantage AI processes suitable datetime columns, so there might be changes in the datetime columns of your logs.**
+
+                - **The size limit per log file is 50MB. Log files which exceed the size limit are not accepted.**
+
+                - **The response time of Vantage AI varies according to the complexity of the query and the size of the selected log.**
+
+                - **Try to provide more context in your queries to allow Vantage AI to generate better responses.**
+                </div>
+                """, unsafe_allow_html=True)
+    
+    st.subheader('Contact Us')
+    st.markdown("""
+                <div class='aboutcontent'>
+
+                **Website: https://vantagepoint.sg**
+                </div>
+                """, unsafe_allow_html=True)
 
 def st_fileuploader():
     '''
@@ -390,11 +536,13 @@ def on_folder_submit(abs_folderpath):
         csv_filepaths = st.session_state.csv_filepaths.copy()
 
         for file in os.listdir(abs_folderpath):
-            if os.path.isfile(abs_folderpath + file):
+            abs_path = abs_folderpath + file
+            #check that abs_path is an existing regular file and file is within size limit of 40MB
+            if os.path.isfile(abs_path) and (os.path.getsize(abs_path) / 10**6 <= 40):
                 if file.endswith('.csv'):
-                    csv_filepaths[file] = abs_folderpath + file
+                    csv_filepaths[file] = abs_path
                 elif not file.endswith('.DS_Store'):
-                    filepaths[file] = abs_folderpath + file
+                    filepaths[file] = abs_path
         
         if filepaths != st.session_state.filepaths:
             st.session_state.filepaths = filepaths
@@ -421,7 +569,6 @@ def clear_files():
     print('Uploaded Files Cleared')
     # update_langgraph()
 
-
 def output(message):
     
     '''
@@ -441,10 +588,12 @@ def output(message):
     avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
     
     with st.chat_message(role, avatar=avatar_image):
-        if role == 'user':
+        #if the message from user or assistant is just a string, output it without formatting
+        if isinstance(message['content'], str):
             st.write(message['content'])
             return 
-        #Determine whether a not to break the question down
+
+        #if assistant message is a list of dict, determine whether a not to break the question down
         format = True
         if len(message['content']) == 1:
             format = False
@@ -497,16 +646,12 @@ async def on_chat_submit(chat_input):
     Returns:
     - None: Updates the chat history in Streamlit's session state.
     """
-    user_input = chat_input
-
 
     try:
         graph = st.session_state.graph
-        out = graph.run(user_input)
-        assistant_reply = out 
+        out = graph.run(chat_input)
 
-        st.session_state.history.append({"role": "user", "content": user_input})
-        st.session_state.history.append({"role": "assistant", "content": assistant_reply})
+        st.session_state.history.append({"role": "assistant", "content": out})
 
     except Exception as e:
         logging.error(f"Error occurred: {e}")
@@ -529,6 +674,7 @@ def run_async_task(chat_input):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(on_chat_submit(chat_input))
         output(st.session_state.history[-1])
+        st.session_state.response_out = True
 
 def initialize_conversation():
     '''
@@ -576,13 +722,15 @@ def initialize_session_state():
         st.session_state.filepaths = {}
     if "csv_filepaths" not in st.session_state:
         st.session_state.csv_filepaths = {}
-        #for testing: set a fixed directory from which to retrieve the logs
+        #default folder path: set a fixed directory from which to retrieve the logs
         default_abs_folder = os.path.abspath('../logs/Test')
         on_folder_submit(default_abs_folder)
     if "graph" not in st.session_state:
         st.session_state.graph = initialize_langgraph()
     if "selected_df" not in st.session_state:
         st.session_state.selected_df = None
+    if "response_out" not in st.session_state:
+        st.session_state.response_out = False
 
 def reset_session_state():
     '''
@@ -594,7 +742,7 @@ def reset_session_state():
     '''
     st.session_state.history = initialize_conversation()
     st.session_state.mode = "Chat with VantageAI"
-    st.session_state.selected_df = None
+    st.session_state.response_out = False
 
 def update_langgraph():
     '''
@@ -664,50 +812,13 @@ def main():
     st_sidebar()
 
     if st.session_state.mode == "Chat with VantageAI":
-                
-        main_col1, main_col2 = st.columns([1, 2])
-        with main_col1:
-            df_option = st.selectbox(
-                "Select a log to query",
-                st.session_state.csv_filepaths.keys(),
-                index=None,
-                placeholder="Select a log to query",
-                label_visibility='collapsed'
-            ) 
-
-            if df_option != st.session_state.selected_df:
-                update_selected_log(df_option)
-        
-        st.markdown(
-                    """
-                    <style>
-                        .stChatMessage.st-emotion-cache-1c7y2kd.eeusbqq4 {
-                            flex-direction: row-reverse; /* Align children to the right */
-                            text-align: right; /* Align text to the right */
-                        }
-                    </style>
-                    """,
-                        unsafe_allow_html=True,
-                    )
-        
-        for message in st.session_state.history[-NUMBER_OF_MESSAGES_TO_DISPLAY:]:
-            output(message= message)
-
-        if chat_input := st.chat_input("Ask a question"):
-            role = "user"
-            avatar_image = "imgs/bot.png" if role == "assistant" else "imgs/user.png" if role == "user" else None
-
-            with st.chat_message(role, avatar=avatar_image):
-                st.write(chat_input)
-
-            try:
-                run_async_task(chat_input)
-            except Exception as e:
-                print(e)
-                st.write(f"<App> Please rephrase your question or restart the chat.")                
+        st_chatpage()           
 
     if st.session_state.mode == "Upload File":
         st_fileuploader()
+
+    if st.session_state.mode == "About":
+        st_aboutpage()
 
     if st.session_state.button:
         st.session_state.button = False

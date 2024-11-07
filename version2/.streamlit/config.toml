@@ -1,5 +1,7 @@
 [runner]
 fastReruns = false
+[server]
+maxUploadSize = 40
 [theme]
 primaryColor = '#55B2FF'
 backgroundColor = '#d4f1f4'
