@@ -143,7 +143,6 @@ class LangchainLLM(LLM):
 
 @skill
 def overall_summary(df):
-def overall_summary(df):
     """
     Use this for any question regarding an Overall Summary
     The output type will be a string
