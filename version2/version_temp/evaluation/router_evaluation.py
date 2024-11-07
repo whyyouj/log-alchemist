@@ -17,6 +17,24 @@ from lang_graph.lang_graph_utils import  router_agent
 
 
 def run_router_agent(query, df):
+    """
+    Processes a query using a router agent to determine appropriate responses based on the provided data.
+
+    Function Description:
+    This function takes a user query and a DataFrame containing log data, creates a state dictionary 
+    with these inputs, and passes them to a router agent. The router agent then determines the 
+    appropriate response based on the query's content and the available data.
+
+    Input:
+    - query (str): The user's question or query about the log data
+    - df (pandas.DataFrame): DataFrame containing the log data to be analyzed
+
+    Output:
+    - result (dict): Contains the router agent's response with a key 'agent_out' holding the answer
+    
+    Note:
+    - If the router_agent fails to process the query, it may return an error message or None
+    """
 
     state = {
         "input": query,  
