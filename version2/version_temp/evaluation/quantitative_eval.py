@@ -17,7 +17,7 @@ class LanguageModelEvaluator:
         self.df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
         
 
-    def generate_response(self, prompt: str) -> str
+    def generate_response(self, prompt: str) -> str:
         PANDAS_LLM = 'jiayuan1/llm2'
         pandas_ai = Python_Ai(PANDAS_LLM, df=self.df).pandas_legend_with_skill()
         # graph = Graph(pandas_ai, self.df)
