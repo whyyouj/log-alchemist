@@ -17,32 +17,21 @@ class LanguageModelEvaluator:
         self.df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
         
 
-    def generate_response(self, prompt: str) -> str:
-        PANDAS_LLM = 'jiayuan1/llm2'
-        pandas_ai = Python_Ai(PANDAS_LLM, df=self.df).pandas_legend_with_skill()
+    def generate_response(self, prompt: str) -> str
         PANDAS_LLM = 'jiayuan1/llm2'
         pandas_ai = Python_Ai(PANDAS_LLM, df=self.df).pandas_legend_with_skill()
         # graph = Graph(pandas_ai, self.df)
         query = f"""
         The following is the query from the user:
         {prompt}
-        query = f"""
-        The following is the query from the user:
-        {prompt}
 
-        You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
         You are to respond with a code output that answers the user query. The code must not be a function and must not have a return statement.
 
         You are to following the instructions below strictly:
         - Any query related to Date or Time, refer to the 'Datetime' column.
         - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
         """
-        You are to following the instructions below strictly:
-        - Any query related to Date or Time, refer to the 'Datetime' column.
-        - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
-        """
-        # response = graph.run(prompt)
-        response = pandas_ai.chat(query)
+        
         response = pandas_ai.chat(query)
         if isinstance(response, bytes):
             return response.decode('utf-8')
