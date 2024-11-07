@@ -14,20 +14,30 @@ template_system_log_df = pd.read_csv(template_system_log)
 # EventID
 def event_freq():
     """
-    
-    Description:
-    This function calculates the top 5 most frequent events and generates a plotly figure with a table and bar chart.
-    
-    Input: None
-    
-    Output:
-    - fig: A plotly figure object containing the table and bar chart
-    """
+    Analyzes and visualizes the frequency of system events.
 
+    Function Description:
+    Calculates the top 5 most frequent events from the system logs and creates a combined 
+    visualization with both a table showing event details and a bar chart showing event counts.
+    The table includes Event IDs and their corresponding patterns from the template log.
+
+    Input:
+    - None (uses global structured_system_log_df and template_system_log_df)
+
+    Output:
+    - fig (plotly.graph_objects.Figure): A composite figure containing both table and bar chart
+      of top 5 system events
+
+    Note:
+    - If no data is available, returns an empty figure
+    - Requires both structured and template log DataFrames to be properly loaded
+    """
+    # Global DataFrame objects for storing log data
     event_freq = structured_system_log_df['EventId'].value_counts()
     top_5_event_freq = event_freq.head(5)
     top_5_event_freq_plotly = top_5_event_freq.reset_index()
     top_5_event_freq_plotly.columns = ['EventId', 'count']
+    # Extract event explanations from template log
     explaination_list = []
     for i in top_5_event_freq_plotly['EventId']:
         explaination_list.append(template_system_log_df.loc[template_system_log_df['EventId'] == i]['EventTemplate'])
@@ -67,14 +77,22 @@ def event_freq():
 
 def component_freq():
     """
-    
-    Description:
-    This function calculates the top 5 most frequent components and generates a plotly bar chart.
-    
-    Input: None
-    
+    Analyzes and visualizes the frequency of system components.
+
+    Function Description:
+    Identifies and displays the top 5 most active components in the system logs through 
+    a bar chart visualization, helping identify which system components are generating 
+    the most log entries.
+
+    Input:
+    - None (uses global structured_system_log_df)
+
     Output:
-    - fig: A plotly figure object containing the bar chart.
+    - fig (plotly.graph_objects.Figure): A bar chart showing the frequency of top 5 components
+
+    Note:
+    - Returns empty figure if no component data is available
+    - Component names are displayed as-is from the log files
     """
     
     component_freq = structured_system_log_df['Component'].value_counts()
@@ -95,14 +113,21 @@ def component_freq():
     
 def user_freq():
     """
-    
-    Description:
-    This function calculates the top 5 most frequent users and generates a plotly bar chart.
-    
-    Input: None
-    
+    Analyzes and visualizes user activity frequency.
+
+    Function Description:
+    Creates a bar chart showing the top 5 most active users in the system logs,
+    helping identify which users are generating the most system events.
+
+    Input:
+    - None (uses global structured_system_log_df)
+
     Output:
-    - fig: A plotly figure object containing the bar chart.
+    - fig (plotly.graph_objects.Figure): A bar chart showing the frequency of top 5 users
+
+    Note:
+    - Returns empty figure if no user data is available
+    - System processes may be included as users
     """
     
     user_freq = structured_system_log_df['User'].value_counts()
@@ -123,15 +148,25 @@ def user_freq():
 
 def top_spikes():
     """
-    
-    Description:
-    This function calculates the top 5 usage spikes and generates a plotly figure with a line chart and table.
-    
-    Input: None
-    
+    Identifies and visualizes periods of high system activity.
+
+    Function Description:
+    Analyzes the log data to find periods with unusually high numbers of events (spikes),
+    creating a time series visualization with both a line chart showing overall activity
+    and a table highlighting the top 5 spike periods.
+
+    Input:
+    - None (uses global structured_system_log_df)
+
     Output:
-    - fig: A plotly figure object containing the line chart and table.
+    - fig (plotly.graph_objects.Figure): A composite figure with line chart and table
+      showing activity spikes
+
+    Note:
+    - Time series is resampled to minute intervals
+    - Returns empty figure if datetime conversion fails
     """
+    # Convert time strings to datetime objects for proper time series analysis
     structured_system_log_df['Datetime'] = pd.to_datetime(structured_system_log_df['Time'], format = '%H:%M:%S')
     time_series = structured_system_log_df.groupby(['Month', 'Date']).apply(
         lambda group: group.set_index('Datetime').resample('min').size()
@@ -229,14 +264,22 @@ def top_spikes_analysis():
 
 def inactivity():
     """
-    
-    Description:
-    This function calculates the top 3 periods of inactivity and generates a plotly table.
-    
-    Input: None
-    
+    Identifies and displays significant system inactivity periods.
+
+    Function Description:
+    Analyzes the log data to find the top 3 longest periods where no system events 
+    were recorded, potentially indicating system downtime or issues.
+
+    Input:
+    - None (uses global structured_system_log_df)
+
     Output:
-    - fig: A plotly figure object containing the table.
+    - fig (plotly.graph_objects.Figure): A table showing the top 3 inactivity periods
+      with their durations
+
+    Note:
+    - Requires datetime conversion of log entries
+    - Returns empty figure if no significant gaps are found
     """
     date_time_structured_system_log_df = structured_system_log_df
     date_time_structured_system_log_df['DateTime'] = pd.to_datetime('2024 ' + date_time_structured_system_log_df['Month'] + " " + date_time_structured_system_log_df['Date'].astype(str) + " " + date_time_structured_system_log_df['Time'])
@@ -276,14 +319,22 @@ def inactivity():
 
 def potential_shut_down():
     """
-    
-    Description:
-    This function identifies potential shutdown events and generates a plotly table.
-    
-    Input: None
-    
+    Identifies potential system shutdown events.
+
+    Function Description:
+    Searches the log data for events containing shutdown-related keywords
+    (shutdown, halt, poweroff, reboot) to identify system shutdown events.
+
+    Input:
+    - None (uses global structured_system_log_df)
+
     Output:
-    - fig: A plotly figure object containing the table.
+    - fig (plotly.graph_objects.Figure): A table showing details of potential
+      shutdown events
+
+    Note:
+    - Keywords are case-insensitive
+    - Returns empty figure if no shutdown events are found
     """
     shutdown_keywords = ['shutdown', 'halt', 'poweroff', 'reboot']
     shutdown_logs = structured_system_log_df[structured_system_log_df['Content'].str.contains('|'.join(shutdown_keywords), case=False, na=False)]
@@ -312,14 +363,22 @@ def potential_shut_down():
 
 def error_analysis():
     """
-    
-    Description:
-    This function identifies the top 5 events with potential errors and generates a plotly table.
-    
-    Input: None
-    
+    Analyzes and visualizes system error patterns.
+
+    Function Description:
+    Identifies events containing error-related keywords and generates a frequency
+    analysis of the top 5 most common error events.
+
+    Input:
+    - None (uses global structured_system_log_df)
+
     Output:
-    - fig: A plotly figure object containing the table.
+    - fig (plotly.graph_objects.Figure): A table showing the top 5 error events
+      and their frequencies
+
+    Note:
+    - Only considers explicit 'error' keyword matches
+    - Returns empty figure if no error events are found
     """
     error_keywords = ['error']
     error_logs = structured_system_log_df[structured_system_log_df['Content'].str.contains('|'.join(error_keywords), case=False, na=False)]
@@ -352,15 +411,26 @@ def error_analysis():
 
 def correlation_analysis():
     """
-    
-    Description:
-    This function calculates the correlations between different components, users, and event IDs, and generates a plotly figure with a heatmap and table.
-    
-    Input: None
-    
+    Analyzes relationships between system components, users, and events.
+
+    Function Description:
+    Performs correlation analysis on encoded categorical variables to identify
+    potential relationships between different system elements. Creates a visualization
+    combining a correlation heatmap and a table of top correlations.
+
+    Input:
+    - None (uses global structured_system_log_df)
+
     Output:
-    - fig: A plotly figure object containing the heatmap and table.
+    - fig (plotly.graph_objects.Figure): A composite figure with correlation heatmap
+      and top correlations table
+
+    Note:
+    - Uses one-hot encoding for categorical variables
+    - May be computationally intensive for large datasets
     """
+    
+    # Convert categorical variables to numeric using one-hot encoding
     encode_data = pd.get_dummies(structured_system_log_df[['Component', 'User', 'EventId']], drop_first=True)
     correlation_df = encode_data.corr()
     correlation_matrix_unstacked = correlation_df.unstack().sort_values(ascending=False)
