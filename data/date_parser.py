@@ -75,7 +75,7 @@ def break_down_date_component(date_str):
     # If no match, return None or raise an error
     return None
 
-def combine_datetime_columns(df, default_year=2024):
+def combine_datetime_columns(df, default_year=datetime.datetime.now().year):
     """
     Combines datetime-related components in a DataFrame into a single 'Datetime' column.
 
@@ -90,7 +90,7 @@ def combine_datetime_columns(df, default_year=2024):
 
     Input:
     - df (pandas.DataFrame): A DataFrame containing date-related columns (e.g., year, month, day, etc.).
-    - default_year (int, optional): A default year to use if the year component is missing. Defaults to 2024.
+    - default_year (int, optional): A default year to use if the year component is missing. Defaults to the current year.
 
     Output:
     - df (pandas.DataFrame): The modified DataFrame with a 'Datetime' column containing the 
@@ -152,7 +152,7 @@ def combine_datetime_columns(df, default_year=2024):
     return df_orig
 
 if __name__ == '__main__':
-    file_name = "auditrecords.csv"
-    df = pd.read_csv(f"../logs/{file_name}")
+    file_name = "Windows_2k.log_structured.csv"
+    df = pd.read_csv(f"../logs/Windows/{file_name}")
     path = f"../logs/Test/{file_name}"
-    combine_datetime_columns(df, 2024).to_csv(path, index = False)
+    combine_datetime_columns(df).to_csv(path, index = False)

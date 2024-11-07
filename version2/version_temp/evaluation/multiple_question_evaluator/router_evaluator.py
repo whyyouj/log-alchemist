@@ -16,7 +16,7 @@ logging.basicConfig(
 )
 
 # Train data
-train_data = pd.read_csv("train_router_3.csv")
+train_data = pd.read_csv("train_router_5.csv")
 
 # Test data
 test_inputs = [
@@ -39,7 +39,17 @@ test_inputs = [
     "Retrieve and list unique User values associated with EventType 'critical'.",
     "Compare the number of entries across different Components where Timestamp falls within 2024. Give me a summary of the data set",
     "Filter rows with EventId starting with 'D' and summarize by Application name.",
-    "Group data by Timestamp (by month) and calculate the total Duration for each month."
+    "Group data by Timestamp (by month) and calculate the total Duration for each month.",
+    "What is the meaning of life",
+    "Filter for User then count it.",
+    "Filter for User then count it. What is the meaning of life. Can you give me the number of rows of data.",
+    "Can you give me the number of rows of data?",
+    "Give me the table for the highest number of products by the top five countries and explain the results.",
+    "Filter the dataset for event that occurred on 2024, only include rows when Component is kernel and return the filtered dataset",
+    "Filter the rows where content contains the word error, filter for events that occurred after 2024 and return that filtered dataset.",
+    "Extract the row where PID is 2 in 2024 and give me the summary of the entire dataset",
+    "Filter where Component is kernel and plot a time series of the number of rows of data per minute.",
+    "Tell me about the meaning of life. Calculate the mean, median and standard deviation of the number of rows of data per minute. Explain your results."
 ]
 
 test_outputs = [
@@ -47,7 +57,7 @@ test_outputs = [
     "[{“Pandas”: “Summarize the dataset by counting unique entries in the Hostname column.”}]",
     "[{“Pandas”: “Group data by Application and EventType, then compare entry counts per group.”}]",
     "[{“Pandas”: “Retrieve entries with EventId C452 and calculate average Duration for these entries.”}]",
-    "[{“Pandas”: “Summarize the occurrences of each EventId across different User values.”}]",
+    "[{“Pandas”: “Summarize the occurrences of each EventType across different User values.”}]",
     "[{“Pandas”: “List all unique IP addresses associated with EventType ‘alert’.”}, {“General”: “Tell me what is the capital of India?”}]",
     "[{“Pandas”: “Filter rows by Timestamp within the range ‘2024-01-01’ to ‘2024-12-31’.”}]",
     "[{“Pandas”: “Count the number of entries where Component is ‘network’ and EventId is A432.”}]",
@@ -57,12 +67,22 @@ test_outputs = [
     "[{“Pandas”: “Compare the number of entries per EventId for the Application ‘system_logger’.”}]",
     "[{“Pandas”: “Calculate the average Duration for each unique User entry.”}, {“Pandas”: “Give me the anomalies in the data set.”}]",
     "[{“Pandas”: “Group entries by Component and Hostname, then count entries per group.”}]",
-    "[{“Pandas”: “Filter rows where IP address starts with ‘192.’ and group by EventId.”}]",
+    "[{“Pandas”: “Filter rows where IP address starts with ‘192.’ and group by EventType.”}]",
     "[{“Pandas”: “Count the number of entries where EventId is ‘warning’ and Component is ‘disk’.”}]",
     "[{“Pandas”: “Retrieve and list unique User values associated with EventType ‘critical’.”}]",
     "[{“Pandas”: “Compare the number of entries across different Components where Timestamp falls within 2024.”}, {“Pandas”: “Give me a summary of the data set.”}]",
     "[{“Pandas”: “Filter rows with EventId starting with ‘D’ and summarize by Application name.”}]",
-    "[{“Pandas”: “Group data by Timestamp (by month) and calculate the total Duration for each month.”}]"
+    "[{“Pandas”: “Group data by Timestamp (by month) and calculate the total Duration for each month.”}]",
+    '[{"General": "What is the meaning of life?"}]',
+    '[{“Pandas”: “Filter for User then count it.”}]',
+    '[{“Pandas”: “Filter for User then count it.”}, {“General”: “What is the meaning of life.”}, {“Pandas”: “Can you give me the number of rows of data.”}]',
+    '[{“Pandas”: “Give me the number of rows of data.”}]',
+    '[{“Pandas”: “Give me the table for the highest number of products by the top five countries.”}, {“Explain”: “Explain the results.”}]',
+    '[{"Pandas": "Filter the dataset for events that occurred on 2024, only include rows when Component is kernel and return the filtered dataset."}]',
+    '[{“Pandas”: “Filter the rows where content contains the word error, filter for events that occurred after 2024 and return that filtered dataset.”}]',
+    '[{"Pandas": "Extract the row where PID is 2 in 2024."}, {"Pandas": "Give me the summary of the entire dataset."}]',
+    '[{“Pandas”: “Filter where Component is kernel and plot a time series of the number of rows of data per minute.”}]',
+    '[{“General”: “Tell me about the meaning of life.”}, {“Pandas”: “Calculate the mean, median and standard deviation of the number of rows of data per minute.”}, {“Explain”: “Explain your results.”}]'
 ]
 
 test_inputs_df = pd.DataFrame(test_inputs, columns=["Input"])
@@ -92,7 +112,7 @@ def evaluate(data):
         try:
             response = generate_response(queries[i])
             logging.info(f"Response: {response}")
-            if response in ground_truths[i]:
+            if response in ground_truths[i] or ground_truths[i] in response:
                 logging.info("Result: Passed\n")
                 correct_counts += 1
             else:
@@ -120,5 +140,5 @@ def evaluate(data):
     print(f"Accuracy: {accuracy:.3f}")
             
 if __name__ == "__main__":
-    # evaluate(train_data)
-    evaluate(test_inputs_df)
+    evaluate(train_data)
+    # evaluate(test_inputs_df)

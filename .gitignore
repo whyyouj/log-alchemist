@@ -7,3 +7,4 @@ build/
 pandasai.log
 version2/pandasai.log
 *.log
+version2/tabulated_anomalies.png
