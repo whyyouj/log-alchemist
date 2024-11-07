@@ -17,6 +17,16 @@ from regular_agent.agent_ai import Agent_Ai
 from lang_graph.lang_graph_utils import python_pandas_ai, final_agent, router_agent, router_agent_decision, router_summary_agent, router_summary_agent_decision, router_python_output, python_summary_agent
 
 class AgentState(TypedDict):
+    """
+    Defines the state structure for the LangGraph agents.
+    
+    Contains:
+    - input: User query string
+    - agent_out: Output from agent (action or finish state)
+    - intermediate_steps: List of agent actions and results
+    - pandas: Python_Ai instance for data analysis
+    - df: DataFrame being analyzed
+    """
     input: str
     agent_out: Union[AgentAction, AgentFinish, None]
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
@@ -24,7 +34,27 @@ class AgentState(TypedDict):
     df: pd.DataFrame
     
 class Graph:
+    """
+    Main class for managing the LangGraph workflow for data analysis.
+    """
+    
     def __init__(self, pandas_llm, df):
+        """
+        Initializes a new Graph instance with data analysis capabilities.
+
+        Function Description:
+        Creates a new graph instance with pandas LLM capabilities and dataset.
+
+        Input:
+        - pandas_llm: Instance of Python_Ai for pandas operations
+        - df: DataFrame to analyze
+
+        Output:
+        - None
+        
+        Note:
+        - Initializes internal state including empty question cache
+        """
         self.pandas = pandas_llm
         self.df = df
         self.qns=''
@@ -32,6 +62,22 @@ class Graph:
     
     @staticmethod
     def get_graph():
+        """
+        Creates and configures the LangGraph workflow.
+
+        Function Description:
+        Builds a directed graph of agents for processing data analysis queries,
+        including routing, summary generation, and pandas operations.
+
+        Input:
+        - None
+
+        Output:
+        - runnable: Compiled LangGraph ready for execution
+        
+        Note:
+        - Graph structure is fixed once compiled
+        """
         graph = StateGraph(AgentState)
 
         # LangGraph Nodes
@@ -82,6 +128,23 @@ class Graph:
         return runnable
     
     def run(self, query):
+        """
+        Executes the graph workflow with a user query.
+
+        Function Description:
+        Processes user query through the agent workflow, handling retry requests
+        and maintaining question history.
+
+        Input:
+        - query: User's question string
+
+        Output:
+        - str: Response from the agent workflow
+        - str: Greeting message if no previous question exists for retry
+        
+        Note:
+        - Returns friendly greeting with emoji if retry attempted without history
+        """
         llm = Agent_Ai(model='mistral', temperature=0)
         prompt = f"""The user has asked: '{query}'.
         Determine if this question is asking to "try again", "retry", or something with a similar meaning related to repeating an action.
@@ -105,6 +168,21 @@ class Graph:
         return out['agent_out']
     
     def show(self):
+        """
+        Visualizes the graph structure.
+
+        Function Description:
+        Generates and saves a PNG visualization of the LangGraph workflow.
+
+        Input:
+        - None
+
+        Output:
+        - str: Path to saved graph visualization image
+        
+        Note:
+        - Creates './image' directory if it doesn't exist
+        """
         from PIL import Image as PILImage
         import io
         import os
@@ -117,7 +195,25 @@ class Graph:
     
     @classmethod
     def create_graph(cls):
+        """
+        Factory method to create a new graph instance.
+
+        Function Description:
+        Creates and initializes a graph instance with default dataset
+        and pandas AI configuration.
+
+        Input:
+        - None
+
+        Output:
+        - Graph: Initialized graph instance
+        
+        Note:
+        - Sets global_graph variable
+        - Uses hardcoded path to data file
+        """
         global global_graph
+        # Load default dataset
         df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
         pandas_ai = Python_Ai(df=df).pandas_legend()
         global_graph = cls(pandas_llm=pandas_ai, df=df)
