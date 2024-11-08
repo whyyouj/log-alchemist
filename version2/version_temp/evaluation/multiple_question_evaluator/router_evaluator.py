@@ -62,13 +62,13 @@ test_outputs = [
     "[{“Pandas”: “Filter rows by Timestamp within the range ‘2024-01-01’ to ‘2024-12-31’.”}]",
     "[{“Pandas”: “Count the number of entries where Component is ‘network’ and EventId is A432.”}]",
     "[{“Pandas”: “Summarize data by calculating the total Duration per Component.”}]",
-    "[{“Pandas”: “Retrieve records where Component is ‘security’ and EventId is ‘error’.”}]",
+    "[{“Pandas”: “Retrieve records where Component is ‘security’ and EventType is ‘error’.”}]",
     "[{“Pandas”: “Filter the data to only include rows where User is ‘admin’ and summarize their entries by EventType.”}]",
     "[{“Pandas”: “Compare the number of entries per EventId for the Application ‘system_logger’.”}]",
     "[{“Pandas”: “Calculate the average Duration for each unique User entry.”}, {“Pandas”: “Give me the anomalies in the data set.”}]",
     "[{“Pandas”: “Group entries by Component and Hostname, then count entries per group.”}]",
     "[{“Pandas”: “Filter rows where IP address starts with ‘192.’ and group by EventType.”}]",
-    "[{“Pandas”: “Count the number of entries where EventId is ‘warning’ and Component is ‘disk’.”}]",
+    "[{“Pandas”: “Count the number of entries where EventType is ‘warning’ and Component is ‘disk’.”}]",
     "[{“Pandas”: “Retrieve and list unique User values associated with EventType ‘critical’.”}]",
     "[{“Pandas”: “Compare the number of entries across different Components where Timestamp falls within 2024.”}, {“Pandas”: “Give me a summary of the data set.”}]",
     "[{“Pandas”: “Filter rows with EventId starting with ‘D’ and summarize by Application name.”}]",
@@ -107,7 +107,7 @@ def generate_response(query):
     - If the LLM fails to generate a response, the function will raise an exception
     - The response format depends on the model's training
     """
-    llm = Agent_Ai("jiayuan1/router_llm", temperature = 0)
+    llm = Agent_Ai("jiayuan1/router_30", temperature = 0)
     output = llm.query_agent(query)
     return output
 
