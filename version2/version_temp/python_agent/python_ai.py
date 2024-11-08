@@ -188,12 +188,12 @@ class LangchainLLM(LLM):
         return f"langchain_{self.langchain_llm._llm_type}"
 
 @skill
-def overall_summary(df):
+def overall_summary(df) -> str:
     """
     Generates comprehensive data summary using SweetViz.
 
     Function Description:
-    Creates an interactive HTML report analyzing the DataFrame structure,
+    Creates an interactive HTML report analyzing the DataFrame structure,s
     relationships, and statistics using the SweetViz library. The report
     includes correlations, distributions, and missing value analysis.
 
@@ -226,7 +226,7 @@ def overall_summary(df):
 
 
 @skill
-def overall_anomaly(df):
+def overall_anomaly(df) -> str:
     """
     Performs comprehensive anomaly detection on DataFrame.
 
