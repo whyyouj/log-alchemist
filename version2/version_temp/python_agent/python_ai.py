@@ -525,11 +525,11 @@ def overall_anomaly(df):
     ax.axis('off')  
     plt.text(0.5, 0.5, anomaly_table, family='monospace', ha='center', va='center', fontsize=12)
 
-
-    png_path = "tabulated_anomalies.png"
-    plt.savefig(png_path, bbox_inches='tight', dpi=300)
-
-    return png_path
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+        tempfile_path = f.name
+        plt.savefig(tempfile_path, bbox_inches='tight', dpi=300)
+        
+    return tempfile_path
 
 
 class Python_Ai:
