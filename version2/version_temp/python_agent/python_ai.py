@@ -260,9 +260,9 @@ def overall_anomaly(df):
     anomalies = {}
 
     #########################
-    ### 0. Number of Rows ###
+    ### 0. Number of rows ###
     #########################
-    anomalies['Number of rows'] = len(df)
+    anomalies['Number of rows'] = len(log_df)
 
     ###########################################
     ### 1. Check for missing or null values ###
@@ -284,44 +284,52 @@ def overall_anomaly(df):
     ### 3. Identify and handle numeric columns ###
     ##############################################
     numeric_columns = log_df.select_dtypes(include=[np.number]).columns
-    numeric_columns = numeric_columns[~numeric_columns.str.contains('id', case=False)]
+    numeric_columns = numeric_columns[~numeric_columns.str.contains('id|index', case=False)]
 
     if not numeric_columns.empty:
         outliers_data = []
 
         for column in numeric_columns:
-            correlation = np.corrcoef(log_df.index, log_df[column])[0, 1]
-            
-            # If the correlation is close to 1, skip outlier detection for this column
-            if np.abs(correlation) > 0.95:  # Threshold to decide if it's linear
-                continue
+            try:
+                temp = log_df[column].dropna().sort_values()
+                if len(temp) == 0:
+                    continue
+                comp = list(range(len(temp)))
+                correlation = np.corrcoef(comp, temp)[0, 1]
+                
+                # If the correlation is close to 1, skip outlier detection for this column
+                
+                if np.abs(correlation) > 0.95 or np.isnan(correlation):  # Threshold to decide if it's linear
+                    continue
 
-            Q1 = log_df[column].quantile(0.25)
-            Q3 = log_df[column].quantile(0.75)
+                Q1 = log_df[column].quantile(0.25)
+                Q3 = log_df[column].quantile(0.75)
+                
+                IQR = Q3 - Q1
+    
+                lower_bound = Q1 - 1.5 * IQR
+                upper_bound = Q3 + 1.5 * IQR
+                
+                outliers_in_column = log_df[(log_df[column] < lower_bound) | (log_df[column] > upper_bound)]
             
-            IQR = Q3 - Q1
- 
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
-            
-            outliers_in_column = log_df[(log_df[column] < lower_bound) | (log_df[column] > upper_bound)]
-           
-            outliers_in_column['distance_from_bound'] = outliers_in_column[column].apply(
-                lambda x: lower_bound - x if x < lower_bound else x - upper_bound
-            )
-            
-            outliers_sorted = outliers_in_column.sort_values(by='distance_from_bound', ascending=False)
-            
-            # Select the top 3 most extreme outliers for the column
-            top_3_outliers = outliers_sorted.head(3)
-            
-            # Append the top 3 outliers for this column to the list (row number, column, value, distance)
-            for index, row in top_3_outliers.iterrows():
-                outliers_data.append({
-                    'numeric_column': column,
-                    'row_number': index,
-                    'outlier_value': row[column]
-                })
+                outliers_in_column['distance_from_bound'] = outliers_in_column[column].apply(
+                    lambda x: lower_bound - x if x < lower_bound else x - upper_bound
+                )
+                
+                outliers_sorted = outliers_in_column.sort_values(by='distance_from_bound', ascending=False)
+                
+                # Select the top 3 most extreme outliers for the column
+                top_3_outliers = outliers_sorted.head(3)
+                
+                # 11. Append the top 3 outliers for this column to the list (row number, column, value, distance)
+                for index, row in top_3_outliers.iterrows():
+                    outliers_data.append({
+                        'numeric_column': column,
+                        'row_number': index,
+                        'outlier_value': row[column]
+                    })
+            except Exception as err:
+                print(err)
 
         if outliers_data:
             outliers_df = pd.DataFrame(outliers_data)
@@ -438,48 +446,60 @@ def overall_anomaly(df):
 
     if timestamp_columns:
         for ts_col in timestamp_columns:
-            log_df[ts_col] = pd.to_datetime(log_df[ts_col], errors='coerce')
-            interval, data = best_timing(log_df, ts_col)
-            if len(data) != 0 and interval != 'NA':
-                data = data.sort_values(by='Count', ascending=False)
-                anomalies[f'timestamp_freq_anomaly_{ts_col}_{interval}'] = tabulate(data, headers=data.columns, tablefmt='pretty', showindex=False)
+            try:
+                log_df[ts_col] = pd.to_datetime(log_df[ts_col], errors='coerce')
+                interval, data = best_timing(log_df, ts_col)
+                if len(data) != 0 and interval != 'NA':
+                    data = data.sort_values(by='Count', ascending=False)
+                    anomalies[f'timestamp_freq_anomaly_{ts_col}_{interval}'] = tabulate(data, headers=data.columns, tablefmt='pretty', showindex=False)
+            except Exception as err:
+                print(err)
+                
     print('[INFO] Anomaly Skill: timestamp checked')
 
     ##################################################################
     ### 5. Identify categorical columns and detect rare categories ###
     ##################################################################
     categorical_columns = log_df.select_dtypes(include=['object', 'category']).columns
-    for col in categorical_columns[:10]:
-        event_frequency = log_df[col].value_counts()
-        event_frequency_df = pd.DataFrame(event_frequency).reset_index()
-        if len(event_frequency_df) <= 10:
-            continue
-        event_frequency_df.columns = ['Value', 'Count']
-        event_frequency_df = event_frequency_df.sort_values('Count', ascending=True)
-        rarest = event_frequency_df.head(3)
-        anomalies[f'Rare_values_in_{col}*'] = tabulate(rarest, headers=rarest.columns, tablefmt='pretty', showindex=False)
+    for col in categorical_columns:
+        try:
+            event_frequency = log_df[col].value_counts()
+            event_frequency_df = pd.DataFrame(event_frequency).reset_index()
+            if len(event_frequency_df) <= 10:
+                continue
+            event_frequency_df.columns = ['Value', 'Count']
+            event_frequency_df = event_frequency_df.sort_values('Count', ascending=True)
+            rarest = event_frequency_df.head(3)
+            rarest['Value'] = rarest['Value'].apply(lambda x: x[:200])
+            anomalies[f'Rare_values_in_{col}'] = tabulate(rarest, headers=rarest.columns, tablefmt='pretty', showindex=False)
+        except Exception as err:
+            print(err)
+
     print('[INFO] Anomaly Skill: categorical columns checked')
 
     #################################
     ### 6. Identify error columns ###
     #################################
-    non_numeric_columns = log_df.select_dtypes(exclude=[np.number, np.datetime64]).columns
+    non_numeric_columns = log_df.select_dtypes(include=['object']).columns
     error_results = []
 
     for column in non_numeric_columns:
-        anomaly = log_df[log_df[column].str.contains('anomaly|anomalies', case=False, na=False)]
-        anomaly_count = len(anomaly)
-        error = log_df[log_df[column].str.contains('error|errors', case=False, na=False)]
-        error_count = len(error)
-        warning = log_df[log_df[column].str.contains('warning|warn', case=False, na=False)]
-        warning_count = len(warning)
-        res = [('anomalies',anomaly_count), ('errors', error_count), ('warnings', warning_count)]
-        res_dic = {}
-        for check, count in res:
-            if count > 0:
-                res_dic[check] = count
-        if len(res_dic) > 0:
-            error_results.append((column, str(res_dic)))
+        try:
+            anomaly = log_df[log_df[column].str.contains('anomaly|anomalies', case=False, na=False)]
+            anomaly_count = len(anomaly)
+            error = log_df[log_df[column].str.contains('error|errors', case=False, na=False)]
+            error_count = len(error)
+            warning = log_df[log_df[column].str.contains('warning|warn', case=False, na=False)]
+            warning_count = len(warning)
+            res = [('anomalies',anomaly_count), ('errors', error_count), ('warnings', warning_count)]
+            res_dic = {}
+            for check, count in res:
+                if count > 0:
+                    res_dic[check] = count
+            if len(res_dic) > 0:
+                error_results.append((column, str(res_dic)))
+        except Exception as err:
+            print(err)
 
     if len(error_results) > 0:
         error_results_df = tabulate(error_results, headers=['Column', 'Error Counts'], tablefmt='grid')
@@ -488,7 +508,7 @@ def overall_anomaly(df):
     ##################
     ### Disclaimer ###
     ##################
-    anomalies['*DISCLAIMER'] = "For a detailed overview on the rare categories in each column, please query for a summary of the data and refer to the SweetVIZ summary."
+    anomalies['DISCLAIMER'] = "1. For a detailed overview on the rare categories in each column, please query for a summary of the data and refer to the SweetVIZ summary. \n2. For rare categories, some values may be cut off if it is too long."
 
     ########################
     ### add in timestamp ###
