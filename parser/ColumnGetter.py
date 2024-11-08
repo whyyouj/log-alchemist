@@ -6,6 +6,7 @@ import examples as eg
 
 
 class ColumnGetter:
+    # Sample log data for testing and demonstration
     sample_log = """
     Jun 14 15:16:01 combo sshd(pam_unix)[19939]: authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=218.188.2.4 
     Jun 14 15:16:02 combo sshd(pam_unix)[19937]: check pass; user unknown
@@ -21,15 +22,24 @@ class ColumnGetter:
 
     
     def _generate_prompt_template_default(self, log_row):
-        """        
-        Description:
-        This function generates a default prompt template to infer column names from log data.
-        
+        """
+        Generates a default prompt template for column name inference.
+
+        Function Description:
+        Creates a standardized prompt template that instructs an LLM to analyze log data
+        and extract relevant column names. Uses a single example approach with specific
+        formatting requirements and constraints for column naming.
+
         Input:
-        - log_row: A string containing rows of log data (str)
-        
+        - log_row (str): Raw log data strings containing one or more log entries
+
         Output:
-        - log_query_template: A formatted PromptTemplate object (PromptTemplate)
+        - log_query_template (PromptTemplate): A formatted template object containing
+        the prompt structure and example
+
+        Note:
+        - Returns None if template creation fails
+        - The template format must maintain 'Content' as the last column
         """
         log_query_template = PromptTemplate.from_template(
             """
@@ -64,15 +74,23 @@ class ColumnGetter:
     
     def _generate_prompt_template_fewshot(self, log_row):
         """
-        
-        Description:
-        This function generates a few-shot prompt template to infer column names from log data using example prompts.
-        
+        Generates a few-shot learning prompt template for column name inference.
+
+        Function Description:
+        Creates a prompt template using multiple examples to help the LLM
+        better understand different log formats. Incorporates example-based learning
+        with specific formatting requirements and constraints.
+
         Input:
-        - log_row: A string containing rows of log data (str)
-        
+        - log_row (str): Raw log data strings containing one or more log entries
+
         Output:
-        - log_query_template: A formatted FewShotPromptTemplate object (FewShotPromptTemplate)
+        - log_query_template (FewShotPromptTemplate): A formatted template object containing
+        the prompt structure and multiple examples
+
+        Note:
+        - Returns None if template creation fails
+        - Requires examples.py file with valid example data
         """
         example_prompt = PromptTemplate(
             input_variables = ['log_data', 'response'],
@@ -118,29 +136,40 @@ class ColumnGetter:
 
     def get_column(self, model, log_data, prompt_method = 'default'):
         """
-        
-        Description:
-        This function generates the column names for the given log data using the specified prompt method and model.
-        
+        Generates column names for log data using specified LLM and prompt method.
+
+        Function Description:
+        Coordinates the process of generating appropriate column names for log data by:
+        1. Initializing the specified LLM model
+        2. Selecting and generating the appropriate prompt template
+        3. Running the inference to get column names
+
         Input:
-        - model: The model to be used for generating column names (str)
-        - log_data: The log data for which column names need to be generated (str)
-        - prompt_method: The prompt method to be used ('default' or 'fewshot') (str)
-        
+        - model (str): Name of the Ollama model to use
+        - log_data (str): Raw log data to analyze
+        - prompt_method (str): Method for prompting ('default' or 'fewshot')
+
         Output:
-        - output: The generated column names (list)
+        - output (str): Generated list of column names in string format
+
+        Note:
+        - Returns empty string if model initialization fails
+        - Falls back to default prompt method if specified method is invalid
         """
         print(f"[INFO] Generating Columns, Model: {model}, Prompt Method: {prompt_method}")
-        # Calling Llama 3.1 model to llm variable
-        llm = OllamaLLM(model = model)
 
+        # Initialize the language model with specified configuration
+        llm = OllamaLLM(model = model)
+        
+        # Select prompt template based on method parameter
         if prompt_method == 'default':
             prompt = self._generate_prompt_template_default(log_data)
         elif prompt_method =='fewshot':
             prompt = self._generate_prompt_template_fewshot(log_data)
 
+        # Create and execute the processing chain
         chain = prompt | llm
-
+        
+        # Extract column names from model output
         output = chain.invoke({"log":log_data})
-        #print(output)
         return output

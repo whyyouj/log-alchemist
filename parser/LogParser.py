@@ -2,34 +2,50 @@ from ColumnGetter import ColumnGetter
 from logparser import Drain
 import re
 
+# Custom exception for column generation failures
 class MaxRetriesError(Exception):
     pass
 
 class LogParser:
     def __init__(self, model, prompt_method):
         """
-        Description:
-        This function initializes the LogParser class with the given model and prompt method.
-        
+        Initializes a LogParser instance with specified model and prompt method.
+
+        Function Description:
+        Creates a new LogParser instance that will use the specified language model
+        and prompting strategy for parsing log files and generating column names.
+
         Input:
-        - model: The model to be used for generating column names (str)
-        - prompt_method: The prompt method to be used ('default' or 'fewshot') (str)
-        
-        Output: None
+        - model (str): Name of the language model to use (e.g., 'Llama3.1')
+        - prompt_method (str): Method for prompting ('default' or 'fewshot')
+
+        Output:
+        - None (initializes instance attributes)
+
+        Note:
+        - Instance will use default model behavior if invalid model name provided
+        - Prompt method defaults to 'default' if invalid method specified
         """
         self.model = model
         self.prompt_method = prompt_method
 
     def read_file(self, path):
         """
-        Description:
-        This function reads the log file from the given path and returns its content as a string.
-        
+        Reads and returns the contents of a log file.
+
+        Function Description:
+        Opens and reads a log file from the specified path, concatenating all lines
+        with newline characters preserved to maintain the original format.
+
         Input:
-        - path: The path to the log file (str)
-        
+        - path (str): Full path to the log file to be read
+
         Output:
-        - log: The content of the log file (str)
+        - log (str): Complete contents of the log file as a single string
+
+        Note:
+        - Returns empty string if file doesn't exist or can't be read
+        - Preserves original line endings and formatting
         """
         log = ''
         with open(path, mode='r') as f:
@@ -39,21 +55,28 @@ class LogParser:
     
     def get_columns(self, path, max_retries=5, max_length=20, max_cols = 10):
         """
-        
-        Description:
-        This function generates column names for the log data using the specified model and prompt method. It retries up to max_retries times if the generated columns do not meet the quality checks.
-        
+        Generates and validates column names for log data.
+
+        Function Description:
+        Attempts to generate appropriate column names for the log data by:
+        1. Reading the log file
+        2. Using ColumnGetter to generate column names
+        3. Validating the generated columns against quality criteria
+        4. Formatting the validated columns for the parser
+
         Input:
-        - path: The path to the log file (str)
-        - max_retries: The maximum number of retries for generating column names (int, default=5)
-        - max_length: The maximum length of a column name (int, default=20)
-        - max_cols: The maximum number of columns (int, default=10)
-        
+        - path (str): Path to the log file
+        - max_retries (int): Maximum attempts to generate valid columns (default=5)
+        - max_length (int): Maximum allowed length for column names (default=20)
+        - max_cols (int): Maximum allowed number of columns (default=10)
+
         Output:
-        - formatted_columns: The formatted column names (str)
-        
-        Raises:
-        - MaxRetriesError: If no valid column names are generated after max_retries attempts
+        - formatted_columns (str): Space-separated string of validated column names
+        enclosed in angle brackets
+
+        Note:
+        - Raises MaxRetriesError if valid columns not generated within max_retries
+        - Column names are sanitized to contain only letters and underscores
         """
         column_getter = ColumnGetter()
         log_str = self.read_file(path)
@@ -67,6 +90,7 @@ class LogParser:
             if match:
                 columns_str = match.group(1)
                 columns = [col.strip().strip('"').strip("'") for col in columns_str.split(',')]
+                # Sanitize and validate column names
                 columns = [re.sub(r'[^A-Za-z]', '_', col) for col in columns]
 
                 ### some quality checks
@@ -90,27 +114,39 @@ class LogParser:
         raise MaxRetriesError(f'[ERROR] No matches for columns found after {max_retries} attempts')
     
     def parse_log(self, input_dir, output_dir, log_file):
-        """        
-        Description:
-        This function parses the log file using the Drain log parser and generates structured output in the specified output directory.
-        
+        """
+        Parses a log file using the Drain algorithm.
+
+        Function Description:
+        Processes the specified log file using the Drain log parsing algorithm:
+        1. Generates appropriate column names
+        2. Configures regex patterns for parsing
+        3. Initializes and runs the Drain parser
+        4. Saves structured output to the specified directory
+
         Input:
-        - input_dir: The directory containing the input log file (str)
-        - output_dir: The directory to save the parsed output (str)
-        - log_file: The name of the log file to be parsed (str)
-        
-        Output: None
+        - input_dir (str): Directory containing the input log file
+        - output_dir (str): Directory where parsed results will be saved
+        - log_file (str): Name of the log file to parse
+
+        Output:
+        - None (generates files in output_dir)
+
+        Note:
+        - Creates output directory if it doesn't exist
+        - Prints error message but doesn't raise exception if parsing fails
         """
         file_path_full = input_dir + log_file
         columns = self.get_columns(file_path_full)
+        # Regular expressions for identifying common log patterns
         regex = [
             r'blk_(|-)[0-9]+', # block id
             r'(/|)([0-9]+\.){3}[0-9]+(:[0-9]+|)(:|)', # IP
             r'(?<=[^A-Za-z0-9])(\-?\+?\d+)(?=[^A-Za-z0-9])|[0-9]+$', # Numbers
         ]
-
-        st = 0.5
-        depth = 4
+        # Drain parser parameters
+        st = 0.5    # Similarity threshold for log grouping
+        depth = 4   # Maximum depth of parsing tree
 
         try:
             print('[INFO] Attempting to parse file...')

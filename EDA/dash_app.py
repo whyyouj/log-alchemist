@@ -5,6 +5,25 @@ class App:
     
     # Initialize the Dash app with Bootstrap theme
     def __init__(self):
+        """
+        Initializes the Dash application with Bootstrap styling and layout components.
+
+        Function Description:
+        Creates a new Dash application instance with Bootstrap theme and sets up the basic layout structure 
+        including a sidebar and content area. Defines styling for both the sidebar and main content areas 
+        using CSS properties.
+
+        Input:
+        - None (initializes with self reference)
+
+        Output:
+        - None (sets up instance attributes: self.app, self.sidebar, self.content)
+
+        Note:
+        - Instantiates core application components that are used by other methods
+        - Creates the visual framework for the dashboard
+        """
+        
         self.app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         
         # Define styles for the sidebar and content
@@ -52,13 +71,21 @@ class App:
         
     def setup_app_layout(self):
         """
+        Establishes the main application layout structure.
 
-        Description:
-        This function sets the layout of the Dash app, including the location component, sidebar, and content area.
+        Function Description:
+        Configures the primary layout of the Dash application by combining the URL location component,
+        sidebar navigation, and main content area into a single container.
 
-        Input: None
+        Input:
+        - None (uses self reference)
 
-        Output: None
+        Output:
+        - None (sets self.app.layout)
+
+        Note:
+        - Must be called after sidebar and content components are defined
+        - Changes to this function will affect the entire application structure
         """
         self.app.layout = html.Div([
             dcc.Location(id='url'),
@@ -68,13 +95,21 @@ class App:
     
     def setup_callbacks(self):
         """
-        
-        Description:
-        This function sets up the callbacks for the Dash app, including the callback to update the page content based on the URL.
-        
-        Input: None
-        
-        Output: None
+        Configures the application's interactive behavior through callbacks.
+
+        Function Description:
+        Sets up the callback system that enables dynamic content updates based on user interaction.
+        Currently implements URL routing to display different content based on the pathname.
+
+        Input:
+        - None (uses self reference)
+
+        Output:
+        - None (establishes callback functions)
+
+        Note:
+        - Callback functions are registered with the Dash app instance
+        - Modifications here affect the application's interactive behavior
         """
         @self.app.callback(
             Output("page-content", "children"),
@@ -83,15 +118,21 @@ class App:
         
         def render_page_content(pathname):
             """
-            
-            Description:
-            This function returns the content to be displayed based on the URL pathname.
-            
+            Generates the appropriate content based on the current URL pathname.
+
+            Function Description:
+            Acts as a router that returns different page content depending on the URL pathname.
+            Handles the main page ("/"), OpenStack page ("/openstack"), and 404 errors.
+
             Input:
-            - pathname: The URL pathname (str)
-            
+            - pathname (str): The current URL pathname
+
             Output:
-            - A list of Dash HTML components to be displayed on the page (list)
+            - list: A list of Dash HTML components representing the page content
+
+            Note:
+            - Returns a 404 page if the pathname doesn't match any defined routes
+            - Main page includes various analysis graphs and visualizations
             """
             if pathname == "/":
                 return [
@@ -127,14 +168,21 @@ class App:
     
     def run(self, debug = False):
         """
-        
-        Description:
-        This function runs the Dash app server.
-        
+        Launches the Dash application server.
+
+        Function Description:
+        Starts the web server that hosts the Dash application, making it accessible via 
+        a web browser at port 8080.
+
         Input:
-        - debug: A boolean indicating whether to run the server in debug mode (bool)
-        
-        Output: None
+        - debug (bool): Flag to enable/disable debug mode, defaults to False
+
+        Output:
+        - None (starts the server process)
+
+        Note:
+        - Server will continue running until manually stopped
+        - Debug mode provides additional development features when enabled
         """
         self.app.run_server(debug = debug, port = 8080)
         

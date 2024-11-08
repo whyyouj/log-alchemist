@@ -2,6 +2,26 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import logging
 
+"""
+Code Snippet Testing Framework
+
+Function Description:
+This script tests code snippets from an Excel dataset by executing them and logging the results.
+It reads input queries and their corresponding code outputs, executes each snippet in a safe
+environment, and tracks success/failure rates.
+
+Input:
+- Excel file ('train_data.xlsx') containing code snippets with 'Input' and 'Output' columns
+- CSV file ('Sales Transaction v.4a.csv') containing data for testing
+
+Output:
+- Prints execution results to console
+- Generates log file ('code_snippets_test.log') with detailed test results
+
+Note:
+- If no Excel file is found, script will raise FileNotFoundError
+- If CSV file is missing, data-dependent snippets may fail execution
+"""
 
 logging.basicConfig(filename='code_snippets_test.log', level=logging.INFO)
 

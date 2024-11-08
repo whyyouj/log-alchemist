@@ -90,12 +90,51 @@ test_inputs_df["Output"] = test_outputs
 
 # Function to generate LLM responses
 def generate_response(query):
+    """
+    Generates a response using a Language Learning Model for a given query.
+
+    Function Description:
+    Initializes an AI agent with a specific model and generates a response
+    for the provided query using zero-shot learning (temperature=0).
+
+    Input:
+    - query (str): The input question or prompt to be processed by the LLM
+
+    Output:
+    - output (str): The generated response from the LLM
+    
+    Note:
+    - If the LLM fails to generate a response, the function will raise an exception
+    - The response format depends on the model's training
+    """
     llm = Agent_Ai("jiayuan1/router_llm", temperature = 0)
     output = llm.query_agent(query)
     return output
 
 # Evaluation function
 def evaluate(data):
+    """
+    Evaluates the performance of the LLM against ground truth responses.
+
+    Function Description:
+    Processes a set of test queries and compares the LLM's responses with expected outputs.
+    Tracks correct and incorrect responses, calculates accuracy, and logs the results.
+    
+    Input:
+    - data (pandas.DataFrame): DataFrame containing test queries and their expected outputs
+      Must have 'Input' and 'Output' columns
+
+    Output:
+    - Prints evaluation metrics to console
+    - Logs detailed results to file including:
+        * Individual query results
+        * Error cases
+        * Summary statistics
+    
+    Note:
+    - If no data is provided, accuracy will be reported as 0
+    - Failed queries (exceptions) are counted as incorrect responses
+    """
     queries = data["Input"]
     ground_truths = data["Output"]    
 

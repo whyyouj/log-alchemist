@@ -15,11 +15,41 @@ from pandasai.pipelines.pipeline_context import PipelineContext
 
 class LangchainLLM(LLM):
     """
-    Class to wrap Langchain LLMs and make PandasAI interoperable
-    with LangChain.
-    """
+    Wrapper class for making Langchain LLMs compatible with PandasAI.
 
+    Function Description:
+    Provides interface compatibility between Langchain language models and PandasAI
+    by implementing required methods and handling code formatting.
+
+    Input:
+    - langchain_llm (BaseLanguageModel): Langchain language model instance
+
+    Output:
+    - None (creates wrapper instance)
+
+    Note:
+    - Fails silently if language model initialization fails
+    - May return unformatted code if code extraction fails
+    """
     def __init__(self, langchain_llm: BaseLanguageModel):
+        """
+        Initializes LangchainLLM wrapper instance.
+
+        Function Description:
+        Creates a wrapper instance that makes a Langchain language model compatible
+        with PandasAI by providing necessary interface methods and code formatting
+        capabilities.
+
+        Input:
+        - langchain_llm (BaseLanguageModel): Instance of a Langchain language model
+
+        Output:
+        - None (sets instance attribute)
+
+        Note:
+        - Fails silently if model instance is invalid
+        - Required for PandasAI integration
+        """
         self.langchain_llm = langchain_llm
         
     # def code_formatter(self, code):
@@ -43,6 +73,23 @@ class LangchainLLM(LLM):
     #     return res
 
     def code_formatter(self, code):
+        """
+        Formats code output from LLM responses.
+
+        Function Description:
+        Extracts and formats Python code from LLM responses, ensuring proper
+        structure for PandasAI result dictionary formatting.
+
+        Input:
+        - code (str): Raw code output from LLM
+
+        Output:
+        - str: Formatted code block with proper Python markdown
+
+        Note:
+        - Returns original code if extraction pattern fails
+        - Attempts to fix incomplete JSON structures
+        """
         import re
         pattern = r"(import.*?result\s*=\s*\{.*?\})" #r"(import.*?result\s*=\s*\{.*?\})"
 
@@ -76,28 +123,25 @@ class LangchainLLM(LLM):
     def call(
         self, instruction: BasePrompt, context: PipelineContext = None, suffix: str = ""
     ) -> str:
-        '''
-        Description: Calls the Langchain LLM with a given instruction and context.
-        
+        """
+        Executes LLM call with given instructions.
+
+        Function Description:
+        Processes instructions through the language model while handling proper
+        formatting and cleaning of the response.
+
         Input:
-        - instruction: BasePrompt
-        - context: PipelineContext (optional)
-        - suffix: str (optional)
-        
+        - instruction (BasePrompt): The prompt to send to the model
+        - context (PipelineContext, optional): Execution context
+        - suffix (str, optional): Additional prompt text
+
         Output:
-        - res: str
-        '''
-        '''
-        Description: Calls the Langchain LLM with a given instruction and context.
-        
-        Input:
-        - instruction: BasePrompt
-        - context: PipelineContext (optional)
-        - suffix: str (optional)
-        
-        Output:
-        - res: str
-        '''
+        - str: Formatted response from the language model
+
+        Note:
+        - Returns empty string if model call fails
+        - Removes special tokens from response
+        """
         prompt = instruction.to_string() + suffix
         memory = context.memory if context else None
         prompt = self.prepend_system_prompt(prompt, memory)
@@ -123,37 +167,46 @@ class LangchainLLM(LLM):
 
     @property
     def type(self) -> str:
-        '''
-        Description: Returns the type of the Langchain LLM.
-        
-        Input: None
-        
+        """
+        Returns the standardized type identifier for the Langchain LLM.
+
+        Function Description:
+        Generates a string identifier that combines the 'langchain' prefix with
+        the underlying LLM type, providing a consistent way to identify the
+        model type in PandasAI.
+
+        Input:
+        - None (uses instance attribute)
+
         Output:
-        - str: type of the Langchain LLM
-        '''
-        '''
-        Description: Returns the type of the Langchain LLM.
-        
-        Input: None
-        
-        Output:
-        - str: type of the Langchain LLM
-        '''
+        - str: Formatted string combining 'langchain_' prefix with model type
+
+        Note:
+        - Requires self.langchain_llm to be properly initialized
+        - Returns malformed string if _llm_type not available
+        """
         return f"langchain_{self.langchain_llm._llm_type}"
 
 @skill
 def overall_summary(df):
     """
-    Use this for any question regarding an Overall Summary
-    The output type will be a string
-    Args:
-        df pd.DataFrame: A pandas dataframe 
-    
+    Generates comprehensive data summary using SweetViz.
+
+    Function Description:
+    Creates an interactive HTML report analyzing the DataFrame structure,
+    relationships, and statistics using the SweetViz library. The report
+    includes correlations, distributions, and missing value analysis.
+
+    Input:
+    - df (pd.DataFrame): DataFrame to analyze
+
     Output:
-        - tempfile_path: str
-    
-    Output:
-        - tempfile_path: str
+    - tempfile_path (str): Path to generated HTML report file
+
+    Note:
+    - Raises Exception if report generation fails
+    - Creates temporary file that needs manual cleanup
+    - Report saved with 'vertical' layout for better readability
     """
     import sweetviz as sv
 
@@ -480,30 +533,68 @@ def overall_anomaly(df):
 
 
 class Python_Ai:
-    def __init__(self, model, df=[], temperature=0.1):
-        ''' 
-        Description: Initializes the Python_Ai object with a model, dataframe, and temperature.
-        
-        Input:
-        - model: str
-        - df: list (optional)
-        - temperature: float (optional)
+    """
+    Data analysis wrapper class.
 
-        Output: None
-        '''
+    Function Description:
+    Provides interface for AI-driven data analysis using language models,
+    incorporating both general pandas operations and specialized skills.
+
+    Input:
+    - model (str): Name/path of language model to use
+    - df (list, optional): List of DataFrames to analyze
+    - temperature (float, optional): Model temperature setting
+
+    Output:
+    - None (initializes instance)
+
+    Note:
+    - Requires valid model path
+    - Temperature affects response randomness
+    """
+    def __init__(self, model, df=[], temperature=0.1):
+        """
+        Initializes Python_Ai instance.
+
+        Function Description:
+        Sets up core attributes needed for AI-powered data analysis,
+        including model configuration and data storage.
+
+        Input:
+        - model (str): Name/path of language model
+        - df (list, optional): List of DataFrames to analyze
+        - temperature (float, optional): Model randomness parameter
+
+        Output:
+        - None (sets instance attributes)
+
+        Note:
+        - Empty df list if none provided
+        - Default temperature of 0.1 for consistent outputs
+        """
         self.model = model
         self.temperature = temperature
         self.df = df
         
     def get_llm(self):
-        '''
-        Description: Initializes the Ollama model.
-        
-        Input: None
-        
+        """
+        Creates language model instance.
+
+        Function Description:
+        Initializes and configures an Ollama model instance with
+        specified parameters for data analysis.
+
+        Input:
+        - None (uses instance attributes)
+
         Output:
-        - Agent_Ai: initialized Agent_Ai object
-        '''
+        - Agent_Ai: Configured language model instance
+
+        Note:
+        - Returns None if model initialization fails
+        - Uses instance temperature setting
+        """
+
         
         return Agent_Ai(
             model=self.model, 
@@ -550,14 +641,23 @@ class Python_Ai:
     #     return pandas_ai
     
     def pandas_legend_with_skill(self):
-        '''
-        Description: Calls the pandas AI agent with both summary and anomaly skills.
-        
-        Input: None
-        
+        """
+        Creates enhanced pandas analysis agent.
+
+        Function Description:
+        Initializes a PandasAI agent with additional skills for
+        summary statistics and anomaly detection.
+
+        Input:
+        - None (uses instance attributes)
+
         Output:
-        - pandas_ai: Agent object
-        '''
+        - Agent: Configured PandasAI agent with added skills
+
+        Note:
+        - Returns None if agent creation fails
+        - Includes summary and anomaly detection capabilities
+        """
         llm  = LangchainLLM(self.get_llm().llm)
 
         pandas_ai = Agent(
