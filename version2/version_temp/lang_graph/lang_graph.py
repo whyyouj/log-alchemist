@@ -18,8 +18,19 @@ from lang_graph.lang_graph_utils import multiple_question_agent, router_agent,ro
 class AgentState(TypedDict):
     '''
     Description: A TypedDict to define the state of an agent.
+    
+    Input: 
+    - input: str
+    - agent_out: Union[AgentAction, AgentFinish, None]
+    - intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+    - pandas: Python_Ai
+    - df: pd.DataFrame
+    - remaining_qns: list
+    - all_answer: list
+    
+    Output: None
     '''
-    # Define expected state components for type checking
+    
     input: str
     agent_out: Union[AgentAction, AgentFinish, None]
     intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
@@ -30,24 +41,15 @@ class AgentState(TypedDict):
     
 class Graph:
     def __init__(self, pandas_llm, df):
-        """
-        Initializes a Graph instance for processing queries.
-
-        Function Description:
-        Creates a new Graph instance with a pandas language model and DataFrame,
-        setting up the processing pipeline for handling user queries.
-
+        '''
+        Description: Initializes the Graph object with a pandas LLM and a DataFrame.
+        
         Input:
-        - pandas_llm (Python_Ai): Language model instance for pandas operations
-        - df (pd.DataFrame): DataFrame containing the log data
-
-        Output:
-        - None (initializes instance attributes)
-
-        Note:
-        - Fails without any notifications if language model initialization fails
-        - Creates empty graph if model or DataFrame is invalid
-        """
+        - pandas_llm: Python_Ai
+        - df: pd.DataFrame
+        
+        Output: None
+        '''
         self.pandas = pandas_llm
         self.df = df
         self.qns = ''
@@ -55,23 +57,14 @@ class Graph:
     
     @staticmethod
     def get_graph():
-        """
-        Constructs the query processing pipeline.
-
-        Function Description:
-        Builds a directed graph of processing nodes for handling multi-part queries,
-        including question parsing, routing, and response generation stages.
-
-        Input:
-        - None
-
-        Output:
-        - runnable (StateGraph): Compiled graph ready for processing queries
-
-        Note:
-        - Returns None if graph compilation fails
-        - Graph structure defines the query processing flow
-        """
+        '''
+        Description: Builds and compiles the state graph.
+        
+        Input: None
+        
+        Output: 
+        - runnable: Compiled state graph
+        '''
         
         graph = StateGraph(AgentState)
 
@@ -118,23 +111,15 @@ class Graph:
         return runnable
     
     def run(self, query):
-        """
-        Processes a user query through the graph pipeline.
-
-        Function Description:
-        Takes a user query, processes it through the defined graph stages,
-        and returns the accumulated answers from all processing steps.
-
+        '''
+        Description: Runs a user query using the Lang Graph.
+        
         Input:
-        - query (str): User's question or request
-
+        - query: str
+        
         Output:
-        - list: Collection of all answers generated during processing
-
-        Note:
-        - Returns empty list if processing fails
-        - Stores query for potential retry operations
-        """
+        - out['all_answer']: list
+        '''
         
         runnable = self.graph
         out = runnable.invoke({"input":f"{query}", "pandas":self.pandas, "df":self.df, "remaining_qns":[], "all_answer":[]})
@@ -142,23 +127,14 @@ class Graph:
         return out['all_answer']
     
     def show(self):
-        """
-        Visualizes the graph structure.
-
-        Function Description:
-        Generates and saves a PNG image showing the structure of the processing
-        pipeline, including all nodes and connections.
-
-        Input:
-        - None
-
+        '''
+        Description: Plots the Lang Graph to visualize how the graph will look.
+        
+        Input: None
+        
         Output:
-        - str: Path to the saved graph visualization image
-
-        Note:
-        - Returns None if visualization fails
-        - Creates 'image' directory if it doesn't exist
-        """
+        - path to the saved image: str
+        '''
         
         from PIL import Image as PILImage
         import io
@@ -171,23 +147,14 @@ class Graph:
         return "./image/lang_chain_graph_pandas_new2.png"
     
     def create_graph():
-        """
-        Creates a global graph instance.
-
-        Function Description:
-        Initializes a global Graph object with a pre-configured language model
-        and DataFrame for consistent query processing across the application.
-
-        Input:
-        - None
-
+        '''
+        Description: Creates a global graph object.
+        
+        Input: None
+        
         Output:
-        - Graph: Global graph instance for query processing
-
-        Note:
-        - Returns None if initialization fails
-        - Requires access to specific CSV file path
-        """
+        - global_graph: Graph
+        '''
         global global_graph
         df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
         pandas_ai = Python_Ai(model='llama3.1',df=df).pandas_legend()
