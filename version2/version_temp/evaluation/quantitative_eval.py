@@ -17,9 +17,9 @@ class LanguageModelEvaluator:
     A class for evaluating language model responses against ground truth for log analysis tasks.
     """
     def __init__(self):
-        self.df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
+        # self.df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
         # self.df = [pd.read_csv("Windows_2k.log_structured.csv")]
-        
+        self.df = [pd.read_csv("auditrecords.csv")]
 
     def generate_response(self, prompt: str) -> str:
         """
@@ -40,6 +40,7 @@ class LanguageModelEvaluator:
         """
         # PANDAS_LLM = 'jiayuan1/llm2'
         PANDAS_LLM = 'jiayuan1/pandas-instruct-30'
+        # PANDAS_LLM = "llama3.1"
         pandas_ai = Python_Ai(PANDAS_LLM, df=self.df).pandas_legend_with_skill()
         # graph = Graph(pandas_ai, self.df)
         query = f"""
@@ -287,9 +288,50 @@ def run_test_evaluation():
     evaluator.save_results(results)
     return results
 
+def run_test_evaluation_audit():
+    """
+    Runs evaluation on Audit log dataset with predefined prompts.
+
+    Function Description:
+    Executes evaluation using audit-specific log data and corresponding ground truth values.
+    Uses a set of predefined prompts focused on audit log analysis.
+
+    Input:
+    None
+
+    Output:
+    - Dict[str, Dict]: Evaluation results
+
+    Note:
+    - Prompts user for number of evaluation runs
+    - Returns None if evaluation fails
+    """
+    log_file = "auditrecords.csv"
+    ground_truth_file = "auditrecords_ground_truth.json"
+    prompts = [
+        "How many rows are there in the dataset?", 
+        "What is the number of ExchangeAdmin in RecordType?",
+        "How many times did the Identity ae99738a-9771-4f58-625e-08d94ade678f occur?",
+        "Who is the top Operations?",
+        "Who is the top RecordType?",
+        "How many distinct values does AuditData have?",
+        "How many missing values are there in Identity?",
+        "What is the total number of rows of ExchangeAdmin and AzureActiveDirectoryStsLogon in RecordType?"
+    ]
+    metric_names = ["total_rows", "exchangeAdmin", "identity_uniq", "top_operations",
+                    "top_recordType", "auditDataDistinct", "missing_identity", "total_num_agg"]
+    
+    n = int(input("Enter the number of times to run each evaluation: "))
+
+    evaluator = LanguageModelEvaluator()
+    results = evaluator.evaluate(log_file, ground_truth_file, prompts, metric_names, n)
+
+    evaluator.save_results(results)
+    return results
 
 def main():
-    run_train_evaluation()
+    # run_train_evaluation()
     # run_test_evaluation()
+    run_test_evaluation_audit()
 
-# main()
+main()
