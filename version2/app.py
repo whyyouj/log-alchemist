@@ -467,7 +467,7 @@ def st_aboutpage():
 
                 - **Vantage AI processes suitable datetime columns, so there might be changes in the datetime columns of your logs.**
 
-                - **The size limit per log file is 50MB. Log files which exceed the size limit are not accepted.**
+                - **The size limit per log file is 200MB. Log files which exceed the size limit are not accepted.**
 
                 - **The response time of Vantage AI varies according to the complexity of the query and the size of the selected log.**
 
