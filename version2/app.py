@@ -632,8 +632,8 @@ def on_folder_submit(abs_folderpath):
 
         for file in os.listdir(abs_folderpath):
             abs_path = abs_folderpath + file
-            #check that abs_path is an existing regular file and file is within size limit of 40MB
-            if os.path.isfile(abs_path) and (os.path.getsize(abs_path) / 10**6 <= 40):
+            #check that abs_path is an existing regular file and file is within size limit of 200MB
+            if os.path.isfile(abs_path) and (os.path.getsize(abs_path) / 10**6 <= 200):
                 if file.endswith('.csv'):
                     csv_filepaths[file] = abs_path
                 elif not file.endswith('.DS_Store'):
