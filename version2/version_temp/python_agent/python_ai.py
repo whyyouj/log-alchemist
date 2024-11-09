@@ -246,7 +246,6 @@ def overall_anomaly(df) -> str:
     - str: Path to generated PNG file containing anomaly report
 
     Note:
-    - Returns empty DataFrame if no anomalies found
     - Saves visualization even if no anomalies detected
     """
     print('[INFO] Anomaly Skill called')
