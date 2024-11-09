@@ -47,7 +47,7 @@ def multiple_question_agent(state: list):
     print(graph_stage_prefix, "Multiple Question Parser")
 
     # Initialize the LLM Agent with specified model, data frame, and temperature
-    llm = Agent_Ai(model='jiayuan1/router_160', df=state['df'], temperature=0)
+    llm = Agent_Ai(model='jiayuan1/router_30', df=state['df'], temperature=0)
 
     # Query the agent with the user's input from the state
     out = llm.query_agent(state['input'])

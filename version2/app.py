@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Constants
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
-PANDAS_LLM = 'jiayuan1/llm2'
+PANDAS_LLM = 'jiayuan1/pandas-instruct-30'
 GENERAL_LLM = "jiayuan1/nous_llm"
 # GENERAL_LLM = "Llama3.1"
 

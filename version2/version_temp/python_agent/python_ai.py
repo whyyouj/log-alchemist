@@ -113,7 +113,7 @@ class LangchainLLM(LLM):
                 if count != 0:
                     extracted_code+= "\"}"
             
-            print("[AI]", extracted_code)
+            # print("[AI]", extracted_code)
             
             return f"```python \n {extracted_code}\n```"
             
@@ -662,17 +662,17 @@ class Python_Ai:
 
         pandas_ai = Agent(
             self.df, 
-            # description = """
-            #     You are a highly skilled data analysis agent, responsible for handling and answering various data-related queries. 
-            #     For each query I provide, your task is to carefully analyze the data and return the most accurate and optimized solution.
+            description = """
+                You are a highly skilled data analysis agent, responsible for handling and answering various data-related queries. 
+                For each query I provide, your task is to carefully analyze the data and return the most accurate and optimized solution.
                 
-            #     Your response should include:
-            #     1. The Python code necessary to derive the answer from the data.
+                Your response should include:
+                1. The Python code necessary to derive the answer from the data.
                 
-            #     Always take your time to think through the query before responding, and ensure the code is optimized for both readability and performance.
+                Always take your time to think through the query before responding, and ensure the code is optimized for both readability and performance.
                 
-            #     Typical questions you will handle include requests like "How many rows are there in the dataset?" or "What are the top 5 events that occurred?" so ensure your answers are tailored to these types of queries.
-            # """,
+                Typical questions you will handle include requests like "How many rows are there in the dataset?" or "What are the top 5 events that occurred?" so ensure your answers are tailored to these types of queries.
+            """,
             config={
                 "llm":llm,
                 "open_charts":False,
