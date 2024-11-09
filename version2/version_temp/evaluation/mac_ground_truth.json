@@ -17,5 +17,6 @@
     "errors_warnings": 191,
     "most_freq_user": "authorMacBook-Pro",
     "most_freq_error": "Cocoa scripting error for '<*>': four character codes must be four characters long.",
-    "missing_val_address": 1946
+    "missing_val_address": 1946,
+    "e189_e188_sum": 237
 }

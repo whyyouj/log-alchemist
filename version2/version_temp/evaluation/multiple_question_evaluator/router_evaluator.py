@@ -107,7 +107,7 @@ def generate_response(query):
     - If the LLM fails to generate a response, the function will raise an exception
     - The response format depends on the model's training
     """
-    llm = Agent_Ai("jiayuan1/router_30", temperature = 0)
+    llm = Agent_Ai("jiayuan1/router_non_instruct", temperature = 0)
     output = llm.query_agent(query)
     return output
 

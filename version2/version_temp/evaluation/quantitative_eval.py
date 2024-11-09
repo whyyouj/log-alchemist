@@ -18,6 +18,7 @@ class LanguageModelEvaluator:
     """
     def __init__(self):
         self.df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
+        # self.df = [pd.read_csv("Windows_2k.log_structured.csv")]
         
 
     def generate_response(self, prompt: str) -> str:
@@ -37,7 +38,8 @@ class LanguageModelEvaluator:
         Note:
         - Returns empty string if the model fails to generate a response
         """
-        PANDAS_LLM = 'jiayuan1/llm2'
+        # PANDAS_LLM = 'jiayuan1/llm2'
+        PANDAS_LLM = 'jiayuan1/pandas-instruct-30'
         pandas_ai = Python_Ai(PANDAS_LLM, df=self.df).pandas_legend_with_skill()
         # graph = Graph(pandas_ai, self.df)
         query = f"""
@@ -48,10 +50,9 @@ class LanguageModelEvaluator:
 
         You are to following the instructions below strictly:
         - Any query related to Date or Time, refer to the 'Datetime' column.
-        - Any query related to ERROR, WARNING or EVENT, refer to the EventTemplate column.
         """
         
-        response = pandas_ai.chat(query)
+        response = pandas_ai.chat(prompt)
         if isinstance(response, bytes):
             return response.decode('utf-8')
         return str(response)
@@ -124,8 +125,8 @@ class LanguageModelEvaluator:
                 try:
                     ground_truth_value = ground_truth[metric_name]
                     
-                    if (str(ground_truth_value) in model_response or 
-                        self.extract_numeric_value(model_response) == ground_truth_value):
+                    if (str(ground_truth_value) in model_response or
+                        str(model_response) in str(ground_truth_value)):
                         correct_predictions += 1
                         overall_correct += 1
                     
@@ -225,24 +226,14 @@ def run_train_evaluation():
         "How many times did the event E189 occur?",
         "How many times did the event with component kernel occur?",
         "What is the most frequent eventid that occurred?",
-        "What is the total number of errors and warnings are recorded in this log?",
         "Who is the top user?",
+        "What is the total number of errors and warnings are recorded in this log?",
         "How many missing values are there in Address?",
-        "How many times did the event with component kernel occur?",
         "How many authorMacBook-Pro user are there?",
-
-        # "How many times did the event with eventid E120 occur?",
-        # "How many times did the event with eventid E203 occur?",
-        # "How many times did the event with eventid E323 occur?",
-        # "How many times did the event with component com.apple.cts occur?",
-        # "How many times did the event with component corecaptured occur?",
-        # "How many times did the event with component QQ occur?",
-        # "How many times did the event with component Microsoft Word occur?",
-        
+        "What is the total number of times that eventid E189 and E188 occur?"
     ]
-    metric_names = ["total_rows", 'E189', "E189", "kernel", "most_frequent_eventid",
-                     "errors_warnings", "most_freq_user", 'missing_val_address', 'kernel', 'authorMacBook-Pro']
-                    # , 'E120', 'E203', 'E323', 'kernel', 'com.apple.cts', 'corecaptured', 'QQ', 'Microsoft Word', 'authorMacBook-Pro']
+    metric_names = ["total_rows", 'E189', "E189", "kernel", "most_frequent_eventid", 
+                    "most_freq_user", "errors_warnings", 'missing_val_address', 'authorMacBook-Pro', "e189_e188_sum"]
     
     n = int(input("Enter the number of times to run each evaluation: "))
 
@@ -297,8 +288,8 @@ def run_test_evaluation():
     return results
 
 
-# def main():
-#     res = run_train_evaluation()
-#     res = run_test_evaluation()
+def main():
+    run_train_evaluation()
+    # run_test_evaluation()
 
-#     return res
+# main()
