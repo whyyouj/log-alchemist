@@ -583,6 +583,9 @@ def on_file_submit(uploaded_files):
             else:
                 filepaths[uploaded_file.name] = tf #file_path
 
+    if filepaths != st.session_state.filepaths or csv_filepaths != st.session_state.csv_filepaths:
+        print('\n[LOG WAREHOUSE]')
+
     if filepaths != st.session_state.filepaths:
         st.session_state.filepaths = filepaths
         print('FILE PATHS: ', st.session_state.filepaths)
@@ -638,6 +641,9 @@ def on_folder_submit(abs_folderpath):
                     csv_filepaths[file] = abs_path
                 elif not file.endswith('.DS_Store'):
                     filepaths[file] = abs_path
+
+        if filepaths != st.session_state.filepaths or csv_filepaths != st.session_state.csv_filepaths:
+            print('\n[LOG WAREHOUSE]')
         
         if filepaths != st.session_state.filepaths:
             st.session_state.filepaths = filepaths
@@ -841,7 +847,7 @@ def initialize_langgraph():
     - Prints confirmation message when initialized
     """
     agent = Agent_Ai(model= GENERAL_LLM)
-    print('LangGraph Initialized')
+    print('\n[INFO]LangGraph Initialised')
     return agent
 
 def initialize_session_state():
@@ -967,7 +973,7 @@ def update_selected_log(df_option):
     graph = Graph(pandas_llm=pandas_llm, df=df_list)
     st.session_state.graph = graph
     st.session_state.selected_df = df_option
-    print("LangGraph updated with selected log:", df_option)
+    print("[INFO]LangGraph updated with selected log:", df_option)
 
 def main():
     """
