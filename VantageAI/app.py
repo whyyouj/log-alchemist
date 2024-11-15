@@ -4,9 +4,9 @@ import streamlit.components.v1 as components
 import logging
 import base64
 import time
-from version_temp.lang_graph.lang_graph import Graph
-from version_temp.python_agent.python_ai import Python_Ai 
-from version_temp.regular_agent.agent_ai import Agent_Ai
+from vantage_ai_backend.lang_graph.lang_graph import Graph
+from vantage_ai_backend.python_agent.python_ai import Python_Ai 
+from vantage_ai_backend.regular_agent.agent_ai import Agent_Ai
 import pandas as pd
 import tempfile
 import asyncio
@@ -21,9 +21,8 @@ logging.basicConfig(level=logging.INFO)
 
 # Constants
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
-PANDAS_LLM = 'jiayuan1/pandas-instruct-30'
-GENERAL_LLM = "jiayuan1/nous_llm"
-# GENERAL_LLM = "Llama3.1"
+PANDAS_LLM = 'team25_vantage/pandasai_agent'
+GENERAL_LLM = "team25_vantage/final_agent"
 
 # Setting up the Streamlit page configuration
 st.set_page_config(

@@ -118,8 +118,9 @@ input = "filter the data and give me the mac users"
 huggingface_model_name = "unsloth/Meta-Llama-3.1-8B-bnb-4bit"
 
 #huggingface_model_name = "meta-llama/Llama-3.1-8B-Instruct"
-#huggingface_model_name = "NousResearch/Meta-Llama-3.1-8B-Instruct"
-huggingface_model_name = "NousResearch/Hermes-3-Llama-3.1-8B" #"NousResearch/Meta-Llama-3.1-8B"# "router_llm"
+#huggingface_model_name = "NousResearch/Hermes-3-Llama-3.1-8B" #"NousResearch/Meta-Llama-3.1-8B"
+huggingface_model_name = "NousResearch/Meta-Llama-3.1-8B-Instruct"
+
 # 2. Before Training
 
 model, tokenizer = FastLanguageModel.from_pretrained(
@@ -233,8 +234,9 @@ inputs = tokenizer(
 text_streamer = TextStreamer(tokenizer)
 model.generate(**inputs, streamer = text_streamer, max_new_tokens = 1024)
 model.save_pretrained("python_llm_v3.1")
-tokenizer.save_pretrained("python_llm_v3.1")
-huggingface_model_name = "jiayuan1/python_llm_v3"
+tokenizer.save_pretrain("python_llm_v3.1")
+model.save_pretrained_gguf("python_llm_v3.1_gguf")
 
+huggingface_model_name = "jiayuan1/python_llm_v3"
 model.push_to_hub_gguf(huggingface_model_name, tokenizer, quantization_method = "q4_k_m", token = HF)
 model.push_to_hub_gguf(huggingface_model_name, tokenizer, quantization_method = "q5_k_m", token = HF)

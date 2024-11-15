@@ -174,12 +174,14 @@ class Graph:
         from PIL import Image as PILImage
         import io
         import os
+        from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
         runnable = self.graph
-        png_data = runnable.get_graph().draw_png()
+        png_data = runnable.get_graph().draw_mermaid_png(node_colors=NodeStyles(first = "#00008b", last = "#add8e6", default = "#00008b"))
         image = PILImage.open(io.BytesIO(png_data))
         os.makedirs("./image", exist_ok=True)
-        image.save("./image/lang_chain_graph_pandas_new2.png")
-        return "./image/lang_chain_graph_pandas_new2.png"
+        image.save("./image/lang_chain_graph_pandas_final_mermaid.png")
+        return "./image/lang_chain_graph_final_mermaid.png"
+
     
     def create_graph():
         """
@@ -201,7 +203,7 @@ class Graph:
         """
         global global_graph
         df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
-        pandas_ai = Python_Ai(model='llama3.1',df=df).pandas_legend()
+        pandas_ai = Python_Ai(model='llama3.1',df=df).pandas_legend_with_skill()
         global_graph = Graph(pandas_llm=pandas_ai, df=df)
         return global_graph
     
@@ -239,7 +241,6 @@ class Graph:
     
 if __name__ == "__main__":
     df = [pd.read_csv('../../../data/Mac_2k.log_structured.csv')]
-    pandas_ai = Python_Ai(model = "llama3.1", df=df).pandas_legend()
+    pandas_ai = Python_Ai(model = "llama3.1", df=df).pandas_legend_with_skill()
     graph = Graph(pandas_llm = pandas_ai, df = df)
     graph.show()
-    #graph.run('how many rows are there')

@@ -15,7 +15,9 @@ import ast
 
 # Define constants
 graph_stage_prefix = '[STAGE]'
-FINAL_LLM = "jiayuan1/nous_llm"
+MULTI_QUESTION_AGENT_LLM = "team25_vantage/multi_question_agent"
+PANDASAI_AGENT_LLM = "team25_vantage/pandasai_agent"
+FINAL_AGENT_LLM = "team25_vantage/final_agent"
 
 def multiple_question_agent(state: list):
     """
@@ -47,7 +49,7 @@ def multiple_question_agent(state: list):
     print(graph_stage_prefix, "Multiple Question Parser")
 
     # Initialize the LLM Agent with specified model, data frame, and temperature
-    llm = Agent_Ai(model='jiayuan1/router_30', df=state['df'], temperature=0)
+    llm = Agent_Ai(model=MULTI_QUESTION_AGENT_LLM, df=state['df'], temperature=0)
 
     # Query the agent with the user's input from the state
     out = llm.query_agent(state['input'])
@@ -184,7 +186,11 @@ def python_pandas_ai(state:list):
     """
     
     print(graph_stage_prefix, 'Pandas AI agent')
-    llm = state['pandas']
+    # 1. Uncomment IF you want to use the same PandasAI instance
+    #llm = state['pandas']
+    #2. IF you want to create a new PandasAI instance
+    llm = Python_Ai(model = PANDASAI_AGENT_LLM, df = state['df'])
+    llm = llm.pandas_legend_with_skill()
     query = state['input']
     # prompt = f"""
     #     The following is the query from the user:
@@ -253,7 +259,7 @@ def final_agent(state:list):
     print(graph_stage_prefix, "Final Agent")
         
     # Initialize the LLM agent with the specified model
-    llm = Agent_Ai(model = FINAL_LLM)
+    llm = Agent_Ai(model = FINAL_AGENT_LLM)
     
     # Retrieve the user's query and all previous answers from the state
     query = state['input']

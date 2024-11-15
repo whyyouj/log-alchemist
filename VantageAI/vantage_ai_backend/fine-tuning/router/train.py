@@ -37,8 +37,8 @@ Return each categorized action in a list format, where each entry is a dictionar
 
 #instruction = "What category does this question fall under: Summary, Anomaly, General"
 input = "plot the graph of users and macbook and what is usa"
-huggingface_model_name = "unsloth/Meta-Llama-3.1-8B-bnb-4bit"
 
+#huggingface_model_name = "unsloth/Meta-Llama-3.1-8B-bnb-4bit"
 #huggingface_model_name = "meta-llama/Llama-3.1-8B-Instruct"
 huggingface_model_name = "NousResearch/Meta-Llama-3-8B-Instruct"
 
@@ -156,8 +156,7 @@ text_streamer = TextStreamer(tokenizer)
 model.generate(**inputs, streamer = text_streamer, max_new_tokens = 1000)
 model.save_pretrained("router_llm")
 tokenizer.save_pretrained("router_llm")
-#model.push_to_hub(huggingface_model_name, token = HF) 
-#tokenizer.push_to_hub(huggingface_model_name, token = HF)
-#model.save_pretrained_gguf('summary_anomaly_model', tokenizer, quantization_method = "")
+model.save_pretrained_gguf("router_llm_gguf")
 huggingface_model_name = "jiayuan1/router_llm"
 model.push_to_hub_gguf(huggingface_model_name, tokenizer, quantization_method = "q4_k_m", token = HF)
+model.push_to_hub_gguf(huggingface_model_name, tokenizer, quantization_method = "q5_k_m", token = HF)
