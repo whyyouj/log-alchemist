@@ -1,0 +1,99 @@
+{
+  "evaluation_time": "2024-10-28T15:31:55.298098",
+  "results": {
+    "Question 1": {
+      "prompt": "How many rows are there in the dataset?",
+      "model_responses": [
+        "2000"
+      ],
+      "ground_truth_value": 2000,
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 5.290130853652954
+    },
+    "Question 2": {
+      "prompt": "How many times did the event with eventid E189 occur?",
+      "model_responses": [
+        "166"
+      ],
+      "ground_truth_value": 166,
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 6.592338800430298
+    },
+    "Question 3": {
+      "prompt": "How many times did the event E189 occur?",
+      "model_responses": [
+        "0"
+      ],
+      "ground_truth_value": 166,
+      "correct_predictions": 0,
+      "total_runs": 1,
+      "accuracy": 0.0,
+      "total_time": 7.547822952270508
+    },
+    "Question 4": {
+      "prompt": "How many times did the event with component kernel occur?",
+      "model_responses": [
+        "775"
+      ],
+      "ground_truth_value": 775,
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 6.702354907989502
+    },
+    "Question 5": {
+      "prompt": "What is the most frequent eventid that occurred?",
+      "model_responses": [
+        "The most frequent event id is E189 and its EventTemplate is com.apple.<*>: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for <*> seconds.  Ignoring."
+      ],
+      "ground_truth_value": "E189",
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 9.307361841201782
+    },
+    "Question 6": {
+      "prompt": "What is the total number of errors and warnings are recorded in this log?",
+      "model_responses": [
+        "Unfortunately, I was not able to answer your question, because of the following error:\n\n'NoneType' object is not subscriptable\n"
+      ],
+      "ground_truth_value": 191,
+      "correct_predictions": 0,
+      "total_runs": 1,
+      "accuracy": 0.0,
+      "total_time": 29.93077063560486
+    },
+    "Question 7": {
+      "prompt": "What is the most frequent user?",
+      "model_responses": [
+        "The most frequent user is authorMacBook-Pro."
+      ],
+      "ground_truth_value": "authorMacBook-Pro",
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 8.105783462524414
+    },
+    "Question 8": {
+      "prompt": "How many missing values are there in Address?",
+      "model_responses": [
+        "1946"
+      ],
+      "ground_truth_value": 1946,
+      "correct_predictions": 1,
+      "total_runs": 1,
+      "accuracy": 100.0,
+      "total_time": 6.857936859130859
+    },
+    "overall": {
+      "correct_predictions": 6,
+      "total_runs": 8,
+      "accuracy": 75.0,
+      "total_time": 80.33450031280518
+    }
+  }
+}
