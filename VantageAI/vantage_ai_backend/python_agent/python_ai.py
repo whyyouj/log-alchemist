@@ -187,27 +187,33 @@ class LangchainLLM(LLM):
         """
         return f"langchain_{self.langchain_llm._llm_type}"
 
+
+
+# @skill overall_summary()
+#'''...''' will be part of the prompt given to pandas ai.
+# Generates comprehensive data summary using SweetViz.
+# Function Description:
+# Creates an interactive HTML report analyzing the DataFrame structure,s
+# relationships, and statistics using the SweetViz library. The report
+# includes correlations, distributions, and missing value analysis.
+# Input:
+# - df (pd.DataFrame): DataFrame to analyze
+# Output:
+# - tempfile_path (str): Path to generated HTML report file
+# Note:
+# - Raises Exception if report generation fails
+# - Creates temporary file that needs manual cleanup
+# - Report saved with 'vertical' layout for better readability
+
 @skill
 def overall_summary(df) -> str:
     """
-    Generates comprehensive data summary using SweetViz.
-
-    Function Description:
-    Creates an interactive HTML report analyzing the DataFrame structure,s
-    relationships, and statistics using the SweetViz library. The report
-    includes correlations, distributions, and missing value analysis.
-
-    Input:
-    - df (pd.DataFrame): DataFrame to analyze
-
-    Output:
-    - tempfile_path (str): Path to generated HTML report file
-
-    Note:
-    - Raises Exception if report generation fails
-    - Creates temporary file that needs manual cleanup
-    - Report saved with 'vertical' layout for better readability
+    Use this for any question regarding an Overall Summary
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
     """
+
     import sweetviz as sv
 
     with tempfile.NamedTemporaryFile(suffix='.html', delete=False) as f:
@@ -225,29 +231,35 @@ def overall_summary(df) -> str:
     return tempfile_path
 
 
+
+
+#@skill overall_anomaly
+#'''...''' part will be part of the prompt in pandas ai.
+# Performs comprehensive anomaly detection on DataFrame.
+# Function Description:
+# Analyzes DataFrame for various types of anomalies including:
+# 1. Missing values
+# 2. Duplicate rows
+# 3. Numerical outliers
+# 4. Timestamp patterns
+# 5. Rare categorical values
+# 6. Error patterns in text
+# Input:
+# - df (pd.DataFrame): DataFrame to analyze
+# Output:
+# - str: Path to generated PNG file containing anomaly report
+# Note:
+# - Saves visualization even if no anomalies detected
+
 @skill
 def overall_anomaly(df) -> str:
     """
-    Performs comprehensive anomaly detection on DataFrame.
-
-    Function Description:
-    Analyzes DataFrame for various types of anomalies including:
-    1. Missing values
-    2. Duplicate rows
-    3. Numerical outliers
-    4. Timestamp patterns
-    5. Rare categorical values
-    6. Error patterns in text
-
-    Input:
-    - df (pd.DataFrame): DataFrame to analyze
-
-    Output:
-    - str: Path to generated PNG file containing anomaly report
-
-    Note:
-    - Saves visualization even if no anomalies detected
+    Use this for any question regarding an Overall Anomaly
+    The output type will be a string
+    Args:
+        df pd.DataFrame: A pandas dataframe 
     """
+
     print('[INFO] Anomaly Skill called')
     import numpy as np
     from scipy import stats

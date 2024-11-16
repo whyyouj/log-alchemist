@@ -153,6 +153,6 @@ def combine_datetime_columns(df, default_year=datetime.datetime.now().year):
 
 if __name__ == '__main__':
     file_name = "Windows_2k.log_structured.csv"
-    df = pd.read_csv(f"../logs/Windows/{file_name}")
-    path = f"../logs/Test/{file_name}"
+    df = pd.read_csv(f"../../logs/Windows/{file_name}")
+    path = f"../../logs/Test/{file_name}"
     combine_datetime_columns(df).to_csv(path, index = False)
