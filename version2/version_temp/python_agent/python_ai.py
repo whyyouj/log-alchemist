@@ -255,6 +255,7 @@ def overall_anomaly(df) -> str:
     from tabulate import tabulate
     import matplotlib.pyplot as plt
     from datetime import datetime
+    from copy import deepcopy
     log_df = df
     anomalies = {}
 
@@ -320,7 +321,7 @@ def overall_anomaly(df) -> str:
                 # Select the top 3 most extreme outliers for the column
                 top_3_outliers = outliers_sorted.head(3)
                 
-                # 11. Append the top 3 outliers for this column to the list (row number, column, value, distance)
+
                 for index, row in top_3_outliers.iterrows():
                     outliers_data.append({
                         'numeric_column': column,
@@ -376,9 +377,8 @@ def overall_anomaly(df) -> str:
         interval_counts = df.resample(interval, on=column).size()
         interval_df = pd.DataFrame(interval_counts).reset_index()
         interval_df.columns = [f'Interval_{interval}', 'Count']
-        skew = interval_df['Count'].skew()
-        kurt = interval_df['Count'].kurt()
-        return (interval_df, skew, kurt, skew+ np.abs(kurt-3))
+        interval_df = interval_df.sort_values(by='Count')
+        return interval_df
 
     def timing_outliers(interval_df):
         """
@@ -406,53 +406,22 @@ def overall_anomaly(df) -> str:
         filtered_df = interval_df[(interval_df['Count'] > upper) | (interval_df['Count'] < lower)].reset_index(drop=True)
         return filtered_df
 
-    def best_timing(df, ts_col):
-        """
-        Determines optimal time interval for anomaly detection.
-
-        Function Description:
-        Tests multiple time intervals and selects the one that produces
-        the most meaningful anomaly pattern based on statistical measures.
-
-        Input:
-        - df (pd.DataFrame): Input DataFrame
-        - ts_col (str): Name of timestamp column
-
-        Output:
-        - tuple: Contains:
-            - best_interval (str): Optimal sampling interval
-            - best_df (pd.DataFrame): Outliers at optimal interval
-
-        Note:
-        - Returns ('NA', empty DataFrame) if no valid intervals found
-        - Tests intervals from 1 minute to 1 day
-        """
-        intervals = ['1min', '5min', '10min', '30min', '1H', '2H', '3H', '6H', '12H', '1D']
-        res = []
-        for i in intervals:
-            data, skew, kurt, total = timing_resampler(df, i , ts_col)
-            if len(data) == 0:
-                pass
-            res.append((i, data, skew, kurt, total))
-
-        if len(res) == 0:
-            return 'NA', pd.DataFrame()
-
-        res.sort(key=lambda x:x[-1])
-        best_interval = res[0][0]
-        best_df = timing_outliers(res[0][1])
-        return best_interval, best_df
-
+    intervals = ['5min', '1H', '1D']
     if timestamp_columns:
         for ts_col in timestamp_columns:
-            try:
-                log_df[ts_col] = pd.to_datetime(log_df[ts_col], errors='coerce')
-                interval, data = best_timing(log_df, ts_col)
-                if len(data) != 0 and interval != 'NA':
-                    data = data.sort_values(by='Count', ascending=False)
-                    anomalies[f'timestamp_freq_anomaly_{ts_col}_{interval}'] = tabulate(data, headers=data.columns, tablefmt='pretty', showindex=False)
-            except Exception as err:
-                print(err)
+            for i in intervals:
+                try:
+                    log_df[ts_col] = pd.to_datetime(log_df[ts_col], errors='coerce')
+                    log_df_resampled = timing_resampler(log_df, i, ts_col)
+                    outliers = timing_outliers(log_df_resampled)
+                    if i == '1D':
+                        print(log_df_resampled)
+                    if len(outliers) != 0:
+                        outliers = outliers.sort_values(by='Count', ascending=False)
+                        outliers = outliers.head(3)
+                        anomalies[f'timestamp_freq_anomaly_{ts_col}_{i}'] = tabulate(outliers, headers=outliers.columns, tablefmt='pretty', showindex=False)
+                except Exception as err:
+                    print(err)
                 
     print('[INFO] Anomaly Skill: timestamp checked')
 
@@ -529,7 +498,6 @@ def overall_anomaly(df) -> str:
         plt.savefig(tempfile_path, bbox_inches='tight', dpi=300)
         
     return tempfile_path
-
 
 class Python_Ai:
     """
