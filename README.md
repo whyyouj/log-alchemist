@@ -17,7 +17,15 @@ Vantage AI enables users to upload their own audit, transaction, and system logs
 - Clone this repository
 - At the root of the repository `log-alchemist`, create a virtual environment
 - Activate the virtual environment
-- Install all the required dependencies in the virtual environment by running the command: `pip install -r requirements.txt`
-- Pull the required model from Ollama: <br />`ollama pull team25_vantage/multi_question_agent`<br /> `ollama pull team25_vantage/pandasai_agent`<br /> `ollama pull team25_vantage/final_agent`
-- Navigate to the `app` directory
+- Install all the required dependencies in the virtual environment by running the command:
+  ```
+  pip install -r requirements.txt
+  ```
+- Pull the required language models from Ollama:
+  ```
+  ollama pull team25_vantage/multi_question_agent
+  ollama pull team25_vantage/pandasai_agent
+  ollama pull team25_vantage/final_agent
+  ```
+- Navigate to the `VantageAI` directory
 - Launch Vantage AI by running the command: `streamlit run app.py`
