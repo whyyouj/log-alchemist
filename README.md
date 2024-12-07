@@ -28,4 +28,7 @@ Vantage AI enables users to upload their own audit, transaction, and system logs
   ollama pull team25_vantage/final_agent
   ```
 - Navigate to the `VantageAI` directory
-- Launch Vantage AI by running the command: `streamlit run app.py`
+- Launch Vantage AI by running the command:
+  ```
+  streamlit run app.py
+  ```
